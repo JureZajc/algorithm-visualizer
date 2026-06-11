@@ -4,10 +4,16 @@ import pytest
 
 from app.algorithms.sorting import (
     bubble_sort_steps,
+    cocktail_shaker_sort_steps,
+    comb_sort_steps,
+    counting_sort_steps,
+    gnome_sort_steps,
+    heap_sort_steps,
     insertion_sort_steps,
     merge_sort_steps,
     quick_sort_steps,
     selection_sort_steps,
+    shell_sort_steps,
 )
 from app.algorithms.types import AlgorithmStep
 
@@ -20,6 +26,12 @@ SORTING_FUNCTIONS: list[SortingFunction] = [
     insertion_sort_steps,
     merge_sort_steps,
     quick_sort_steps,
+    heap_sort_steps,
+    shell_sort_steps,
+    cocktail_shaker_sort_steps,
+    gnome_sort_steps,
+    comb_sort_steps,
+    counting_sort_steps,
 ]
 
 INPUTS = [
@@ -37,6 +49,7 @@ VALID_STEP_TYPES = {
     "overwrite",
     "partition",
     "merge",
+    "heapify",
     "done",
 }
 
@@ -82,6 +95,12 @@ def test_step_arrays_are_independent_copies(sort_function: SortingFunction) -> N
             {"partition", "compare", "overwrite", "merge", "done"},
         ),
         (quick_sort_steps, {"partition", "compare", "swap", "done"}),
+        (heap_sort_steps, {"heapify", "compare", "swap", "done"}),
+        (shell_sort_steps, {"compare", "overwrite", "done"}),
+        (cocktail_shaker_sort_steps, {"compare", "swap", "done"}),
+        (gnome_sort_steps, {"compare", "swap", "done"}),
+        (comb_sort_steps, {"compare", "swap", "done"}),
+        (counting_sort_steps, {"overwrite", "done"}),
     ],
 )
 def test_algorithm_emits_expected_step_types(
