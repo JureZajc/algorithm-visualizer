@@ -17,7 +17,7 @@ interface VisualizerControlsProps {
   onCountChange: (count: number) => void;
   onSpeedChange: (speed: number) => void;
   onGenerate: (count: number) => void;
-  onStart: () => void;
+  onStart: (count: number) => void;
   onTogglePlayback: () => void;
   onReset: () => void;
 }
@@ -115,7 +115,7 @@ export function VisualizerControls({
           className="button button-primary"
           type="button"
           disabled={isPlaying || isLoading}
-          onClick={onStart}
+          onClick={() => onStart(normalizeCount())}
         >
           {isLoading ? "Loading steps..." : "Start visualization"}
         </button>

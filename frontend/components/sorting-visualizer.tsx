@@ -106,13 +106,21 @@ export function SortingVisualizer() {
     }
   }
 
-  async function handleStart() {
+  async function handleStart(numberCount: number) {
     setError(null);
     setIsLoading(true);
     clearVisualization();
 
     try {
-      const response = await fetchSortingSteps(initialNumbers, algorithm);
+      let numbersToSort = initialNumbers;
+
+      if (initialNumbers.length !== numberCount) {
+        const generatedResponse = await generateRandomNumbers(numberCount);
+        numbersToSort = generatedResponse.numbers;
+        setInitialNumbers(numbersToSort);
+      }
+
+      const response = await fetchSortingSteps(numbersToSort, algorithm);
       setSteps(response.steps);
       setCurrentStepIndex(0);
 
