@@ -91,13 +91,13 @@ export function SortingVisualizer() {
     setElapsedMs(0);
   }, []);
 
-  async function handleGenerate() {
+  async function handleGenerate(numberCount: number) {
     setError(null);
     setIsLoading(true);
     clearVisualization();
 
     try {
-      const response = await generateRandomNumbers(count);
+      const response = await generateRandomNumbers(numberCount);
       setInitialNumbers(response.numbers);
     } catch {
       setError("Could not reach the backend. Make sure FastAPI is running on port 8000.");

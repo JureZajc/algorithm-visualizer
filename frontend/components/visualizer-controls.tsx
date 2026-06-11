@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   ALGORITHM_LABELS,
   type SortingAlgorithm,
@@ -14,7 +16,7 @@ interface VisualizerControlsProps {
   onAlgorithmChange: (algorithm: SortingAlgorithm) => void;
   onCountChange: (count: number) => void;
   onSpeedChange: (speed: number) => void;
-  onGenerate: () => void;
+  onGenerate: (count: number) => void;
   onStart: () => void;
   onTogglePlayback: () => void;
   onReset: () => void;
@@ -36,6 +38,19 @@ export function VisualizerControls({
   onTogglePlayback,
   onReset,
 }: VisualizerControlsProps) {
+  const [countDraft, setCountDraft] = useState(String(count));
+
+  function normalizeCount(): number {
+    const parsedCount = Number.parseInt(countDraft, 10);
+    const normalizedCount = Number.isNaN(parsedCount)
+      ? count
+      : Math.min(50, Math.max(5, parsedCount));
+
+    setCountDraft(String(normalizedCount));
+    onCountChange(normalizedCount);
+    return normalizedCount;
+  }
+
   return (
     <section className="control-panel" aria-label="Visualization controls">
       <div className="field">
@@ -63,11 +78,10 @@ export function VisualizerControls({
           type="number"
           min={5}
           max={50}
-          value={count}
+          value={countDraft}
           disabled={isPlaying || isLoading}
-          onChange={(event) =>
-            onCountChange(Math.min(50, Math.max(5, Number(event.target.value))))
-          }
+          onBlur={normalizeCount}
+          onChange={(event) => setCountDraft(event.target.value)}
         />
       </div>
 
@@ -93,7 +107,7 @@ export function VisualizerControls({
           className="button button-secondary"
           type="button"
           disabled={isPlaying || isLoading}
-          onClick={onGenerate}
+          onClick={() => onGenerate(normalizeCount())}
         >
           Generate numbers
         </button>
