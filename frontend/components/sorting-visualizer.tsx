@@ -91,13 +91,13 @@ export function SortingVisualizer() {
     setElapsedMs(0);
   }, []);
 
-  async function handleGenerate() {
+  async function handleGenerate(numberCount: number) {
     setError(null);
     setIsLoading(true);
     clearVisualization();
 
     try {
-      const response = await generateRandomNumbers(count);
+      const response = await generateRandomNumbers(numberCount);
       setInitialNumbers(response.numbers);
     } catch {
       setError("Could not reach the backend. Make sure FastAPI is running on port 8000.");
@@ -106,13 +106,21 @@ export function SortingVisualizer() {
     }
   }
 
-  async function handleStart() {
+  async function handleStart(numberCount: number) {
     setError(null);
     setIsLoading(true);
     clearVisualization();
 
     try {
-      const response = await fetchSortingSteps(initialNumbers, algorithm);
+      let numbersToSort = initialNumbers;
+
+      if (initialNumbers.length !== numberCount) {
+        const generatedResponse = await generateRandomNumbers(numberCount);
+        numbersToSort = generatedResponse.numbers;
+        setInitialNumbers(numbersToSort);
+      }
+
+      const response = await fetchSortingSteps(numbersToSort, algorithm);
       setSteps(response.steps);
       setCurrentStepIndex(0);
 
