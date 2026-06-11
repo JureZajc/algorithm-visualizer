@@ -315,6 +315,7 @@ h1 {
 .bar-swap { background: var(--swap); }
 .bar-overwrite { background: var(--overwrite); }
 .bar-partition { background: #0ea5e9; }
+.bar-heapify { background: #ec4899; }
 .bar-merge,
 .bar-done { background: var(--complete); }
 
