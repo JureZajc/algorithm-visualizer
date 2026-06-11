@@ -7,6 +7,9 @@ StepType = Literal[
     "overwrite",
     "partition",
     "merge",
+    "heapify",
+    "found",
+    "not_found",
     "done",
 ]
 
@@ -16,6 +19,17 @@ SortingAlgorithm = Literal[
     "insertion_sort",
     "merge_sort",
     "quick_sort",
+    "heap_sort",
+    "shell_sort",
+    "cocktail_shaker_sort",
+    "gnome_sort",
+    "comb_sort",
+    "counting_sort",
+]
+
+SearchingAlgorithm = Literal[
+    "linear_search",
+    "binary_search",
 ]
 
 

@@ -1,10 +1,16 @@
 from collections.abc import Callable
 
 from app.algorithms.sorting.bubble_sort import bubble_sort_steps
+from app.algorithms.sorting.cocktail_shaker_sort import cocktail_shaker_sort_steps
+from app.algorithms.sorting.comb_sort import comb_sort_steps
+from app.algorithms.sorting.counting_sort import counting_sort_steps
+from app.algorithms.sorting.gnome_sort import gnome_sort_steps
+from app.algorithms.sorting.heap_sort import heap_sort_steps
 from app.algorithms.sorting.insertion_sort import insertion_sort_steps
 from app.algorithms.sorting.merge_sort import merge_sort_steps
 from app.algorithms.sorting.quick_sort import quick_sort_steps
 from app.algorithms.sorting.selection_sort import selection_sort_steps
+from app.algorithms.sorting.shell_sort import shell_sort_steps
 from app.algorithms.types import AlgorithmStep, SortingAlgorithm
 
 
@@ -16,13 +22,43 @@ SORTING_ALGORITHMS: dict[SortingAlgorithm, SortingFunction] = {
     "insertion_sort": insertion_sort_steps,
     "merge_sort": merge_sort_steps,
     "quick_sort": quick_sort_steps,
+    "heap_sort": heap_sort_steps,
+    "shell_sort": shell_sort_steps,
+    "cocktail_shaker_sort": cocktail_shaker_sort_steps,
+    "gnome_sort": gnome_sort_steps,
+    "comb_sort": comb_sort_steps,
+    "counting_sort": counting_sort_steps,
 }
+
+SORTING_ALGORITHM_METADATA = [
+    {"id": algorithm_id, "label": label}
+    for algorithm_id, label in [
+        ("bubble_sort", "Bubble Sort"),
+        ("selection_sort", "Selection Sort"),
+        ("insertion_sort", "Insertion Sort"),
+        ("merge_sort", "Merge Sort"),
+        ("quick_sort", "Quick Sort"),
+        ("heap_sort", "Heap Sort"),
+        ("shell_sort", "Shell Sort"),
+        ("cocktail_shaker_sort", "Cocktail Shaker Sort"),
+        ("gnome_sort", "Gnome Sort"),
+        ("comb_sort", "Comb Sort"),
+        ("counting_sort", "Counting Sort"),
+    ]
+]
 
 __all__ = [
     "SORTING_ALGORITHMS",
+    "SORTING_ALGORITHM_METADATA",
     "bubble_sort_steps",
+    "cocktail_shaker_sort_steps",
+    "comb_sort_steps",
+    "counting_sort_steps",
+    "gnome_sort_steps",
+    "heap_sort_steps",
     "insertion_sort_steps",
     "merge_sort_steps",
     "quick_sort_steps",
     "selection_sort_steps",
+    "shell_sort_steps",
 ]
