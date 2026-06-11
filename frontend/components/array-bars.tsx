@@ -11,6 +11,7 @@ const ACTIVE_CLASS: Record<StepType, string> = {
   overwrite: "bar-overwrite",
   partition: "bar-partition",
   merge: "bar-merge",
+  heapify: "bar-heapify",
   done: "bar-done",
 };
 
