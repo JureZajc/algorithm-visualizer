@@ -38,6 +38,22 @@ EXPECTED_ALGORITHMS = {
         {"id": "linear_search", "label": "Linear Search"},
         {"id": "binary_search", "label": "Binary Search"},
     ],
+    "graph": [
+        {"id": "bfs", "label": "Breadth-First Search"},
+        {"id": "dfs", "label": "Depth-First Search"},
+        {"id": "dijkstra", "label": "Dijkstra's Algorithm"},
+    ],
+}
+
+GRAPH_REQUEST = {
+    "nodes": ["A", "B", "C", "D"],
+    "edges": [
+        {"source": "A", "target": "B", "weight": 1},
+        {"source": "A", "target": "C", "weight": 4},
+        {"source": "B", "target": "D", "weight": 2},
+    ],
+    "start": "A",
+    "target": "D",
 }
 
 
@@ -135,4 +151,93 @@ def test_binary_search_endpoint_rejects_unsorted_input() -> None:
     assert response.status_code == 422
     assert response.json() == {
         "detail": "Binary search requires numbers sorted in ascending order."
+    }
+
+
+@pytest.mark.parametrize("algorithm", ["bfs", "dfs", "dijkstra"])
+def test_graph_steps_endpoint(algorithm: str) -> None:
+    request = {**GRAPH_REQUEST, "algorithm": algorithm}
+
+    response = client.post("/graph/steps", json=request)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == algorithm
+    assert body["nodes"] == request["nodes"]
+    assert body["edges"] == request["edges"]
+    assert body["start"] == request["start"]
+    assert body["target"] == request["target"]
+    assert body["directed"] is False
+    assert body["steps"][-2]["type"] == "path_found"
+    assert body["steps"][-1]["type"] == "done"
+    assert body["step_count"] == len(body["steps"])
+
+
+def test_graph_steps_endpoint_supports_default_edge_weight() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={
+            "nodes": ["A", "B"],
+            "edges": [{"source": "A", "target": "B"}],
+            "start": "A",
+            "target": "B",
+            "algorithm": "bfs",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["edges"] == [
+        {"source": "A", "target": "B", "weight": 1}
+    ]
+
+
+def test_graph_steps_endpoint_rejects_unsupported_algorithm() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={**GRAPH_REQUEST, "algorithm": "bellman_ford"},
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {**GRAPH_REQUEST, "nodes": ["A", "A", "C", "D"]},
+        {**GRAPH_REQUEST, "start": "missing"},
+        {**GRAPH_REQUEST, "target": "missing"},
+        {
+            **GRAPH_REQUEST,
+            "edges": [{"source": "missing", "target": "A", "weight": 1}],
+        },
+        {
+            **GRAPH_REQUEST,
+            "edges": [{"source": "A", "target": "missing", "weight": 1}],
+        },
+    ],
+)
+def test_graph_steps_endpoint_rejects_invalid_graph(
+    payload: dict[str, object],
+) -> None:
+    response = client.post(
+        "/graph/steps",
+        json={**payload, "algorithm": "bfs"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_dijkstra_endpoint_rejects_negative_weights() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={
+            **GRAPH_REQUEST,
+            "algorithm": "dijkstra",
+            "edges": [{"source": "A", "target": "D", "weight": -1}],
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": "Dijkstra's algorithm requires non-negative weights."
     }
