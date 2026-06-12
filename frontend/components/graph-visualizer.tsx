@@ -3,11 +3,13 @@
 import { useState } from "react";
 
 import { GraphCanvas } from "@/components/graph-canvas";
+import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { ErrorMessage } from "@/components/sorting-visualizer";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchGraphSteps } from "@/lib/api";
 import { createAdmissibleHeuristics, GRAPH_PRESETS } from "@/lib/graph-presets";
+import type { MetadataSourceProps } from "@/types/algorithm";
 import { GRAPH_ALGORITHM_LABELS, type GraphAlgorithm, type GraphEdge, type GraphStep } from "@/types/graph";
 
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
@@ -31,7 +33,7 @@ function formatEdges(edges: GraphEdge[]) {
     : "None";
 }
 
-export function GraphVisualizer() {
+export function GraphVisualizer(props: MetadataSourceProps) {
   const [presetId, setPresetId] = useState(GRAPH_PRESETS[0].id);
   const preset = GRAPH_PRESETS.find((item) => item.id === presetId) ?? GRAPH_PRESETS[0];
   const [algorithm, setAlgorithm] = useState<GraphAlgorithm>("bfs");
@@ -162,6 +164,8 @@ export function GraphVisualizer() {
           <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={isLoading} onClick={playback.reset}>Reset</button>
         </div>
       </section>
+
+      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
       {error ? <ErrorMessage message={error} /> : null}
 

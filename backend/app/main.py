@@ -4,14 +4,19 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, model_validator
 
-from app.algorithms.graph import GRAPH_ALGORITHM_METADATA, graph_algorithm_steps
+from app.algorithms.graph import graph_algorithm_steps
 from app.algorithms.graph.types import GraphAlgorithm, GraphEdge, GraphStep
 from app.algorithms.graph.utils import validate_graph
-from app.algorithms.searching import (
+from app.algorithms.metadata import (
+    AlgorithmsResponse,
+    GRAPH_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
+    SORTING_ALGORITHM_METADATA,
+)
+from app.algorithms.searching import (
     SEARCHING_ALGORITHMS,
 )
-from app.algorithms.sorting import SORTING_ALGORITHM_METADATA, SORTING_ALGORITHMS
+from app.algorithms.sorting import SORTING_ALGORITHMS
 from app.algorithms.types import (
     AlgorithmStep,
     SearchingAlgorithm,
@@ -112,17 +117,6 @@ class GraphResponse(BaseModel):
     step_count: int
 
 
-class AlgorithmMetadata(BaseModel):
-    id: str
-    label: str
-
-
-class AlgorithmsResponse(BaseModel):
-    sorting: list[AlgorithmMetadata]
-    searching: list[AlgorithmMetadata]
-    graph: list[AlgorithmMetadata]
-
-
 @app.get("/")
 def root() -> dict[str, str]:
     return {"message": "Algorithm Visualizer API is running"}
@@ -131,11 +125,9 @@ def root() -> dict[str, str]:
 @app.get("/algorithms", response_model=AlgorithmsResponse)
 def algorithms() -> AlgorithmsResponse:
     return AlgorithmsResponse(
-        sorting=[AlgorithmMetadata(**item) for item in SORTING_ALGORITHM_METADATA],
-        searching=[
-            AlgorithmMetadata(**item) for item in SEARCHING_ALGORITHM_METADATA
-        ],
-        graph=[AlgorithmMetadata(**item) for item in GRAPH_ALGORITHM_METADATA],
+        sorting=SORTING_ALGORITHM_METADATA,
+        searching=SEARCHING_ALGORITHM_METADATA,
+        graph=GRAPH_ALGORITHM_METADATA,
     )
 
 

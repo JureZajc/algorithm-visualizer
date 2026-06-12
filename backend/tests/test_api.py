@@ -20,32 +20,17 @@ SUPPORTED_ALGORITHMS = [
     "counting_sort",
 ]
 
-EXPECTED_ALGORITHMS = {
-    "sorting": [
-        {"id": "bubble_sort", "label": "Bubble Sort"},
-        {"id": "selection_sort", "label": "Selection Sort"},
-        {"id": "insertion_sort", "label": "Insertion Sort"},
-        {"id": "merge_sort", "label": "Merge Sort"},
-        {"id": "quick_sort", "label": "Quick Sort"},
-        {"id": "heap_sort", "label": "Heap Sort"},
-        {"id": "shell_sort", "label": "Shell Sort"},
-        {"id": "cocktail_shaker_sort", "label": "Cocktail Shaker Sort"},
-        {"id": "gnome_sort", "label": "Gnome Sort"},
-        {"id": "comb_sort", "label": "Comb Sort"},
-        {"id": "counting_sort", "label": "Counting Sort"},
-    ],
-    "searching": [
-        {"id": "linear_search", "label": "Linear Search"},
-        {"id": "binary_search", "label": "Binary Search"},
-    ],
+EXPECTED_ALGORITHM_IDS = {
+    "sorting": SUPPORTED_ALGORITHMS,
+    "searching": ["linear_search", "binary_search"],
     "graph": [
-        {"id": "bfs", "label": "Breadth-First Search"},
-        {"id": "dfs", "label": "Depth-First Search"},
-        {"id": "dijkstra", "label": "Dijkstra's Algorithm"},
-        {"id": "a_star", "label": "A* Search"},
-        {"id": "topological_sort", "label": "Topological Sort"},
-        {"id": "kruskal", "label": "Kruskal's Minimum Spanning Tree"},
-        {"id": "prim", "label": "Prim's Minimum Spanning Tree"},
+        "bfs",
+        "dfs",
+        "dijkstra",
+        "a_star",
+        "topological_sort",
+        "kruskal",
+        "prim",
     ],
 }
 
@@ -71,7 +56,31 @@ def test_algorithms_endpoint() -> None:
     response = client.get("/algorithms")
 
     assert response.status_code == 200
-    assert response.json() == EXPECTED_ALGORITHMS
+    body = response.json()
+    assert {
+        category: [item["id"] for item in items]
+        for category, items in body.items()
+    } == EXPECTED_ALGORITHM_IDS
+
+    required_fields = {
+        "id",
+        "label",
+        "name",
+        "category",
+        "description",
+        "time_complexity",
+        "space_complexity",
+        "notes",
+    }
+    for category, items in body.items():
+        for item in items:
+            assert set(item) == required_fields
+            assert item["category"] == category
+            assert item["label"] == item["name"]
+            assert set(item["time_complexity"]) == {"best", "average", "worst"}
+            assert item["description"]
+            assert item["space_complexity"]
+            assert item["notes"]
 
 
 @pytest.mark.parametrize("algorithm", SUPPORTED_ALGORITHMS)

@@ -51,11 +51,35 @@ the animation.
 
 The backend exposes these main routes:
 
-- `GET /algorithms` lists supported sorting, searching, and graph algorithms.
+- `GET /algorithms` lists supported sorting, searching, and graph algorithms with
+  descriptions, complexity bounds, and notes or limitations.
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
 - `POST /graph/steps` generates graph algorithm visualization steps.
+
+Each item returned by `GET /algorithms` has this shape:
+
+```json
+{
+  "id": "bubble_sort",
+  "label": "Bubble Sort",
+  "name": "Bubble Sort",
+  "category": "sorting",
+  "description": "Repeatedly compares neighboring values and swaps pairs that are out of order.",
+  "time_complexity": {
+    "best": "O(n)",
+    "average": "O(n²)",
+    "worst": "O(n²)"
+  },
+  "space_complexity": "O(1)",
+  "notes": ["Stable and in-place."]
+}
+```
+
+`label` is retained as a compatibility alias for `name`. Complexity values
+describe the algorithms themselves and do not include the extra snapshots kept
+for step-by-step animation.
 
 Sorting request example:
 
