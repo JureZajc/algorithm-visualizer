@@ -22,7 +22,7 @@ export function AlgorithmVisualizer() {
         <div>
           <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-indigo-600">Open source learning tool</p>
           <h1 className="mb-3 text-[clamp(2.25rem,6vw,4.5rem)] font-black leading-[0.92] tracking-[-0.06em] text-slate-950">Algorithm<br className="hidden sm:block" /> Visualizer</h1>
-          <p className="m-0 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">See how data structures change at every step, from array operations to weighted shortest paths.</p>
+          <p className="m-0 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">See how data structures change at every step, from array operations to graph traversal, shortest paths, ordering, and spanning trees.</p>
         </div>
         <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
           <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.14)]" />

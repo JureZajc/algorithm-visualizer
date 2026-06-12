@@ -107,7 +107,13 @@ export function ErrorMessage({ message }: { message: string }) {
 }
 
 export function VisualizerHeading({ title, description, legend }: { title: string; description: string; legend: string[] }) {
-  const colors = ["bg-amber-400", "bg-rose-500", "bg-violet-500", "bg-sky-500", "bg-emerald-500"];
+  const legendClasses: Record<string, string> = {
+    Compare: "bg-amber-400",
+    Swap: "bg-rose-500",
+    Overwrite: "bg-violet-500",
+    Inspect: "bg-sky-500",
+    Found: "bg-emerald-500",
+  };
   return (
     <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
       <div>
@@ -115,9 +121,9 @@ export function VisualizerHeading({ title, description, legend }: { title: strin
         <p className="m-0 min-h-5 text-sm leading-6 text-slate-500" aria-live="polite">{description}</p>
       </div>
       <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-500">
-        {legend.map((item, index) => (
+        {legend.map((item) => (
           <span className="inline-flex items-center gap-1.5" key={item}>
-            <span className={`h-2.5 w-2.5 rounded-sm ${colors[index]}`} />{item}
+            <span className={`h-2.5 w-2.5 rounded-sm ${legendClasses[item] ?? "bg-slate-400"}`} />{item}
           </span>
         ))}
       </div>

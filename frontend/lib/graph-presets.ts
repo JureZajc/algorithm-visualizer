@@ -52,6 +52,32 @@ export const GRAPH_PRESETS: GraphPreset[] = [
     defaultTarget: "G",
   },
   {
+    id: "build-pipeline",
+    label: "Build Pipeline (DAG)",
+    description: "A directed acyclic graph designed for topological sorting.",
+    nodes: [
+      { id: "A", x: 75, y: 205 },
+      { id: "B", x: 205, y: 85 },
+      { id: "C", x: 205, y: 325 },
+      { id: "D", x: 365, y: 85 },
+      { id: "E", x: 365, y: 325 },
+      { id: "F", x: 500, y: 205 },
+      { id: "G", x: 600, y: 205 },
+    ],
+    edges: [
+      { source: "A", target: "B", weight: 2 },
+      { source: "A", target: "C", weight: 3 },
+      { source: "B", target: "D", weight: 2 },
+      { source: "B", target: "E", weight: 4 },
+      { source: "C", target: "E", weight: 2 },
+      { source: "D", target: "F", weight: 3 },
+      { source: "E", target: "F", weight: 1 },
+      { source: "F", target: "G", weight: 2 },
+    ],
+    defaultStart: "A",
+    defaultTarget: "G",
+  },
+  {
     id: "islands",
     label: "Disconnected Islands",
     description: "Two components for demonstrating the no-path outcome.",
@@ -75,3 +101,28 @@ export const GRAPH_PRESETS: GraphPreset[] = [
     defaultTarget: "F",
   },
 ];
+
+export function createAdmissibleHeuristics(
+  preset: GraphPreset,
+  targetId: string,
+): Record<string, number> {
+  const positions = new Map(preset.nodes.map((node) => [node.id, node]));
+  const target = positions.get(targetId);
+  if (!target) return {};
+
+  const ratios = preset.edges.flatMap((edge) => {
+    const source = positions.get(edge.source);
+    const edgeTarget = positions.get(edge.target);
+    if (!source || !edgeTarget) return [];
+    const length = Math.hypot(source.x - edgeTarget.x, source.y - edgeTarget.y);
+    return length > 0 ? [edge.weight / length] : [];
+  });
+  const scale = ratios.length > 0 ? Math.min(...ratios) : 0;
+
+  return Object.fromEntries(
+    preset.nodes.map((node) => [
+      node.id,
+      Math.floor(Math.hypot(node.x - target.x, node.y - target.y) * scale * 100) / 100,
+    ]),
+  );
+}
