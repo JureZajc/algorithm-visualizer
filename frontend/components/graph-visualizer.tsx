@@ -12,6 +12,14 @@ import { GRAPH_ALGORITHM_LABELS, type GraphAlgorithm, type GraphStep } from "@/t
 
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:opacity-60";
 const buttonClass = "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
+const LEGEND_CLASSES = {
+  current: "bg-amber-400",
+  visited: "bg-sky-500",
+  frontier: "bg-violet-500",
+  path: "bg-emerald-500",
+} as const;
+
+type LegendVariant = keyof typeof LEGEND_CLASSES;
 
 export function GraphVisualizer() {
   const [presetId, setPresetId] = useState(GRAPH_PRESETS[0].id);
@@ -116,7 +124,7 @@ export function GraphVisualizer() {
               <p className="m-0 text-sm leading-6 text-slate-500" aria-live="polite">{playback.currentStep?.description ?? preset.description}</p>
             </div>
             <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-500">
-              <Legend color="bg-amber-400" label="Current" /><Legend color="bg-sky-500" label="Visited" /><Legend color="bg-violet-500" label="Frontier" /><Legend color="bg-emerald-500" label="Path" />
+              <Legend variant="current" label="Current" /><Legend variant="visited" label="Visited" /><Legend variant="frontier" label="Frontier" /><Legend variant="path" label="Path" />
             </div>
           </div>
           <GraphCanvas nodes={preset.nodes} edges={preset.edges} start={start} target={target} directed={directed} step={playback.currentStep} />
@@ -131,6 +139,6 @@ export function GraphVisualizer() {
   );
 }
 
-function Legend({ color, label }: { color: string; label: string }) {
-  return <span className="inline-flex items-center gap-1.5"><span className={`h-2.5 w-2.5 rounded-full ${color}`} />{label}</span>;
+function Legend({ variant, label }: { variant: LegendVariant; label: string }) {
+  return <span className="inline-flex items-center gap-1.5"><span className={`h-2.5 w-2.5 rounded-full ${LEGEND_CLASSES[variant]}`} />{label}</span>;
 }

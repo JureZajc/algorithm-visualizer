@@ -31,6 +31,9 @@ export function ArrayBars({ values, step }: ArrayBarsProps) {
         const isActive = highlightAll || activeIndices.has(index);
         const height = 8 + (Math.abs(value) / largestValue) * 82;
         const activeClass = isActive && step ? ACTIVE_CLASS[step.type] : "";
+        const barClass = isActive
+          ? `-translate-y-1 shadow-lg ${activeClass}`
+          : "bg-indigo-500";
 
         return (
           <div
@@ -41,7 +44,7 @@ export function ArrayBars({ values, step }: ArrayBarsProps) {
               {value}
             </span>
             <div
-              className={`min-h-1.5 w-full max-w-11 rounded-t-lg bg-indigo-500 shadow-inner transition-all duration-150 ${isActive ? `-translate-y-1 shadow-lg ${activeClass}` : ""}`}
+              className={`min-h-1.5 w-full max-w-11 rounded-t-lg shadow-inner transition-all duration-150 ${barClass}`}
               style={{ height: `${height}%` }}
               title={`Index ${index}: ${value}`}
             />
