@@ -1,5 +1,5 @@
-import { SortingVisualizer } from "@/components/sorting-visualizer";
+import { AlgorithmVisualizer } from "@/components/algorithm-visualizer";
 
 export default function Home() {
-  return <SortingVisualizer />;
+  return <AlgorithmVisualizer />;
 }

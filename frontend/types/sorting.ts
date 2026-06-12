@@ -1,11 +1,6 @@
-export type StepType =
-  | "compare"
-  | "swap"
-  | "overwrite"
-  | "partition"
-  | "merge"
-  | "heapify"
-  | "done";
+import type { ArrayAlgorithmStep, ArrayStepType } from "@/types/algorithm";
+
+export type StepType = ArrayStepType;
 
 export type SortingAlgorithm =
   | "bubble_sort"
@@ -20,12 +15,7 @@ export type SortingAlgorithm =
   | "comb_sort"
   | "counting_sort";
 
-export interface AlgorithmStep {
-  type: StepType;
-  indices: number[];
-  array: number[];
-  description: string;
-}
+export type AlgorithmStep = ArrayAlgorithmStep;
 
 export interface SortingStepsResponse {
   algorithm: SortingAlgorithm;

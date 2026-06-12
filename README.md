@@ -28,14 +28,27 @@ Next.js frontend.
 Binary search requires its input array to already be sorted in ascending
 order. The API returns HTTP 422 for unsorted input.
 
+### Graph / Pathfinding
+
+- Breadth-First Search (BFS)
+- Depth-First Search (DFS)
+- Dijkstra's Algorithm
+
+The frontend includes curated weighted graph presets, start and target node
+selection, optional directed edges, and an SVG animation of the current node,
+visited nodes, frontier, inspected edge, and final path. Dijkstra also displays
+the current distance table. A* is not shown because it is not currently
+supported by the backend API.
+
 ## API
 
 The backend exposes these main routes:
 
-- `GET /algorithms` lists supported sorting and searching algorithms.
+- `GET /algorithms` lists supported sorting, searching, and graph algorithms.
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
+- `POST /graph/steps` generates graph traversal and shortest-path steps.
 
 Sorting request example:
 
@@ -53,6 +66,23 @@ Searching request example:
   "numbers": [1, 3, 5, 7, 9],
   "algorithm": "binary_search",
   "target": 7
+}
+```
+
+Graph request example:
+
+```json
+{
+  "nodes": ["A", "B", "C", "D"],
+  "edges": [
+    { "source": "A", "target": "B", "weight": 2 },
+    { "source": "B", "target": "D", "weight": 3 },
+    { "source": "A", "target": "C", "weight": 1 }
+  ],
+  "start": "A",
+  "target": "D",
+  "algorithm": "dijkstra",
+  "directed": false
 }
 ```
 
@@ -87,9 +117,21 @@ uv run ruff check .
 
 ```bash
 cd /home/jure/projekti/algorithm-visualizer/frontend
+source /home/jure/.nvm/nvm.sh
+nvm use 24.16.0
 npm install
 npm run dev
 ```
 
 The frontend is available at `http://localhost:3000` and expects the backend
 on port 8000 by default.
+
+Run frontend checks with:
+
+```bash
+cd /home/jure/projekti/algorithm-visualizer/frontend
+source /home/jure/.nvm/nvm.sh
+nvm use 24.16.0
+npm run lint
+npm run build
+```
