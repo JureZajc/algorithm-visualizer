@@ -1,7 +1,15 @@
 from typing import Literal, TypedDict
 
 
-GraphAlgorithm = Literal["bfs", "dfs", "dijkstra"]
+GraphAlgorithm = Literal[
+    "bfs",
+    "dfs",
+    "dijkstra",
+    "a_star",
+    "topological_sort",
+    "kruskal",
+    "prim",
+]
 
 GraphStepType = Literal[
     "visit",
@@ -13,6 +21,11 @@ GraphStepType = Literal[
     "relax",
     "path_found",
     "not_found",
+    "cycle_detected",
+    "accept_edge",
+    "reject_edge",
+    "add_to_result",
+    "update_frontier",
     "done",
 ]
 
@@ -37,6 +50,10 @@ class GraphStep(TypedDict):
     distances: dict[str, int | float] | None
     previous: dict[str, str | None] | None
     path: list[str]
+    result: list[str]
+    frontier_edges: list[GraphEdge]
+    mst_edges: list[GraphEdge]
+    total_weight: int | float | None
     description: str
 
 
@@ -52,6 +69,10 @@ def create_graph_step(
     previous: dict[str, str | None] | None,
     path: list[str],
     description: str,
+    result: list[str] | None = None,
+    frontier_edges: list[GraphEdge] | None = None,
+    mst_edges: list[GraphEdge] | None = None,
+    total_weight: int | float | None = None,
 ) -> GraphStep:
     """Create a graph step with independent copies of mutable values."""
 
@@ -65,5 +86,11 @@ def create_graph_step(
         "distances": distances.copy() if distances is not None else None,
         "previous": previous.copy() if previous is not None else None,
         "path": path.copy(),
+        "result": result.copy() if result is not None else [],
+        "frontier_edges": [
+            frontier_edge.copy() for frontier_edge in (frontier_edges or [])
+        ],
+        "mst_edges": [mst_edge.copy() for mst_edge in (mst_edges or [])],
+        "total_weight": total_weight,
         "description": description,
     }

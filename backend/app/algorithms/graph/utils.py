@@ -4,20 +4,14 @@ from app.algorithms.graph.types import GraphEdge
 AdjacencyList = dict[str, list[GraphEdge]]
 
 
-def validate_graph(
+def validate_graph_structure(
     nodes: list[str],
     edges: list[GraphEdge],
-    start: str,
-    target: str,
 ) -> None:
-    """Validate graph references shared by all graph algorithms."""
+    """Validate graph nodes and edge references."""
 
     if len(nodes) != len(set(nodes)):
         raise ValueError("Graph nodes must be unique.")
-    if start not in nodes:
-        raise ValueError(f"Start node {start!r} is not in the graph.")
-    if target not in nodes:
-        raise ValueError(f"Target node {target!r} is not in the graph.")
 
     node_set = set(nodes)
     for edge in edges:
@@ -29,6 +23,21 @@ def validate_graph(
             raise ValueError(
                 f"Edge target {edge['target']!r} is not in the graph."
             )
+
+
+def validate_graph(
+    nodes: list[str],
+    edges: list[GraphEdge],
+    start: str,
+    target: str,
+) -> None:
+    """Validate a graph used by a start-to-target algorithm."""
+
+    validate_graph_structure(nodes, edges)
+    if start not in nodes:
+        raise ValueError(f"Start node {start!r} is not in the graph.")
+    if target not in nodes:
+        raise ValueError(f"Target node {target!r} is not in the graph.")
 
 
 def build_adjacency_list(

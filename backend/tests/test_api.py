@@ -42,6 +42,10 @@ EXPECTED_ALGORITHMS = {
         {"id": "bfs", "label": "Breadth-First Search"},
         {"id": "dfs", "label": "Depth-First Search"},
         {"id": "dijkstra", "label": "Dijkstra's Algorithm"},
+        {"id": "a_star", "label": "A* Search"},
+        {"id": "topological_sort", "label": "Topological Sort"},
+        {"id": "kruskal", "label": "Kruskal's Minimum Spanning Tree"},
+        {"id": "prim", "label": "Prim's Minimum Spanning Tree"},
     ],
 }
 
@@ -241,3 +245,162 @@ def test_dijkstra_endpoint_rejects_negative_weights() -> None:
     assert response.json() == {
         "detail": "Dijkstra's algorithm requires non-negative weights."
     }
+
+
+def test_a_star_steps_endpoint() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={
+            **GRAPH_REQUEST,
+            "algorithm": "a_star",
+            "heuristics": {"A": 2, "B": 1, "C": 4, "D": 0},
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == "a_star"
+    assert body["heuristics"] == {"A": 2, "B": 1, "C": 4, "D": 0}
+    assert body["steps"][-2]["type"] == "path_found"
+    assert body["steps"][-1]["type"] == "done"
+    assert body["steps"][-1]["distances"]["D"] == 3
+
+
+def test_a_star_endpoint_uses_zero_heuristic_when_omitted() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={**GRAPH_REQUEST, "algorithm": "a_star"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["heuristics"] is None
+    assert response.json()["steps"][-1]["distances"]["D"] == 3
+
+
+def test_a_star_endpoint_rejects_negative_weights() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={
+            **GRAPH_REQUEST,
+            "algorithm": "a_star",
+            "edges": [{"source": "A", "target": "D", "weight": -1}],
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": "A* search requires non-negative weights."
+    }
+
+
+@pytest.mark.parametrize(
+    "heuristics",
+    [
+        {"missing": 1},
+        {"A": -1},
+    ],
+)
+def test_graph_endpoint_rejects_invalid_heuristics(
+    heuristics: dict[str, int],
+) -> None:
+    response = client.post(
+        "/graph/steps",
+        json={
+            **GRAPH_REQUEST,
+            "algorithm": "a_star",
+            "heuristics": heuristics,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+TOPOLOGICAL_REQUEST = {
+    "nodes": ["A", "B", "C", "D"],
+    "edges": [
+        {"source": "A", "target": "B", "weight": 1},
+        {"source": "A", "target": "C", "weight": 1},
+        {"source": "B", "target": "D", "weight": 1},
+        {"source": "C", "target": "D", "weight": 1},
+    ],
+    "start": "A",
+    "target": "D",
+    "algorithm": "topological_sort",
+    "directed": True,
+}
+
+
+def test_topological_sort_steps_endpoint() -> None:
+    response = client.post("/graph/steps", json=TOPOLOGICAL_REQUEST)
+
+    assert response.status_code == 200
+    body = response.json()
+    positions = {
+        node: index for index, node in enumerate(body["steps"][-1]["result"])
+    }
+    assert all(
+        positions[edge["source"]] < positions[edge["target"]]
+        for edge in TOPOLOGICAL_REQUEST["edges"]
+    )
+    assert body["steps"][-1]["type"] == "done"
+
+
+def test_topological_sort_endpoint_detects_cycle() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={
+            **TOPOLOGICAL_REQUEST,
+            "nodes": ["A", "B", "C"],
+            "edges": [
+                {"source": "A", "target": "B", "weight": 1},
+                {"source": "B", "target": "C", "weight": 1},
+                {"source": "C", "target": "A", "weight": 1},
+            ],
+            "target": "C",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["steps"][-2]["type"] == "cycle_detected"
+    assert response.json()["steps"][-1]["type"] == "done"
+
+
+def test_topological_sort_endpoint_rejects_undirected_graph() -> None:
+    response = client.post(
+        "/graph/steps",
+        json={**TOPOLOGICAL_REQUEST, "directed": False},
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": "Topological sort requires a directed graph."
+    }
+
+
+MST_REQUEST = {
+    "nodes": ["A", "B", "C", "D"],
+    "edges": [
+        {"source": "A", "target": "B", "weight": 1},
+        {"source": "A", "target": "C", "weight": 4},
+        {"source": "B", "target": "C", "weight": 2},
+        {"source": "B", "target": "D", "weight": 5},
+        {"source": "C", "target": "D", "weight": 3},
+    ],
+    "start": "A",
+    "target": "D",
+}
+
+
+@pytest.mark.parametrize("algorithm", ["kruskal", "prim"])
+def test_mst_steps_endpoint(algorithm: str) -> None:
+    response = client.post(
+        "/graph/steps",
+        json={**MST_REQUEST, "algorithm": algorithm, "directed": True},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == algorithm
+    assert body["steps"][-1]["type"] == "done"
+    assert body["steps"][-1]["total_weight"] == 6
+    assert len(body["steps"][-1]["mst_edges"]) == 3
