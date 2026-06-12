@@ -1,4 +1,11 @@
-export type GraphAlgorithm = "bfs" | "dfs" | "dijkstra";
+export type GraphAlgorithm =
+  | "bfs"
+  | "dfs"
+  | "dijkstra"
+  | "a_star"
+  | "topological_sort"
+  | "kruskal"
+  | "prim";
 
 export type GraphStepType =
   | "visit"
@@ -10,6 +17,11 @@ export type GraphStepType =
   | "relax"
   | "path_found"
   | "not_found"
+  | "cycle_detected"
+  | "accept_edge"
+  | "reject_edge"
+  | "add_to_result"
+  | "update_frontier"
   | "done";
 
 export interface GraphEdge {
@@ -28,6 +40,10 @@ export interface GraphStep {
   distances: Record<string, number> | null;
   previous: Record<string, string | null> | null;
   path: string[];
+  result: string[];
+  frontier_edges: GraphEdge[];
+  mst_edges: GraphEdge[];
+  total_weight: number | null;
   description: string;
 }
 
@@ -38,9 +54,11 @@ export interface GraphRequest {
   target: string;
   algorithm: GraphAlgorithm;
   directed: boolean;
+  heuristics?: Record<string, number> | null;
 }
 
 export interface GraphResponse extends GraphRequest {
+  heuristics: Record<string, number> | null;
   steps: GraphStep[];
   step_count: number;
 }
@@ -65,4 +83,8 @@ export const GRAPH_ALGORITHM_LABELS: Record<GraphAlgorithm, string> = {
   bfs: "Breadth-First Search",
   dfs: "Depth-First Search",
   dijkstra: "Dijkstra's Algorithm",
+  a_star: "A* Search",
+  topological_sort: "Topological Sort",
+  kruskal: "Kruskal's Minimum Spanning Tree",
+  prim: "Prim's Minimum Spanning Tree",
 };

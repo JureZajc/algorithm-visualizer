@@ -38,11 +38,14 @@ order. The API returns HTTP 422 for unsorted input.
 - Kruskal's Minimum Spanning Tree
 - Prim's Minimum Spanning Tree
 
-The frontend includes curated weighted graph presets, start and target node
-selection, optional directed edges, and an SVG animation of the current node,
-visited nodes, frontier, inspected edge, and final path. Dijkstra also displays
-the current distance table. The additional graph algorithms currently expose
-backend visualization steps but do not yet have dedicated frontend controls.
+The frontend includes curated weighted graph presets and dedicated SVG states
+for traversal, shortest-path, topological-order, and minimum-spanning-tree
+algorithms. Controls adapt to each algorithm: pathfinding uses start and target
+nodes, Topological Sort uses a directed graph, Prim uses a start node, and both
+MST algorithms use undirected edges. A* displays generated admissible
+heuristics, while Dijkstra and A* display live path costs. Topological results,
+candidate and accepted MST edges, and total forest weight are shown alongside
+the animation.
 
 ## API
 
@@ -52,7 +55,7 @@ The backend exposes these main routes:
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
-- `POST /graph/steps` generates graph traversal and shortest-path steps.
+- `POST /graph/steps` generates graph algorithm visualization steps.
 
 Sorting request example:
 
@@ -173,15 +176,16 @@ Every visualization step contains a step `type`, active `indices`, an array
 snapshot, and a human-readable `description`. Responses also include the
 initial array and total step count.
 
-## Run in WSL
+## Local development on macOS
 
-Run all commands inside Ubuntu WSL from the repository at
-`/home/jure/projekti/algorithm-visualizer`.
+Run the backend and frontend in separate Terminal tabs from the repository
+root. Install Python dependencies through `uv` and frontend dependencies with
+`npm install` before the first run.
 
 ### Backend
 
 ```bash
-cd /home/jure/projekti/algorithm-visualizer/backend
+cd backend
 uv run uvicorn app.main:app --reload
 ```
 
@@ -191,17 +195,15 @@ available at `http://127.0.0.1:8000/docs`.
 Run backend tests and lint checks with:
 
 ```bash
-cd /home/jure/projekti/algorithm-visualizer/backend
-uv run pytest
+cd backend
 uv run ruff check .
+uv run pytest
 ```
 
 ### Frontend
 
 ```bash
-cd /home/jure/projekti/algorithm-visualizer/frontend
-source /home/jure/.nvm/nvm.sh
-nvm use 24.16.0
+cd frontend
 npm install
 npm run dev
 ```
@@ -209,12 +211,14 @@ npm run dev
 The frontend is available at `http://localhost:3000` and expects the backend
 on port 8000 by default.
 
-Run frontend checks with:
+Open `http://localhost:3000`, choose **Graph / Pathfinding**, select a preset
+and algorithm, configure the available start/target/direction controls, and
+click **Start visualization**. Playback can be paused, resumed, reset, and
+slowed down while the side panel reports algorithm-specific state.
+
+Run the production frontend check with:
 
 ```bash
-cd /home/jure/projekti/algorithm-visualizer/frontend
-source /home/jure/.nvm/nvm.sh
-nvm use 24.16.0
-npm run lint
+cd frontend
 npm run build
 ```
