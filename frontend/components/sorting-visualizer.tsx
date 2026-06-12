@@ -1,16 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
 import { VisualizerControls } from "@/components/visualizer-controls";
 import { VisualizerStats } from "@/components/visualizer-stats";
+import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
-import {
-  ALGORITHM_LABELS,
-  type AlgorithmStep,
-  type SortingAlgorithm,
-} from "@/types/sorting";
+import { ALGORITHM_LABELS, type AlgorithmStep, type SortingAlgorithm } from "@/types/sorting";
 
 const DEFAULT_NUMBERS = [42, 17, 83, 29, 64, 8, 51, 36, 75, 23, 92, 58];
 
@@ -19,88 +16,21 @@ export function SortingVisualizer() {
   const [count, setCount] = useState(DEFAULT_NUMBERS.length);
   const [speed, setSpeed] = useState(320);
   const [initialNumbers, setInitialNumbers] = useState(DEFAULT_NUMBERS);
-  const [steps, setSteps] = useState<AlgorithmStep[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(-1);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const accumulatedTimeRef = useRef(0);
-  const playStartedAtRef = useRef<number | null>(null);
-
-  const currentStep = currentStepIndex >= 0 ? steps[currentStepIndex] : null;
-  const displayedNumbers = currentStep?.array ?? initialNumbers;
-  const isComplete = currentStep?.type === "done";
-  const finalArray = isComplete ? currentStep.array : null;
-
-  const pauseAnimation = useCallback(() => {
-    if (playStartedAtRef.current !== null) {
-      accumulatedTimeRef.current += performance.now() - playStartedAtRef.current;
-      playStartedAtRef.current = null;
-      setElapsedMs(accumulatedTimeRef.current);
-    }
-    setIsPlaying(false);
-  }, []);
-
-  const playAnimation = useCallback(() => {
-    playStartedAtRef.current = performance.now();
-    setIsPlaying(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isPlaying) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      if (playStartedAtRef.current !== null) {
-        setElapsedMs(
-          accumulatedTimeRef.current +
-            performance.now() -
-            playStartedAtRef.current,
-        );
-      }
-    }, 50);
-
-    return () => window.clearInterval(timer);
-  }, [isPlaying]);
-
-  useEffect(() => {
-    if (!isPlaying) {
-      return;
-    }
-
-    if (currentStepIndex >= steps.length - 1) {
-      pauseAnimation();
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      setCurrentStepIndex((index) => index + 1);
-    }, speed);
-
-    return () => window.clearTimeout(timer);
-  }, [currentStepIndex, isPlaying, pauseAnimation, speed, steps.length]);
-
-  const clearVisualization = useCallback(() => {
-    playStartedAtRef.current = null;
-    accumulatedTimeRef.current = 0;
-    setSteps([]);
-    setCurrentStepIndex(-1);
-    setIsPlaying(false);
-    setElapsedMs(0);
-  }, []);
+  const playback = useStepPlayback<AlgorithmStep>(speed);
+  const displayedNumbers = playback.currentStep?.array ?? initialNumbers;
+  const finalArray = playback.isComplete ? playback.currentStep?.array : null;
 
   async function handleGenerate(numberCount: number) {
     setError(null);
     setIsLoading(true);
-    clearVisualization();
-
+    playback.reset();
     try {
       const response = await generateRandomNumbers(numberCount);
       setInitialNumbers(response.numbers);
-    } catch {
-      setError("Could not reach the backend. Make sure FastAPI is running on port 8000.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not generate numbers.");
     } finally {
       setIsLoading(false);
     }
@@ -109,122 +39,88 @@ export function SortingVisualizer() {
   async function handleStart(numberCount: number) {
     setError(null);
     setIsLoading(true);
-    clearVisualization();
-
+    playback.reset();
     try {
-      let numbersToSort = initialNumbers;
-
-      if (initialNumbers.length !== numberCount) {
-        const generatedResponse = await generateRandomNumbers(numberCount);
-        numbersToSort = generatedResponse.numbers;
-        setInitialNumbers(numbersToSort);
+      let numbers = initialNumbers;
+      if (numbers.length !== numberCount) {
+        numbers = (await generateRandomNumbers(numberCount)).numbers;
+        setInitialNumbers(numbers);
       }
-
-      const response = await fetchSortingSteps(numbersToSort, algorithm);
-      setSteps(response.steps);
-      setCurrentStepIndex(0);
-
-      if (response.steps.length > 1) {
-        playAnimation();
-      }
-    } catch {
-      setError("Could not load sorting steps from the backend.");
+      playback.load((await fetchSortingSteps(numbers, algorithm)).steps);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not load sorting steps.");
     } finally {
       setIsLoading(false);
     }
   }
 
-  function handleTogglePlayback() {
-    if (isPlaying) {
-      pauseAnimation();
-    } else if (!isComplete) {
-      playAnimation();
-    }
+  function changeAlgorithm(next: SortingAlgorithm) {
+    setAlgorithm(next);
+    playback.reset();
   }
-
-  function handleAlgorithmChange(nextAlgorithm: SortingAlgorithm) {
-    setAlgorithm(nextAlgorithm);
-    clearVisualization();
-  }
-
-  const status = isLoading
-    ? "Loading"
-    : isPlaying
-      ? "Animating"
-      : isComplete
-        ? "Complete"
-        : steps.length > 0
-          ? "Paused"
-          : "Ready";
 
   return (
-    <main className="app-shell">
-      <header className="app-header">
-        <div>
-          <p className="eyebrow">Open source learning tool</p>
-          <h1>Algorithm Visualizer</h1>
-          <p className="subtitle">
-            Watch each comparison, swap, and overwrite turn an unsorted array
-            into an ordered one.
-          </p>
-        </div>
-        <div className="status-pill" aria-live="polite">
-          <span className="status-dot" />
-          {status}
-        </div>
-      </header>
-
+    <div>
       <VisualizerControls
         algorithm={algorithm}
         count={count}
         speed={speed}
         isLoading={isLoading}
-        isPlaying={isPlaying}
-        hasSteps={steps.length > 0}
-        isComplete={isComplete}
-        onAlgorithmChange={handleAlgorithmChange}
+        isPlaying={playback.isPlaying}
+        hasSteps={playback.steps.length > 0}
+        isComplete={playback.isComplete}
+        onAlgorithmChange={changeAlgorithm}
         onCountChange={setCount}
         onSpeedChange={setSpeed}
         onGenerate={handleGenerate}
         onStart={handleStart}
-        onTogglePlayback={handleTogglePlayback}
-        onReset={clearVisualization}
+        onTogglePlayback={playback.toggle}
+        onReset={playback.reset}
       />
 
-      {error ? <p className="error-message">{error}</p> : null}
+      {error ? <ErrorMessage message={error} /> : null}
 
-      <div className="workspace-grid">
-        <section className="visualizer-card">
-          <div className="card-heading">
-            <div>
-              <h2>{ALGORITHM_LABELS[algorithm]}</h2>
-              <p className="step-description" aria-live="polite">
-                {currentStep?.description ?? "Generate a new array or start with the sample values."}
-              </p>
-            </div>
-            <div className="legend" aria-label="Bar color legend">
-              <span className="legend-item">
-                <span className="legend-swatch bar-compare" /> Compare
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch bar-swap" /> Swap
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch bar-overwrite" /> Overwrite
-              </span>
-            </div>
-          </div>
-          <ArrayBars values={displayedNumbers} step={currentStep} />
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
+        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
+          <VisualizerHeading
+            title={ALGORITHM_LABELS[algorithm]}
+            description={playback.currentStep?.description ?? "Generate a new array or start with the sample values."}
+            legend={["Compare", "Swap", "Overwrite"]}
+          />
+          <ArrayBars values={displayedNumbers} step={playback.currentStep} />
         </section>
-
         <VisualizerStats
           algorithmName={ALGORITHM_LABELS[algorithm]}
-          currentStep={currentStepIndex + 1}
-          totalSteps={steps.length}
-          elapsedMs={elapsedMs}
-          finalArray={finalArray}
+          currentStep={playback.currentStepIndex + 1}
+          totalSteps={playback.steps.length}
+          elapsedMs={playback.elapsedMs}
+          resultLabel="Final sorted array"
+          result={<span className="font-mono text-xs font-medium">{finalArray ? `[${finalArray.join(", ")}]` : "Waiting for completion"}</span>}
         />
       </div>
-    </main>
+    </div>
+  );
+}
+
+export function ErrorMessage({ message }: { message: string }) {
+  return <p className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{message}</p>;
+}
+
+export function VisualizerHeading({ title, description, legend }: { title: string; description: string; legend: string[] }) {
+  const colors = ["bg-amber-400", "bg-rose-500", "bg-violet-500", "bg-sky-500", "bg-emerald-500"];
+  return (
+    <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+      <div>
+        <h2 className="mb-1 text-lg font-extrabold tracking-tight text-slate-900">{title}</h2>
+        <p className="m-0 min-h-5 text-sm leading-6 text-slate-500" aria-live="polite">{description}</p>
+      </div>
+      <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-500">
+        {legend.map((item, index) => (
+          <span className="inline-flex items-center gap-1.5" key={item}>
+            <span className={`h-2.5 w-2.5 rounded-sm ${colors[index]}`} />{item}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
