@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { GraphVisualizer } from "@/components/graph-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
-import type { VisualizerMode } from "@/types/algorithm";
+import { fetchAlgorithms } from "@/lib/api";
+import type { AlgorithmsResponse, VisualizerMode } from "@/types/algorithm";
 
 const MODES: { id: VisualizerMode; label: string; shortLabel: string }[] = [
   { id: "sorting", label: "Sorting", shortLabel: "Sort" },
@@ -15,6 +16,25 @@ const MODES: { id: VisualizerMode; label: string; shortLabel: string }[] = [
 
 export function AlgorithmVisualizer() {
   const [mode, setMode] = useState<VisualizerMode>("sorting");
+  const [algorithms, setAlgorithms] = useState<AlgorithmsResponse | null>(null);
+  const [isMetadataLoading, setIsMetadataLoading] = useState(true);
+  const [metadataError, setMetadataError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetchAlgorithms(controller.signal)
+      .then(setAlgorithms)
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setMetadataError(error instanceof Error ? error.message : "Could not load algorithm details.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsMetadataLoading(false);
+      });
+
+    return () => controller.abort();
+  }, []);
 
   return (
     <main className="mx-auto min-h-screen w-[min(1240px,calc(100%-24px))] py-6 sm:w-[min(1240px,calc(100%-40px))] sm:py-10">
@@ -45,9 +65,9 @@ export function AlgorithmVisualizer() {
         ))}
       </nav>
 
-      {mode === "sorting" ? <SortingVisualizer /> : null}
-      {mode === "searching" ? <SearchingVisualizer /> : null}
-      {mode === "graph" ? <GraphVisualizer /> : null}
+      {mode === "sorting" ? <SortingVisualizer algorithms={algorithms?.sorting ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
+      {mode === "searching" ? <SearchingVisualizer algorithms={algorithms?.searching ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
+      {mode === "graph" ? <GraphVisualizer algorithms={algorithms?.graph ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
     </main>
   );
 }

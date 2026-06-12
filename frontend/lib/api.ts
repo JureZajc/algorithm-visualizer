@@ -1,4 +1,7 @@
 import type {
+  AlgorithmsResponse,
+} from "@/types/algorithm";
+import type {
   RandomNumbersResponse,
   SortingAlgorithm,
   SortingStepsResponse,
@@ -11,6 +14,16 @@ import type {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
+
+async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, { signal });
+
+  if (!response.ok) {
+    throw new Error(`The backend returned status ${response.status}.`);
+  }
+
+  return response.json() as Promise<T>;
+}
 
 async function postJson<T>(path: string, body: object): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -31,6 +44,10 @@ async function postJson<T>(path: string, body: object): Promise<T> {
   }
 
   return response.json() as Promise<T>;
+}
+
+export function fetchAlgorithms(signal?: AbortSignal): Promise<AlgorithmsResponse> {
+  return getJson<AlgorithmsResponse>("/algorithms", signal);
 }
 
 export function fetchSearchingSteps(

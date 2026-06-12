@@ -3,18 +3,19 @@
 import { useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
+import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { ErrorMessage, VisualizerHeading } from "@/components/sorting-visualizer";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchSearchingSteps, generateRandomNumbers } from "@/lib/api";
-import type { ArrayAlgorithmStep } from "@/types/algorithm";
+import type { ArrayAlgorithmStep, MetadataSourceProps } from "@/types/algorithm";
 import { SEARCHING_ALGORITHM_LABELS, type SearchingAlgorithm } from "@/types/searching";
 
 const DEFAULT_NUMBERS = [8, 14, 23, 31, 42, 56, 67, 75, 83, 91];
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:opacity-60";
 const buttonClass = "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
 
-export function SearchingVisualizer() {
+export function SearchingVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<SearchingAlgorithm>("linear_search");
   const [count, setCount] = useState(DEFAULT_NUMBERS.length);
   const [countDraft, setCountDraft] = useState(String(DEFAULT_NUMBERS.length));
@@ -112,6 +113,8 @@ export function SearchingVisualizer() {
           <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={isLoading} onClick={playback.reset}>Reset</button>
         </div>
       </section>
+
+      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
       {algorithm === "binary_search" ? <p className="mb-5 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">Binary Search uses an ascending copy of the generated values.</p> : null}
       {error ? <ErrorMessage message={error} /> : null}

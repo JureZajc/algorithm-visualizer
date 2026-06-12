@@ -8,17 +8,6 @@ from app.algorithms.graph.topological_sort import topological_sort_steps
 from app.algorithms.graph.types import GraphAlgorithm, GraphEdge, GraphStep
 
 
-GRAPH_ALGORITHM_METADATA = [
-    {"id": "bfs", "label": "Breadth-First Search"},
-    {"id": "dfs", "label": "Depth-First Search"},
-    {"id": "dijkstra", "label": "Dijkstra's Algorithm"},
-    {"id": "a_star", "label": "A* Search"},
-    {"id": "topological_sort", "label": "Topological Sort"},
-    {"id": "kruskal", "label": "Kruskal's Minimum Spanning Tree"},
-    {"id": "prim", "label": "Prim's Minimum Spanning Tree"},
-]
-
-
 def graph_algorithm_steps(
     algorithm: GraphAlgorithm,
     nodes: list[str],
@@ -53,7 +42,6 @@ def graph_algorithm_steps(
 
 
 __all__ = [
-    "GRAPH_ALGORITHM_METADATA",
     "a_star_steps",
     "breadth_first_search_steps",
     "depth_first_search_steps",

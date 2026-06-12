@@ -30,26 +30,8 @@ SORTING_ALGORITHMS: dict[SortingAlgorithm, SortingFunction] = {
     "counting_sort": counting_sort_steps,
 }
 
-SORTING_ALGORITHM_METADATA = [
-    {"id": algorithm_id, "label": label}
-    for algorithm_id, label in [
-        ("bubble_sort", "Bubble Sort"),
-        ("selection_sort", "Selection Sort"),
-        ("insertion_sort", "Insertion Sort"),
-        ("merge_sort", "Merge Sort"),
-        ("quick_sort", "Quick Sort"),
-        ("heap_sort", "Heap Sort"),
-        ("shell_sort", "Shell Sort"),
-        ("cocktail_shaker_sort", "Cocktail Shaker Sort"),
-        ("gnome_sort", "Gnome Sort"),
-        ("comb_sort", "Comb Sort"),
-        ("counting_sort", "Counting Sort"),
-    ]
-]
-
 __all__ = [
     "SORTING_ALGORITHMS",
-    "SORTING_ALGORITHM_METADATA",
     "bubble_sort_steps",
     "cocktail_shaker_sort_steps",
     "comb_sort_steps",

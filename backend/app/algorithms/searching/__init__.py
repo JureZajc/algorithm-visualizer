@@ -12,14 +12,8 @@ SEARCHING_ALGORITHMS: dict[SearchingAlgorithm, SearchingFunction] = {
     "binary_search": binary_search_steps,
 }
 
-SEARCHING_ALGORITHM_METADATA = [
-    {"id": "linear_search", "label": "Linear Search"},
-    {"id": "binary_search", "label": "Binary Search"},
-]
-
 __all__ = [
     "SEARCHING_ALGORITHMS",
-    "SEARCHING_ALGORITHM_METADATA",
     "binary_search_steps",
     "linear_search_steps",
 ]

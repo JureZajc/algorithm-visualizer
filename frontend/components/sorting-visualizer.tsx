@@ -3,15 +3,17 @@
 import { useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
+import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { VisualizerControls } from "@/components/visualizer-controls";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
+import type { MetadataSourceProps } from "@/types/algorithm";
 import { ALGORITHM_LABELS, type AlgorithmStep, type SortingAlgorithm } from "@/types/sorting";
 
 const DEFAULT_NUMBERS = [42, 17, 83, 29, 64, 8, 51, 36, 75, 23, 92, 58];
 
-export function SortingVisualizer() {
+export function SortingVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<SortingAlgorithm>("bubble_sort");
   const [count, setCount] = useState(DEFAULT_NUMBERS.length);
   const [speed, setSpeed] = useState(320);
@@ -77,6 +79,8 @@ export function SortingVisualizer() {
         onTogglePlayback={playback.toggle}
         onReset={playback.reset}
       />
+
+      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
       {error ? <ErrorMessage message={error} /> : null}
 
