@@ -4,9 +4,13 @@ from copy import deepcopy
 import pytest
 
 from app.algorithms.graph import (
+    a_star_steps,
     breadth_first_search_steps,
     depth_first_search_steps,
     dijkstra_steps,
+    kruskal_steps,
+    prim_steps,
+    topological_sort_steps,
 )
 from app.algorithms.graph.types import GraphEdge, GraphStep
 
@@ -39,6 +43,10 @@ STEP_KEYS = {
     "distances",
     "previous",
     "path",
+    "result",
+    "frontier_edges",
+    "mst_edges",
+    "total_weight",
     "description",
 }
 
@@ -74,7 +82,15 @@ def test_graph_step_states_are_independent_copies(
 ) -> None:
     steps = graph_function(NODES, EDGES, "A", "D", False)
 
-    for field in ("visited", "frontier", "previous", "path"):
+    for field in (
+        "visited",
+        "frontier",
+        "previous",
+        "path",
+        "result",
+        "frontier_edges",
+        "mst_edges",
+    ):
         assert len({id(step[field]) for step in steps}) == len(steps)
 
     edge_steps = [step for step in steps if step["edge"] is not None]
@@ -196,3 +212,145 @@ def test_dijkstra_rejects_negative_weights_without_mutating_input() -> None:
         dijkstra_steps(["A", "B"], edges, "A", "B")
 
     assert edges == original
+
+
+def test_a_star_matches_dijkstra_shortest_path_cost() -> None:
+    edges: list[GraphEdge] = [
+        {"source": "A", "target": "B", "weight": 4},
+        {"source": "A", "target": "C", "weight": 1},
+        {"source": "C", "target": "B", "weight": 2},
+        {"source": "B", "target": "D", "weight": 1},
+        {"source": "C", "target": "D", "weight": 5},
+    ]
+    heuristics = {"A": 3, "B": 1, "C": 3, "D": 0}
+
+    a_star = a_star_steps(NODES, edges, "A", "D", heuristics=heuristics)
+    dijkstra = dijkstra_steps(NODES, edges, "A", "D")
+
+    assert a_star[-1]["path"] == ["A", "C", "B", "D"]
+    assert a_star[-1]["distances"]["D"] == dijkstra[-1]["distances"]["D"]
+
+
+def test_a_star_uses_zero_heuristic_by_default() -> None:
+    steps = a_star_steps(NODES, EDGES, "A", "D")
+
+    assert steps[-2]["type"] == "path_found"
+    assert steps[-1]["path"] == ["A", "B", "D"]
+    assert steps[-1]["distances"]["D"] == 3
+
+
+def test_a_star_rejects_negative_weights_without_mutating_input() -> None:
+    edges: list[GraphEdge] = [
+        {"source": "A", "target": "B", "weight": -1},
+    ]
+    original = deepcopy(edges)
+
+    with pytest.raises(ValueError, match="requires non-negative weights"):
+        a_star_steps(["A", "B"], edges, "A", "B")
+
+    assert edges == original
+
+
+def test_topological_sort_returns_valid_order_without_mutating_input() -> None:
+    nodes = ["A", "B", "C", "D"]
+    edges: list[GraphEdge] = [
+        {"source": "A", "target": "B", "weight": 1},
+        {"source": "A", "target": "C", "weight": 1},
+        {"source": "B", "target": "D", "weight": 1},
+        {"source": "C", "target": "D", "weight": 1},
+    ]
+    original_nodes = nodes.copy()
+    original_edges = deepcopy(edges)
+
+    steps = topological_sort_steps(nodes, edges, directed=True)
+    result = steps[-1]["result"]
+    positions = {node: index for index, node in enumerate(result)}
+
+    assert nodes == original_nodes
+    assert edges == original_edges
+    assert steps
+    assert steps[-1]["type"] == "done"
+    assert len(result) == len(nodes)
+    assert all(
+        positions[edge["source"]] < positions[edge["target"]]
+        for edge in edges
+    )
+
+
+def test_topological_sort_detects_cycle() -> None:
+    edges: list[GraphEdge] = [
+        {"source": "A", "target": "B", "weight": 1},
+        {"source": "B", "target": "C", "weight": 1},
+        {"source": "C", "target": "A", "weight": 1},
+    ]
+
+    steps = topological_sort_steps(["A", "B", "C"], edges, directed=True)
+
+    assert steps[-2]["type"] == "cycle_detected"
+    assert steps[-1]["type"] == "done"
+    assert len(steps[-1]["result"]) < 3
+
+
+def test_topological_sort_rejects_undirected_graph() -> None:
+    with pytest.raises(ValueError, match="requires a directed graph"):
+        topological_sort_steps(NODES, EDGES, directed=False)
+
+
+MST_EDGES: list[GraphEdge] = [
+    {"source": "A", "target": "B", "weight": 1},
+    {"source": "A", "target": "C", "weight": 4},
+    {"source": "B", "target": "C", "weight": 2},
+    {"source": "B", "target": "D", "weight": 5},
+    {"source": "C", "target": "D", "weight": 3},
+]
+
+
+@pytest.mark.parametrize("algorithm", [kruskal_steps, prim_steps])
+def test_mst_algorithm_contract_and_weight(
+    algorithm: Callable[..., list[GraphStep]],
+) -> None:
+    nodes = NODES.copy()
+    edges = deepcopy(MST_EDGES)
+    original_nodes = nodes.copy()
+    original_edges = deepcopy(edges)
+
+    steps = (
+        algorithm(nodes, edges, "A")
+        if algorithm is prim_steps
+        else algorithm(nodes, edges)
+    )
+
+    assert nodes == original_nodes
+    assert edges == original_edges
+    assert steps
+    assert steps[-1]["type"] == "done"
+    assert steps[-1]["total_weight"] == 6
+    assert len(steps[-1]["mst_edges"]) == 3
+    assert all(set(step) == STEP_KEYS for step in steps)
+
+
+def test_kruskal_and_prim_agree_on_mst_weight() -> None:
+    kruskal = kruskal_steps(NODES, MST_EDGES)
+    prim = prim_steps(NODES, MST_EDGES, "A")
+
+    assert kruskal[-1]["total_weight"] == prim[-1]["total_weight"] == 6
+
+
+@pytest.mark.parametrize("algorithm", [kruskal_steps, prim_steps])
+def test_mst_algorithms_return_forest_for_disconnected_graph(
+    algorithm: Callable[..., list[GraphStep]],
+) -> None:
+    edges: list[GraphEdge] = [
+        {"source": "A", "target": "B", "weight": 1},
+        {"source": "C", "target": "D", "weight": 2},
+    ]
+
+    steps = (
+        algorithm(NODES, edges, "A")
+        if algorithm is prim_steps
+        else algorithm(NODES, edges)
+    )
+
+    assert steps[-1]["type"] == "done"
+    assert steps[-1]["total_weight"] == 3
+    assert len(steps[-1]["mst_edges"]) == 2

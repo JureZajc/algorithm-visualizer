@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, model_validator
 
-from app.algorithms.graph import GRAPH_ALGORITHM_METADATA, GRAPH_ALGORITHMS
+from app.algorithms.graph import GRAPH_ALGORITHM_METADATA, graph_algorithm_steps
 from app.algorithms.graph.types import GraphAlgorithm, GraphEdge, GraphStep
 from app.algorithms.graph.utils import validate_graph
 from app.algorithms.searching import (
@@ -73,6 +73,7 @@ class GraphRequest(BaseModel):
     target: str
     algorithm: GraphAlgorithm
     directed: bool = False
+    heuristics: dict[str, int | float] | None = None
 
     @model_validator(mode="after")
     def validate_references(self) -> "GraphRequest":
@@ -87,6 +88,15 @@ class GraphRequest(BaseModel):
             for edge in self.edges
         ]
         validate_graph(self.nodes, edges, self.start, self.target)
+        if self.heuristics is not None:
+            unknown_nodes = set(self.heuristics) - set(self.nodes)
+            if unknown_nodes:
+                unknown = min(unknown_nodes)
+                raise ValueError(f"Heuristic node {unknown!r} is not in the graph.")
+            if any(value < 0 for value in self.heuristics.values()):
+                raise ValueError(
+                    "A* search requires non-negative heuristic values."
+                )
         return self
 
 
@@ -97,6 +107,7 @@ class GraphResponse(BaseModel):
     start: str
     target: str
     directed: bool
+    heuristics: dict[str, int | float] | None
     steps: list[GraphStep]
     step_count: int
 
@@ -183,12 +194,14 @@ def graph_steps(request: GraphRequest) -> GraphResponse:
     ]
 
     try:
-        steps = GRAPH_ALGORITHMS[request.algorithm](
+        steps = graph_algorithm_steps(
+            request.algorithm,
             request.nodes,
             edges,
             request.start,
             request.target,
             request.directed,
+            request.heuristics,
         )
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
@@ -200,6 +213,7 @@ def graph_steps(request: GraphRequest) -> GraphResponse:
         start=request.start,
         target=request.target,
         directed=request.directed,
+        heuristics=request.heuristics.copy() if request.heuristics else None,
         steps=steps,
         step_count=len(steps),
     )

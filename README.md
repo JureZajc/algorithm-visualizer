@@ -33,12 +33,16 @@ order. The API returns HTTP 422 for unsorted input.
 - Breadth-First Search (BFS)
 - Depth-First Search (DFS)
 - Dijkstra's Algorithm
+- A* Search
+- Topological Sort
+- Kruskal's Minimum Spanning Tree
+- Prim's Minimum Spanning Tree
 
 The frontend includes curated weighted graph presets, start and target node
 selection, optional directed edges, and an SVG animation of the current node,
 visited nodes, frontier, inspected edge, and final path. Dijkstra also displays
-the current distance table. A* is not shown because it is not currently
-supported by the backend API.
+the current distance table. The additional graph algorithms currently expose
+backend visualization steps but do not yet have dedicated frontend controls.
 
 ## API
 
@@ -85,6 +89,85 @@ Graph request example:
   "directed": false
 }
 ```
+
+A* accepts optional heuristic values keyed by node. Missing heuristic values
+default to zero, which makes it behave like Dijkstra's algorithm:
+
+```json
+{
+  "nodes": ["A", "B", "C", "D"],
+  "edges": [
+    { "source": "A", "target": "B", "weight": 1 },
+    { "source": "B", "target": "D", "weight": 2 },
+    { "source": "A", "target": "C", "weight": 4 }
+  ],
+  "start": "A",
+  "target": "D",
+  "algorithm": "a_star",
+  "directed": false,
+  "heuristics": { "A": 2, "B": 1, "C": 3, "D": 0 }
+}
+```
+
+Topological sort requires a directed graph. A cycle produces a
+`cycle_detected` step followed by `done`:
+
+```json
+{
+  "nodes": ["A", "B", "C", "D"],
+  "edges": [
+    { "source": "A", "target": "B", "weight": 1 },
+    { "source": "A", "target": "C", "weight": 1 },
+    { "source": "B", "target": "D", "weight": 1 },
+    { "source": "C", "target": "D", "weight": 1 }
+  ],
+  "start": "A",
+  "target": "D",
+  "algorithm": "topological_sort",
+  "directed": true
+}
+```
+
+Kruskal treats edges as undirected and ignores `start`, `target`, and
+`directed` while preserving those fields in the shared API contract:
+
+```json
+{
+  "nodes": ["A", "B", "C", "D"],
+  "edges": [
+    { "source": "A", "target": "B", "weight": 1 },
+    { "source": "B", "target": "C", "weight": 2 },
+    { "source": "C", "target": "D", "weight": 3 },
+    { "source": "A", "target": "D", "weight": 8 }
+  ],
+  "start": "A",
+  "target": "D",
+  "algorithm": "kruskal",
+  "directed": false
+}
+```
+
+Prim also treats edges as undirected and uses `start` as its first node:
+
+```json
+{
+  "nodes": ["A", "B", "C", "D"],
+  "edges": [
+    { "source": "A", "target": "B", "weight": 1 },
+    { "source": "B", "target": "C", "weight": 2 },
+    { "source": "C", "target": "D", "weight": 3 },
+    { "source": "A", "target": "D", "weight": 8 }
+  ],
+  "start": "A",
+  "target": "D",
+  "algorithm": "prim",
+  "directed": false
+}
+```
+
+Graph steps share the original pathfinding fields and also include `result`
+for topological order, `frontier_edges` for Prim candidates, `mst_edges` for
+accepted spanning-forest edges, and `total_weight` for the current forest.
 
 Every visualization step contains a step `type`, active `indices`, an array
 snapshot, and a human-readable `description`. Responses also include the
