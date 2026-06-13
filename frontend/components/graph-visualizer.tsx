@@ -40,7 +40,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<GraphAlgorithm>("bfs");
   const [start, setStart] = useState(preset.defaultStart);
   const [target, setTarget] = useState(preset.defaultTarget);
-  const [directed, setDirected] = useState(false);
+  const [directed, setDirected] = useState(preset.defaultDirected ?? false);
   const [speed, setSpeed] = useState(520);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,15 +65,12 @@ export function GraphVisualizer(props: MetadataSourceProps) {
     setPresetId(next.id);
     setStart(next.defaultStart);
     setTarget(next.defaultTarget);
+    setDirected(next.defaultDirected ?? false);
     resetForInputChange();
   }
 
   function selectAlgorithm(next: GraphAlgorithm) {
     setAlgorithm(next);
-    if (next === "topological_sort" && preset.id !== "build-pipeline") {
-      selectPreset("build-pipeline");
-      return;
-    }
     resetForInputChange();
   }
 

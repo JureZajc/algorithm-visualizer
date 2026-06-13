@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import type { SortingPreset } from "@/lib/array-presets";
 import { ALGORITHM_LABELS, type SortingAlgorithm } from "@/types/sorting";
 
 interface VisualizerControlsProps {
@@ -10,6 +11,8 @@ interface VisualizerControlsProps {
   isPlaying: boolean;
   hasSteps: boolean;
   isComplete: boolean;
+  presetId: string;
+  presets: SortingPreset[];
   onAlgorithmChange: (algorithm: SortingAlgorithm) => void;
   onCountChange: (count: number) => void;
   onSpeedChange: (speed: number) => void;
@@ -17,6 +20,7 @@ interface VisualizerControlsProps {
   onStart: (count: number) => void;
   onTogglePlayback: () => void;
   onReset: () => void;
+  onPresetChange: (presetId: string) => void;
 }
 
 const inputClass =
@@ -39,7 +43,7 @@ export function VisualizerControls(props: VisualizerControlsProps) {
 
   return (
     <section
-      className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur md:grid-cols-[1.35fr_0.75fr_1fr]"
+      className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur md:grid-cols-2 xl:grid-cols-4"
       aria-label="Sorting visualization controls"
     >
       <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
@@ -54,6 +58,21 @@ export function VisualizerControls(props: VisualizerControlsProps) {
         >
           {Object.entries(ALGORITHM_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
+        Sample preset
+        <select
+          className={inputClass}
+          value={props.presetId}
+          disabled={props.isPlaying || props.isLoading}
+          onChange={(event) => props.onPresetChange(event.target.value)}
+        >
+          <option value="" disabled>Choose a preset</option>
+          {props.presets.map((preset) => (
+            <option key={preset.id} value={preset.id}>{preset.label}</option>
           ))}
         </select>
       </label>
@@ -88,7 +107,7 @@ export function VisualizerControls(props: VisualizerControlsProps) {
         />
       </label>
 
-      <div className="flex flex-wrap gap-2 md:col-span-3">
+      <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-4">
         <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={props.isPlaying || props.isLoading} onClick={() => props.onGenerate(normalizeCount())}>
           Generate numbers
         </button>

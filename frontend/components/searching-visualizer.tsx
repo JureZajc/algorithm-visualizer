@@ -9,6 +9,7 @@ import { ErrorMessage, VisualizerHeading } from "@/components/sorting-visualizer
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchSearchingSteps, generateRandomNumbers } from "@/lib/api";
+import { SEARCHING_PRESETS } from "@/lib/array-presets";
 import type { ArrayAlgorithmStep, MetadataSourceProps } from "@/types/algorithm";
 import { SEARCHING_ALGORITHM_LABELS, type SearchingAlgorithm } from "@/types/searching";
 
@@ -20,6 +21,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<SearchingAlgorithm>("linear_search");
   const [count, setCount] = useState(DEFAULT_NUMBERS.length);
   const [countDraft, setCountDraft] = useState(String(DEFAULT_NUMBERS.length));
+  const [presetId, setPresetId] = useState("");
   const [target, setTarget] = useState(67);
   const [numbers, setNumbers] = useState(DEFAULT_NUMBERS);
   const [speed, setSpeed] = useState(420);
@@ -38,6 +40,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
     const normalized = Number.isNaN(parsed) ? count : Math.min(40, Math.max(5, parsed));
     setCount(normalized);
     setCountDraft(String(normalized));
+    if (normalized !== numbers.length) setPresetId("");
     return normalized;
   }
 
@@ -50,6 +53,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
       if (algorithm === "binary_search") next = [...next].sort((a, b) => a - b);
       setNumbers(next);
       setTarget(next[Math.floor(next.length / 2)] ?? 0);
+      setPresetId("");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Could not generate numbers.");
     } finally {
@@ -63,7 +67,10 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
     playback.reset();
     try {
       let next = numbers;
-      if (next.length !== numberCount) next = (await generateRandomNumbers(numberCount)).numbers;
+      if (next.length !== numberCount) {
+        next = (await generateRandomNumbers(numberCount)).numbers;
+        setPresetId("");
+      }
       if (algorithm === "binary_search") next = [...next].sort((a, b) => a - b);
       setNumbers(next);
       playback.load((await fetchSearchingSteps(next, algorithm, target)).steps);
@@ -76,8 +83,22 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
 
   function changeAlgorithm(next: SearchingAlgorithm) {
     setAlgorithm(next);
+    setPresetId("");
     playback.reset();
     if (next === "binary_search") setNumbers((current) => [...current].sort((a, b) => a - b));
+  }
+
+  function loadPreset(nextId: string) {
+    const preset = SEARCHING_PRESETS.find((item) => item.id === nextId);
+    if (!preset) return;
+    setPresetId(preset.id);
+    setNumbers([...preset.numbers]);
+    setTarget(preset.target);
+    setCount(preset.numbers.length);
+    setCountDraft(String(preset.numbers.length));
+    if (preset.algorithm) setAlgorithm(preset.algorithm);
+    setError(null);
+    playback.reset();
   }
 
   const result = playback.isComplete
@@ -88,7 +109,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
 
   return (
     <div>
-      <section className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] md:grid-cols-2 xl:grid-cols-4">
+      <section className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] md:grid-cols-2 xl:grid-cols-5">
         <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
           Searching algorithm
           <select className={inputClass} value={algorithm} disabled={playback.isPlaying || isLoading} onChange={(event) => changeAlgorithm(event.target.value as SearchingAlgorithm)}>
@@ -96,8 +117,15 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
           </select>
         </label>
         <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
+          Sample preset
+          <select className={inputClass} value={presetId} disabled={playback.isPlaying || isLoading} onChange={(event) => loadPreset(event.target.value)}>
+            <option value="" disabled>Choose a preset</option>
+            {SEARCHING_PRESETS.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}
+          </select>
+        </label>
+        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
           Target value
-          <input className={inputClass} type="number" value={target} disabled={playback.isPlaying || isLoading} onChange={(event) => { setTarget(Number(event.target.value)); playback.reset(); }} />
+          <input className={inputClass} type="number" value={target} disabled={playback.isPlaying || isLoading} onChange={(event) => { setTarget(Number(event.target.value)); setPresetId(""); playback.reset(); }} />
         </label>
         <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
           Random values
@@ -107,7 +135,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
           <span className="flex justify-between"><span>Animation speed</span><span className="font-mono text-indigo-600">{speed} ms</span></span>
           <input className="w-full accent-indigo-600" type="range" min={80} max={1000} step={20} value={speed} onChange={(event) => setSpeed(Number(event.target.value))} />
         </label>
-        <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-4">
+        <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-5">
           <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={playback.isPlaying || isLoading} onClick={() => generate(normalizeCount())}>Generate numbers</button>
           <button className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`} type="button" disabled={playback.isPlaying || isLoading} onClick={() => start(normalizeCount())}>{isLoading ? "Loading steps..." : "Start visualization"}</button>
           <button className={`${buttonClass} bg-indigo-50 text-indigo-700 hover:bg-indigo-100`} type="button" disabled={playback.steps.length === 0 || isLoading || playback.isComplete} onClick={playback.toggle}>{playback.isPlaying ? "Pause" : "Resume"}</button>

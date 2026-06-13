@@ -78,6 +78,7 @@ export interface GraphPreset {
   edges: GraphEdge[];
   defaultStart: string;
   defaultTarget: string;
+  defaultDirected?: boolean;
 }
 
 export const GRAPH_ALGORITHM_LABELS: Record<GraphAlgorithm, string> = {

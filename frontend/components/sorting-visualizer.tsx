@@ -9,6 +9,7 @@ import { VisualizerControls } from "@/components/visualizer-controls";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
+import { SORTING_PRESETS } from "@/lib/array-presets";
 import type { MetadataSourceProps } from "@/types/algorithm";
 import { ALGORITHM_LABELS, type AlgorithmStep, type SortingAlgorithm } from "@/types/sorting";
 
@@ -17,6 +18,7 @@ const DEFAULT_NUMBERS = [42, 17, 83, 29, 64, 8, 51, 36, 75, 23, 92, 58];
 export function SortingVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<SortingAlgorithm>("bubble_sort");
   const [count, setCount] = useState(DEFAULT_NUMBERS.length);
+  const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(320);
   const [initialNumbers, setInitialNumbers] = useState(DEFAULT_NUMBERS);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +34,7 @@ export function SortingVisualizer(props: MetadataSourceProps) {
     try {
       const response = await generateRandomNumbers(numberCount);
       setInitialNumbers(response.numbers);
+      setPresetId("");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Could not generate numbers.");
     } finally {
@@ -48,6 +51,7 @@ export function SortingVisualizer(props: MetadataSourceProps) {
       if (numbers.length !== numberCount) {
         numbers = (await generateRandomNumbers(numberCount)).numbers;
         setInitialNumbers(numbers);
+        setPresetId("");
       }
       playback.load((await fetchSortingSteps(numbers, algorithm)).steps);
     } catch (error) {
@@ -62,9 +66,21 @@ export function SortingVisualizer(props: MetadataSourceProps) {
     playback.reset();
   }
 
+  function loadPreset(nextId: string) {
+    const preset = SORTING_PRESETS.find((item) => item.id === nextId);
+    if (!preset) return;
+    const numbers = preset.createNumbers();
+    setPresetId(preset.id);
+    setCount(numbers.length);
+    setInitialNumbers(numbers);
+    setError(null);
+    playback.reset();
+  }
+
   return (
     <div>
       <VisualizerControls
+        key={count}
         algorithm={algorithm}
         count={count}
         speed={speed}
@@ -72,13 +88,19 @@ export function SortingVisualizer(props: MetadataSourceProps) {
         isPlaying={playback.isPlaying}
         hasSteps={playback.steps.length > 0}
         isComplete={playback.isComplete}
+        presetId={presetId}
+        presets={SORTING_PRESETS}
         onAlgorithmChange={changeAlgorithm}
-        onCountChange={setCount}
+        onCountChange={(nextCount) => {
+          setCount(nextCount);
+          if (nextCount !== initialNumbers.length) setPresetId("");
+        }}
         onSpeedChange={setSpeed}
         onGenerate={handleGenerate}
         onStart={handleStart}
         onTogglePlayback={playback.toggle}
         onReset={playback.reset}
+        onPresetChange={loadPreset}
       />
 
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
