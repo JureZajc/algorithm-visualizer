@@ -1,4 +1,9 @@
-from app.algorithms.graph.types import GraphEdge, GraphStep, create_graph_step
+from app.algorithms.graph.types import (
+    GraphEdge,
+    GraphStep,
+    apply_graph_pseudocode_lines,
+    create_graph_step,
+)
 from app.algorithms.graph.utils import validate_graph_structure
 
 
@@ -111,4 +116,7 @@ def kruskal_steps(
             description="Kruskal's minimum spanning forest is complete.",
         )
     )
-    return steps
+    return apply_graph_pseudocode_lines(
+        steps,
+        {"inspect_edge": 2, "accept_edge": 3, "reject_edge": 4, "done": 6},
+    )

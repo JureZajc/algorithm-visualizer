@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def selection_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -38,4 +38,4 @@ def selection_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
             )
 
     steps.append(create_step("done", [], array, "Selection sort is complete."))
-    return steps
+    return apply_pseudocode_lines(steps, {"compare": 3, "swap": 5, "done": 6})

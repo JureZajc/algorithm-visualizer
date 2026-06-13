@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def quick_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -70,10 +70,14 @@ def quick_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
                 [smaller_index],
                 array,
                 f"Pivot {pivot_value} is fixed at index {smaller_index}.",
+                4,
             )
         )
         return smaller_index
 
     quick_sort(0, len(array) - 1)
     steps.append(create_step("done", [], array, "Quick sort is complete."))
-    return steps
+    return apply_pseudocode_lines(
+        steps,
+        {"partition": 1, "compare": 2, "swap": 3, "done": 6},
+    )

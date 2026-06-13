@@ -1,6 +1,11 @@
 from collections import deque
 
-from app.algorithms.graph.types import GraphEdge, GraphStep, create_graph_step
+from app.algorithms.graph.types import (
+    GraphEdge,
+    GraphStep,
+    apply_graph_pseudocode_lines,
+    create_graph_step,
+)
 from app.algorithms.graph.utils import (
     build_adjacency_list,
     reconstruct_path,
@@ -37,6 +42,7 @@ def breadth_first_search_steps(
             previous=previous,
             path=[],
             description=f"Add start node {start} to the queue.",
+            pseudocode_line=1,
         )
     )
 
@@ -113,6 +119,7 @@ def breadth_first_search_steps(
                     previous=previous,
                     path=[],
                     description=f"Add {neighbor} to the queue.",
+                    pseudocode_line=6,
                 )
             )
 
@@ -151,4 +158,15 @@ def breadth_first_search_steps(
             description="Breadth-first search is complete.",
         )
     )
-    return steps
+    return apply_graph_pseudocode_lines(
+        steps,
+        {
+            "enqueue": 6,
+            "dequeue": 2,
+            "visit": 3,
+            "inspect_edge": 5,
+            "path_found": 7,
+            "not_found": 7,
+            "done": 8,
+        },
+    )

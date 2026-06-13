@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def counting_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -30,4 +30,4 @@ def counting_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
                 write_index += 1
 
     steps.append(create_step("done", [], array, "Counting sort is complete."))
-    return steps
+    return apply_pseudocode_lines(steps, {"overwrite": 4, "done": 5})

@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def comb_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -36,4 +36,4 @@ def comb_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
                 )
 
     steps.append(create_step("done", [], array, "Comb sort is complete."))
-    return steps
+    return apply_pseudocode_lines(steps, {"compare": 2, "swap": 3, "done": 5})

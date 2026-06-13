@@ -71,6 +71,7 @@ def test_algorithms_endpoint() -> None:
         "time_complexity",
         "space_complexity",
         "notes",
+        "pseudocode",
     }
     for category, items in body.items():
         for item in items:
@@ -81,6 +82,7 @@ def test_algorithms_endpoint() -> None:
             assert item["description"]
             assert item["space_complexity"]
             assert item["notes"]
+            assert item["pseudocode"]
 
 
 @pytest.mark.parametrize("algorithm", SUPPORTED_ALGORITHMS)

@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def heap_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -59,9 +59,13 @@ def heap_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
                 [0, end_index],
                 array,
                 f"Move the largest remaining value to index {end_index}.",
+                4,
             )
         )
         heapify(end_index, 0)
 
     steps.append(create_step("done", [], array, "Heap sort is complete."))
-    return steps
+    return apply_pseudocode_lines(
+        steps,
+        {"heapify": 5, "compare": 2, "swap": 3, "done": 6},
+    )

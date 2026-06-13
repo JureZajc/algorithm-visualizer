@@ -14,6 +14,7 @@ export interface ArrayAlgorithmStep {
   indices: number[];
   array: number[];
   description: string;
+  pseudocode_line?: number;
 }
 
 export type VisualizerMode = "sorting" | "searching" | "graph";
@@ -35,6 +36,7 @@ export interface AlgorithmMetadata {
   time_complexity: TimeComplexity;
   space_complexity: string;
   notes: string[];
+  pseudocode: string[];
 }
 
 export interface AlgorithmsResponse {

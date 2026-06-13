@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def bubble_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -37,4 +37,4 @@ def bubble_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
             break
 
     steps.append(create_step("done", [], array, "Bubble sort is complete."))
-    return steps
+    return apply_pseudocode_lines(steps, {"compare": 2, "swap": 3, "done": 5})

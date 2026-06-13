@@ -1,4 +1,4 @@
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 
 GraphAlgorithm = Literal[
@@ -55,6 +55,7 @@ class GraphStep(TypedDict):
     mst_edges: list[GraphEdge]
     total_weight: int | float | None
     description: str
+    pseudocode_line: NotRequired[int]
 
 
 def create_graph_step(
@@ -73,10 +74,11 @@ def create_graph_step(
     frontier_edges: list[GraphEdge] | None = None,
     mst_edges: list[GraphEdge] | None = None,
     total_weight: int | float | None = None,
+    pseudocode_line: int | None = None,
 ) -> GraphStep:
     """Create a graph step with independent copies of mutable values."""
 
-    return {
+    step: GraphStep = {
         "type": step_type,
         "current": current,
         "neighbor": neighbor,
@@ -94,3 +96,19 @@ def create_graph_step(
         "total_weight": total_weight,
         "description": description,
     }
+    if pseudocode_line is not None:
+        step["pseudocode_line"] = pseudocode_line
+    return step
+
+
+def apply_graph_pseudocode_lines(
+    steps: list[GraphStep],
+    lines_by_type: dict[GraphStepType, int],
+) -> list[GraphStep]:
+    """Attach 1-based pseudocode lines without changing step generation."""
+
+    for step in steps:
+        line = lines_by_type.get(step["type"])
+        if line is not None and "pseudocode_line" not in step:
+            step["pseudocode_line"] = line
+    return steps

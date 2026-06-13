@@ -1,7 +1,12 @@
 from heapq import heappop, heappush
 from itertools import count
 
-from app.algorithms.graph.types import GraphEdge, GraphStep, create_graph_step
+from app.algorithms.graph.types import (
+    GraphEdge,
+    GraphStep,
+    apply_graph_pseudocode_lines,
+    create_graph_step,
+)
 from app.algorithms.graph.utils import (
     build_adjacency_list,
     reconstruct_path,
@@ -204,4 +209,16 @@ def dijkstra_steps(
             description="Dijkstra's algorithm is complete.",
         )
     )
-    return steps
+    return apply_graph_pseudocode_lines(
+        steps,
+        {
+            "push": 1,
+            "pop": 2,
+            "visit": 3,
+            "inspect_edge": 5,
+            "relax": 6,
+            "path_found": 7,
+            "not_found": 7,
+            "done": 8,
+        },
+    )

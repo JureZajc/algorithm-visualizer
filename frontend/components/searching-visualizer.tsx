@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
 import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
+import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { ErrorMessage, VisualizerHeading } from "@/components/sorting-visualizer";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
@@ -124,7 +125,10 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
           <VisualizerHeading title={SEARCHING_ALGORITHM_LABELS[algorithm]} description={currentStep?.description ?? "Choose a target and start the search."} legend={["Inspect", "Found"]} />
           <ArrayBars values={currentStep?.array ?? numbers} step={outcomeStep} />
         </section>
-        <VisualizerStats algorithmName={SEARCHING_ALGORITHM_LABELS[algorithm]} currentStep={playback.currentStepIndex + 1} totalSteps={playback.steps.length} elapsedMs={playback.elapsedMs} resultLabel="Search result" result={result} />
+        <div className="grid gap-5 self-start">
+          <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line} isLoading={props.isMetadataLoading} error={props.metadataError} />
+          <VisualizerStats algorithmName={SEARCHING_ALGORITHM_LABELS[algorithm]} currentStep={playback.currentStepIndex + 1} totalSteps={playback.steps.length} elapsedMs={playback.elapsedMs} resultLabel="Search result" result={result} />
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def linear_search_steps(numbers: list[int], target: int) -> list[AlgorithmStep]:
@@ -37,4 +37,7 @@ def linear_search_steps(numbers: list[int], target: int) -> list[AlgorithmStep]:
         )
 
     steps.append(create_step("done", [], array, "Linear search is complete."))
-    return steps
+    return apply_pseudocode_lines(
+        steps,
+        {"compare": 2, "found": 3, "not_found": 4, "done": 5},
+    )

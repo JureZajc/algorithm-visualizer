@@ -1,7 +1,12 @@
 from heapq import heappop, heappush
 from itertools import count
 
-from app.algorithms.graph.types import GraphEdge, GraphStep, create_graph_step
+from app.algorithms.graph.types import (
+    GraphEdge,
+    GraphStep,
+    apply_graph_pseudocode_lines,
+    create_graph_step,
+)
 from app.algorithms.graph.utils import build_adjacency_list, validate_graph_structure
 
 
@@ -163,4 +168,13 @@ def prim_steps(
             description="Prim's minimum spanning forest is complete.",
         )
     )
-    return steps
+    return apply_graph_pseudocode_lines(
+        steps,
+        {
+            "update_frontier": 5,
+            "inspect_edge": 2,
+            "reject_edge": 3,
+            "accept_edge": 4,
+            "done": 7,
+        },
+    )

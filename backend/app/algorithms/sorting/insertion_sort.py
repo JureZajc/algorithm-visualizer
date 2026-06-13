@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def insertion_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -44,8 +44,12 @@ def insertion_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
                     [insertion_index],
                     array,
                     f"Insert {value_to_insert} at index {insertion_index}.",
+                    4,
                 )
             )
 
     steps.append(create_step("done", [], array, "Insertion sort is complete."))
-    return steps
+    return apply_pseudocode_lines(
+        steps,
+        {"compare": 2, "overwrite": 3, "done": 5},
+    )
