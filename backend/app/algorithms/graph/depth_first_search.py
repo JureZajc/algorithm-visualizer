@@ -1,4 +1,9 @@
-from app.algorithms.graph.types import GraphEdge, GraphStep, create_graph_step
+from app.algorithms.graph.types import (
+    GraphEdge,
+    GraphStep,
+    apply_graph_pseudocode_lines,
+    create_graph_step,
+)
 from app.algorithms.graph.utils import (
     build_adjacency_list,
     reconstruct_path,
@@ -35,6 +40,7 @@ def depth_first_search_steps(
             previous=previous,
             path=[],
             description=f"Push start node {start} onto the stack.",
+            pseudocode_line=1,
         )
     )
 
@@ -111,6 +117,7 @@ def depth_first_search_steps(
                     previous=previous,
                     path=[],
                     description=f"Push {neighbor} onto the stack.",
+                    pseudocode_line=6,
                 )
             )
 
@@ -149,4 +156,15 @@ def depth_first_search_steps(
             description="Depth-first search is complete.",
         )
     )
-    return steps
+    return apply_graph_pseudocode_lines(
+        steps,
+        {
+            "push": 6,
+            "pop": 2,
+            "visit": 3,
+            "inspect_edge": 5,
+            "path_found": 7,
+            "not_found": 7,
+            "done": 8,
+        },
+    )

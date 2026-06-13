@@ -1,6 +1,11 @@
 from collections import deque
 
-from app.algorithms.graph.types import GraphEdge, GraphStep, create_graph_step
+from app.algorithms.graph.types import (
+    GraphEdge,
+    GraphStep,
+    apply_graph_pseudocode_lines,
+    create_graph_step,
+)
 from app.algorithms.graph.utils import build_adjacency_list, validate_graph_structure
 
 
@@ -36,6 +41,7 @@ def topological_sort_steps(
             path=[],
             result=result,
             description="Collect all nodes with zero in-degree.",
+            pseudocode_line=1,
         )
     ]
 
@@ -136,4 +142,13 @@ def topological_sort_steps(
             ),
         )
     )
-    return steps
+    return apply_graph_pseudocode_lines(
+        steps,
+        {
+            "update_frontier": 5,
+            "add_to_result": 3,
+            "inspect_edge": 4,
+            "cycle_detected": 6,
+            "done": 7,
+        },
+    )

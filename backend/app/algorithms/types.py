@@ -1,4 +1,4 @@
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 
 StepType = Literal[
@@ -40,6 +40,7 @@ class AlgorithmStep(TypedDict):
     indices: list[int]
     array: list[int]
     description: str
+    pseudocode_line: NotRequired[int]
 
 
 def create_step(
@@ -47,12 +48,29 @@ def create_step(
     indices: list[int],
     array: list[int],
     description: str,
+    pseudocode_line: int | None = None,
 ) -> AlgorithmStep:
     """Create a step with independent copies of its mutable values."""
 
-    return {
+    step: AlgorithmStep = {
         "type": step_type,
         "indices": indices.copy(),
         "array": array.copy(),
         "description": description,
     }
+    if pseudocode_line is not None:
+        step["pseudocode_line"] = pseudocode_line
+    return step
+
+
+def apply_pseudocode_lines(
+    steps: list[AlgorithmStep],
+    lines_by_type: dict[StepType, int],
+) -> list[AlgorithmStep]:
+    """Attach 1-based pseudocode lines without changing step generation."""
+
+    for step in steps:
+        line = lines_by_type.get(step["type"])
+        if line is not None and "pseudocode_line" not in step:
+            step["pseudocode_line"] = line
+    return steps

@@ -21,6 +21,7 @@ class AlgorithmMetadata(BaseModel):
     time_complexity: TimeComplexity
     space_complexity: str
     notes: list[str]
+    pseudocode: list[str]
 
 
 class AlgorithmsResponse(BaseModel):
@@ -53,7 +54,179 @@ def metadata(
         ),
         space_complexity=space,
         notes=list(notes),
+        pseudocode=ALGORITHM_PSEUDOCODE[algorithm_id],
     )
+
+
+ALGORITHM_PSEUDOCODE = {
+    "bubble_sort": [
+        "for each pass through the unsorted values",
+        "  compare each adjacent pair",
+        "  if the left value is larger, swap the pair",
+        "  stop early if the pass made no swaps",
+        "return the sorted array",
+    ],
+    "selection_sort": [
+        "for each position in the array",
+        "  assume this position holds the minimum",
+        "  compare the minimum with each remaining value",
+        "  remember any smaller value",
+        "  swap the minimum into the current position",
+        "return the sorted array",
+    ],
+    "insertion_sort": [
+        "for each value after the first",
+        "  compare it with values in the sorted prefix",
+        "  shift larger values one position right",
+        "  insert the value into the open position",
+        "return the sorted array",
+    ],
+    "merge_sort": [
+        "split the current range into two halves",
+        "recursively sort the left and right halves",
+        "compare the next value from each half",
+        "write the smaller values back in order",
+        "mark the range as merged",
+        "return the sorted array",
+    ],
+    "quick_sort": [
+        "choose the final value as the pivot",
+        "compare each value with the pivot",
+        "swap smaller values into the left partition",
+        "move the pivot between the partitions",
+        "recursively sort both partitions",
+        "return the sorted array",
+    ],
+    "heap_sort": [
+        "build a max heap from the array",
+        "compare a root with its children",
+        "swap the root with its largest child when needed",
+        "move the heap maximum to the array's end",
+        "restore the reduced heap",
+        "return the sorted array",
+    ],
+    "shell_sort": [
+        "start with a gap equal to half the array length",
+        "compare values separated by the gap",
+        "shift larger values forward by the gap",
+        "insert the value into its gapped position",
+        "halve the gap and repeat",
+        "return the sorted array",
+    ],
+    "cocktail_shaker_sort": [
+        "scan left to right through the active range",
+        "  compare adjacent values and swap when needed",
+        "shrink the right boundary",
+        "scan right to left through the active range",
+        "  compare adjacent values and swap when needed",
+        "shrink the left boundary and repeat",
+        "return the sorted array",
+    ],
+    "gnome_sort": [
+        "compare the current value with its predecessor",
+        "if they are ordered, move one position forward",
+        "otherwise swap them and move one position back",
+        "repeat until the end of the array",
+        "return the sorted array",
+    ],
+    "comb_sort": [
+        "shrink the comparison gap",
+        "compare each pair separated by the gap",
+        "swap pairs that are out of order",
+        "repeat until the gap is one and no swaps occur",
+        "return the sorted array",
+    ],
+    "counting_sort": [
+        "find the minimum and maximum values",
+        "count how often each value occurs",
+        "iterate through the counts in ascending order",
+        "write each value back for its recorded count",
+        "return the sorted array",
+    ],
+    "linear_search": [
+        "for each value from left to right",
+        "  compare the value with the target",
+        "  if they match, report its index",
+        "report that the target was not found",
+        "finish the search",
+    ],
+    "binary_search": [
+        "set low and high around the candidate range",
+        "while low is not beyond high",
+        "  inspect the midpoint value",
+        "  if it matches, report its index",
+        "  if it is smaller, search the right half",
+        "  otherwise search the left half",
+        "report that the target was not found",
+        "finish the search",
+    ],
+    "bfs": [
+        "enqueue the start node",
+        "dequeue the next node",
+        "mark the node as visited",
+        "if it is the target, reconstruct the path",
+        "inspect each outgoing edge",
+        "enqueue each undiscovered neighbor",
+        "report whether a path was found",
+        "finish the search",
+    ],
+    "dfs": [
+        "push the start node onto the stack",
+        "pop the next node",
+        "mark the node as visited",
+        "if it is the target, reconstruct the path",
+        "inspect each outgoing edge",
+        "push each undiscovered neighbor",
+        "report whether a path was found",
+        "finish the search",
+    ],
+    "dijkstra": [
+        "add the start node with distance zero",
+        "remove the node with the smallest distance",
+        "mark the node as visited",
+        "if it is the target, reconstruct the path",
+        "inspect each outgoing edge",
+        "relax the edge when it gives a shorter distance",
+        "report whether a shortest path was found",
+        "finish the search",
+    ],
+    "a_star": [
+        "add the start node with its estimated cost",
+        "remove the node with the smallest estimated cost",
+        "move the node to the closed set",
+        "if it is the target, reconstruct the path",
+        "inspect each outgoing edge",
+        "update a neighbor when its new path is better",
+        "report whether a shortest path was found",
+        "finish the search",
+    ],
+    "topological_sort": [
+        "collect all nodes with zero in-degree",
+        "remove a zero in-degree node",
+        "add the node to the result",
+        "decrease each outgoing neighbor's in-degree",
+        "add newly available neighbors to the frontier",
+        "report a cycle if not every node was processed",
+        "finish with the topological order",
+    ],
+    "kruskal": [
+        "sort all edges by increasing weight",
+        "inspect the next lightest edge",
+        "accept it if it joins two components",
+        "otherwise reject it to avoid a cycle",
+        "repeat for every edge",
+        "return the minimum spanning forest",
+    ],
+    "prim": [
+        "start a component and add its candidate edges",
+        "remove the lightest candidate edge",
+        "reject it if its target is already visited",
+        "otherwise accept it into the forest",
+        "visit the new node and add its candidate edges",
+        "repeat for disconnected components",
+        "return the minimum spanning forest",
+    ],
+}
 
 
 SORTING_ALGORITHM_METADATA = [

@@ -41,6 +41,8 @@ def test_metadata_has_consistent_display_fields_and_categories() -> None:
         assert item.space_complexity.strip()
         assert item.notes
         assert all(note.strip() for note in item.notes)
+        assert item.pseudocode
+        assert all(line.strip() for line in item.pseudocode)
         assert item.time_complexity.best.strip()
         assert item.time_complexity.average.strip()
         assert item.time_complexity.worst.strip()

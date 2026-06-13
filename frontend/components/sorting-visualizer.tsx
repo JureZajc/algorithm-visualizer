@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
 import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
+import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { VisualizerControls } from "@/components/visualizer-controls";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
@@ -93,14 +94,17 @@ export function SortingVisualizer(props: MetadataSourceProps) {
           />
           <ArrayBars values={displayedNumbers} step={playback.currentStep} />
         </section>
-        <VisualizerStats
-          algorithmName={ALGORITHM_LABELS[algorithm]}
-          currentStep={playback.currentStepIndex + 1}
-          totalSteps={playback.steps.length}
-          elapsedMs={playback.elapsedMs}
-          resultLabel="Final sorted array"
-          result={<span className="font-mono text-xs font-medium">{finalArray ? `[${finalArray.join(", ")}]` : "Waiting for completion"}</span>}
-        />
+        <div className="grid gap-5 self-start">
+          <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={playback.currentStep?.pseudocode_line} isLoading={props.isMetadataLoading} error={props.metadataError} />
+          <VisualizerStats
+            algorithmName={ALGORITHM_LABELS[algorithm]}
+            currentStep={playback.currentStepIndex + 1}
+            totalSteps={playback.steps.length}
+            elapsedMs={playback.elapsedMs}
+            resultLabel="Final sorted array"
+            result={<span className="font-mono text-xs font-medium">{finalArray ? `[${finalArray.join(", ")}]` : "Waiting for completion"}</span>}
+          />
+        </div>
       </div>
     </div>
   );

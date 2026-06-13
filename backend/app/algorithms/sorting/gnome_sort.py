@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def gnome_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -32,4 +32,4 @@ def gnome_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
             index = max(1, index - 1)
 
     steps.append(create_step("done", [], array, "Gnome sort is complete."))
-    return steps
+    return apply_pseudocode_lines(steps, {"compare": 1, "swap": 3, "done": 5})

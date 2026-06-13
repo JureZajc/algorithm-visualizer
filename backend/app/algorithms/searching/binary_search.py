@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def binary_search_steps(numbers: list[int], target: int) -> list[AlgorithmStep]:
@@ -48,4 +48,7 @@ def binary_search_steps(numbers: list[int], target: int) -> list[AlgorithmStep]:
         )
 
     steps.append(create_step("done", [], array, "Binary search is complete."))
-    return steps
+    return apply_pseudocode_lines(
+        steps,
+        {"compare": 3, "found": 4, "not_found": 7, "done": 8},
+    )

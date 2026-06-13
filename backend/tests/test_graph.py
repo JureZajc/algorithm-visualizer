@@ -13,6 +13,7 @@ from app.algorithms.graph import (
     topological_sort_steps,
 )
 from app.algorithms.graph.types import GraphEdge, GraphStep
+from app.algorithms.metadata import ALGORITHM_METADATA
 
 
 GraphFunction = Callable[
@@ -48,7 +49,9 @@ STEP_KEYS = {
     "mst_edges",
     "total_weight",
     "description",
+    "pseudocode_line",
 }
+PSEUDOCODE_LENGTHS = {item.id: len(item.pseudocode) for item in ALGORITHM_METADATA}
 
 
 @pytest.mark.parametrize("graph_function", GRAPH_FUNCTIONS)
@@ -74,6 +77,22 @@ def test_graph_algorithm_contract(graph_function: GraphFunction) -> None:
         assert isinstance(step["path"], list)
         assert step["previous"] is not None
         assert step["description"]
+
+
+def test_all_graph_steps_have_valid_pseudocode_lines() -> None:
+    algorithm_steps = {
+        "bfs": breadth_first_search_steps(NODES, EDGES, "A", "D"),
+        "dfs": depth_first_search_steps(NODES, EDGES, "A", "D"),
+        "dijkstra": dijkstra_steps(NODES, EDGES, "A", "D"),
+        "a_star": a_star_steps(NODES, EDGES, "A", "D"),
+        "topological_sort": topological_sort_steps(NODES, EDGES, True),
+        "kruskal": kruskal_steps(NODES, EDGES),
+        "prim": prim_steps(NODES, EDGES, "A"),
+    }
+
+    for algorithm_id, steps in algorithm_steps.items():
+        for step in steps:
+            assert 1 <= step["pseudocode_line"] <= PSEUDOCODE_LENGTHS[algorithm_id]
 
 
 @pytest.mark.parametrize("graph_function", GRAPH_FUNCTIONS)

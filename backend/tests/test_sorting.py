@@ -15,7 +15,8 @@ from app.algorithms.sorting import (
     selection_sort_steps,
     shell_sort_steps,
 )
-from app.algorithms.types import AlgorithmStep
+from app.algorithms.metadata import ALGORITHM_METADATA
+from app.algorithms.types import AlgorithmStep, create_step
 
 
 SortingFunction = Callable[[list[int]], list[AlgorithmStep]]
@@ -52,6 +53,7 @@ VALID_STEP_TYPES = {
     "heapify",
     "done",
 }
+PSEUDOCODE_LENGTHS = {item.id: len(item.pseudocode) for item in ALGORITHM_METADATA}
 
 
 @pytest.mark.parametrize("sort_function", SORTING_FUNCTIONS)
@@ -70,11 +72,19 @@ def test_sorting_algorithm_contract(
     assert steps[-1]["array"] == sorted(original)
 
     for step in steps:
-        assert set(step) == {"type", "indices", "array", "description"}
+        assert set(step) == {
+            "type",
+            "indices",
+            "array",
+            "description",
+            "pseudocode_line",
+        }
         assert step["type"] in VALID_STEP_TYPES
         assert isinstance(step["indices"], list)
         assert isinstance(step["array"], list)
         assert step["description"]
+        algorithm_id = sort_function.__name__.removesuffix("_steps")
+        assert 1 <= step["pseudocode_line"] <= PSEUDOCODE_LENGTHS[algorithm_id]
 
 
 @pytest.mark.parametrize("sort_function", SORTING_FUNCTIONS)
@@ -110,3 +120,17 @@ def test_algorithm_emits_expected_step_types(
     steps = sort_function([3, 1, 2])
 
     assert {step["type"] for step in steps} == expected_types
+
+
+def test_create_step_keeps_pseudocode_line_optional() -> None:
+    legacy_step = create_step("compare", [0, 1], [2, 1], "Compare values.")
+    annotated_step = create_step(
+        "compare",
+        [0, 1],
+        [2, 1],
+        "Compare values.",
+        2,
+    )
+
+    assert "pseudocode_line" not in legacy_step
+    assert annotated_step["pseudocode_line"] == 2

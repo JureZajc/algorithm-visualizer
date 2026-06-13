@@ -45,6 +45,7 @@ export interface GraphStep {
   mst_edges: GraphEdge[];
   total_weight: number | null;
   description: string;
+  pseudocode_line?: number;
 }
 
 export interface GraphRequest {

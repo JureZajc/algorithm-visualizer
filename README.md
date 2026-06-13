@@ -2,7 +2,9 @@
 
 Algorithm Visualizer is an open-source learning project that generates
 step-by-step algorithm states in a FastAPI backend and animates them in a
-Next.js frontend.
+Next.js frontend. Each supported algorithm includes a learning-focused
+explanation and pseudocode panel whose active line follows the current
+visualization step.
 
 ## Supported algorithms
 
@@ -52,7 +54,7 @@ the animation.
 The backend exposes these main routes:
 
 - `GET /algorithms` lists supported sorting, searching, and graph algorithms with
-  descriptions, complexity bounds, and notes or limitations.
+  descriptions, complexity bounds, notes or limitations, and ordered pseudocode.
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
@@ -73,7 +75,14 @@ Each item returned by `GET /algorithms` has this shape:
     "worst": "O(n²)"
   },
   "space_complexity": "O(1)",
-  "notes": ["Stable and in-place."]
+  "notes": ["Stable and in-place."],
+  "pseudocode": [
+    "for each pass through the unsorted values",
+    "  compare each adjacent pair",
+    "  if the left value is larger, swap the pair",
+    "  stop early if the pass made no swaps",
+    "return the sorted array"
+  ]
 }
 ```
 
@@ -196,9 +205,15 @@ Graph steps share the original pathfinding fields and also include `result`
 for topological order, `frontier_edges` for Prim candidates, `mst_edges` for
 accepted spanning-forest edges, and `total_weight` for the current forest.
 
-Every visualization step contains a step `type`, active `indices`, an array
-snapshot, and a human-readable `description`. Responses also include the
-initial array and total step count.
+Every visualization step contains its existing state fields and may also
+include a 1-based `pseudocode_line`. The frontend uses that number to highlight
+the matching line while the animation plays. Older clients can ignore the
+additive field, and steps without it remain valid. Responses also include the
+initial input and total step count.
+
+The pseudocode panel stays synchronized across sorting, searching, and graph
+visualizers, pairing highlighted algorithm steps with the existing descriptions,
+complexity details, notes, and live data-structure state.
 
 ## Local development on macOS
 

@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def merge_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -80,4 +80,7 @@ def merge_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
 
     merge_sort(0, len(array) - 1)
     steps.append(create_step("done", [], array, "Merge sort is complete."))
-    return steps
+    return apply_pseudocode_lines(
+        steps,
+        {"partition": 1, "compare": 3, "overwrite": 4, "merge": 5, "done": 6},
+    )

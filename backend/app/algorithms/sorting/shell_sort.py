@@ -1,4 +1,4 @@
-from app.algorithms.types import AlgorithmStep, create_step
+from app.algorithms.types import AlgorithmStep, apply_pseudocode_lines, create_step
 
 
 def shell_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
@@ -45,10 +45,14 @@ def shell_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
                         [position],
                         array,
                         f"Insert {value_to_insert} at index {position}.",
+                        4,
                     )
                 )
 
         gap //= 2
 
     steps.append(create_step("done", [], array, "Shell sort is complete."))
-    return steps
+    return apply_pseudocode_lines(
+        steps,
+        {"compare": 2, "overwrite": 3, "done": 6},
+    )

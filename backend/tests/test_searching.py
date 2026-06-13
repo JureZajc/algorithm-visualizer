@@ -3,6 +3,7 @@ from collections.abc import Callable
 import pytest
 
 from app.algorithms.searching import binary_search_steps, linear_search_steps
+from app.algorithms.metadata import ALGORITHM_METADATA
 from app.algorithms.types import AlgorithmStep
 
 
@@ -12,6 +13,7 @@ SEARCHING_FUNCTIONS: list[SearchingFunction] = [
     linear_search_steps,
     binary_search_steps,
 ]
+PSEUDOCODE_LENGTHS = {item.id: len(item.pseudocode) for item in ALGORITHM_METADATA}
 
 
 @pytest.mark.parametrize("search_function", SEARCHING_FUNCTIONS)
@@ -41,11 +43,19 @@ def test_searching_algorithm_contract(
     assert expected_outcome in {step["type"] for step in steps}
 
     for step in steps:
-        assert set(step) == {"type", "indices", "array", "description"}
+        assert set(step) == {
+            "type",
+            "indices",
+            "array",
+            "description",
+            "pseudocode_line",
+        }
         assert step["type"] in {"compare", "found", "not_found", "done"}
         assert isinstance(step["indices"], list)
         assert isinstance(step["array"], list)
         assert step["description"]
+        algorithm_id = search_function.__name__.removesuffix("_steps")
+        assert 1 <= step["pseudocode_line"] <= PSEUDOCODE_LENGTHS[algorithm_id]
 
 
 @pytest.mark.parametrize("search_function", SEARCHING_FUNCTIONS)
