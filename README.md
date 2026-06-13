@@ -215,6 +215,15 @@ The pseudocode panel stays synchronized across sorting, searching, and graph
 visualizers, pairing highlighted algorithm steps with the existing descriptions,
 complexity details, notes, and live data-structure state.
 
+## Sample presets
+
+Each visualizer includes frontend-only sample presets for quickly loading useful
+inputs. Sorting examples cover common data shapes and array sizes, searching
+examples cover successful and unsuccessful target positions plus binary search,
+and graph examples cover paths, weights, disconnected components, cycles,
+topological sorting, minimum spanning trees, and A* search. Selecting a preset
+updates the current input while leaving the existing manual controls available.
+
 ## Local development on macOS
 
 Run the backend and frontend in separate Terminal tabs from the repository
