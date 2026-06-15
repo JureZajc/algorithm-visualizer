@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { StepControls } from "@/components/step-controls";
 import type { SortingPreset } from "@/lib/array-presets";
 import { ALGORITHM_LABELS, type SortingAlgorithm } from "@/types/sorting";
 
@@ -9,8 +10,8 @@ interface VisualizerControlsProps {
   speed: number;
   isLoading: boolean;
   isPlaying: boolean;
-  hasSteps: boolean;
-  isComplete: boolean;
+  currentStepIndex: number;
+  totalSteps: number;
   presetId: string;
   presets: SortingPreset[];
   onAlgorithmChange: (algorithm: SortingAlgorithm) => void;
@@ -19,6 +20,11 @@ interface VisualizerControlsProps {
   onGenerate: (count: number) => void;
   onStart: (count: number) => void;
   onTogglePlayback: () => void;
+  onPreviousStep: () => void;
+  onNextStep: () => void;
+  onJumpToStart: () => void;
+  onJumpToEnd: () => void;
+  onSeek: (index: number) => void;
   onReset: () => void;
   onPresetChange: (presetId: string) => void;
 }
@@ -114,12 +120,24 @@ export function VisualizerControls(props: VisualizerControlsProps) {
         <button className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`} type="button" disabled={props.isPlaying || props.isLoading} onClick={() => props.onStart(normalizeCount())}>
           {props.isLoading ? "Loading steps..." : "Start visualization"}
         </button>
-        <button className={`${buttonClass} bg-indigo-50 text-indigo-700 hover:bg-indigo-100`} type="button" disabled={!props.hasSteps || props.isLoading || props.isComplete} onClick={props.onTogglePlayback}>
-          {props.isPlaying ? "Pause" : "Resume"}
-        </button>
         <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={props.isLoading} onClick={props.onReset}>
           Reset
         </button>
+      </div>
+
+      <div className="md:col-span-2 xl:col-span-4">
+        <StepControls
+          currentStepIndex={props.currentStepIndex}
+          totalSteps={props.totalSteps}
+          isLoading={props.isLoading}
+          isPlaying={props.isPlaying}
+          onTogglePlayback={props.onTogglePlayback}
+          onPrevious={props.onPreviousStep}
+          onNext={props.onNextStep}
+          onJumpToStart={props.onJumpToStart}
+          onJumpToEnd={props.onJumpToEnd}
+          onSeek={props.onSeek}
+        />
       </div>
     </section>
   );
