@@ -40,14 +40,14 @@ order. The API returns HTTP 422 for unsorted input.
 - Kruskal's Minimum Spanning Tree
 - Prim's Minimum Spanning Tree
 
-The frontend includes curated weighted graph presets and dedicated SVG states
-for traversal, shortest-path, topological-order, and minimum-spanning-tree
-algorithms. Controls adapt to each algorithm: pathfinding uses start and target
-nodes, Topological Sort uses a directed graph, Prim uses a start node, and both
-MST algorithms use undirected edges. A* displays generated admissible
-heuristics, while Dijkstra and A* display live path costs. Topological results,
-candidate and accepted MST edges, and total forest weight are shown alongside
-the animation.
+The frontend includes curated weighted graph presets, a custom graph editor,
+and dedicated SVG states for traversal, shortest-path, topological-order, and
+minimum-spanning-tree algorithms. Controls adapt to each algorithm: pathfinding
+uses start and target nodes, Topological Sort uses a directed graph, Prim uses a
+start node, and both MST algorithms use undirected edges. A* displays generated
+admissible heuristics, while Dijkstra and A* display live path costs.
+Topological results, candidate and accepted MST edges, and total forest weight
+are shown alongside the animation.
 
 ## API
 
@@ -224,6 +224,27 @@ and graph examples cover paths, weights, disconnected components, cycles,
 topological sorting, minimum spanning trees, and A* search. Selecting a preset
 updates the current input while leaving the existing manual controls available.
 
+## Custom graph editor
+
+Choose **Custom graph** from the Graph menu to build a graph for the current
+browser session:
+
+1. Enter a unique node ID, click **Add node**, then click the SVG canvas to
+   place it.
+2. Choose two existing nodes, enter a numeric weight, and click **Add edge**.
+3. Edit weights directly in the edge list, or remove edges and nodes with their
+   remove buttons. Removing a node also removes its connected edges.
+4. Choose directed or undirected mode and select the start and target nodes.
+5. Select an algorithm and click **Start visualization**.
+
+Node IDs cannot be empty or duplicated. Edges must connect two different
+existing nodes, and weights must be finite numbers. Negative weights can be
+stored for algorithms that support them, but Dijkstra and A* clearly block the
+run because they require non-negative weights. Topological Sort temporarily
+runs the graph as directed, while Kruskal and Prim temporarily run it as
+undirected; the editor preserves the user's graph type choice for other
+algorithms. Switching to a preset does not discard the custom draft.
+
 ## Local development on macOS
 
 Run the backend and frontend in separate Terminal tabs from the repository
@@ -259,10 +280,10 @@ npm run dev
 The frontend is available at `http://localhost:3000` and expects the backend
 on port 8000 by default.
 
-Open `http://localhost:3000`, choose **Graph / Pathfinding**, select a preset
-and algorithm, configure the available start/target/direction controls, and
-click **Start visualization**. Playback can be paused, resumed, reset, and
-slowed down while the side panel reports algorithm-specific state.
+Open `http://localhost:3000`, choose **Graph / Pathfinding**, select a preset or
+the custom graph editor, configure the available start/target/direction
+controls, and click **Start visualization**. Playback can be paused, resumed,
+reset, and slowed down while the side panel reports algorithm-specific state.
 
 Run the production frontend check with:
 
