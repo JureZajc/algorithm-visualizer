@@ -88,6 +88,31 @@ export function useStepPlayback<T>(speed: number) {
     else if (steps.length > 0 && currentStepIndex < steps.length - 1) play();
   }, [currentStepIndex, isPlaying, pause, play, steps.length]);
 
+  const seek = useCallback(
+    (index: number) => {
+      if (steps.length === 0) return;
+      pause();
+      setCurrentStepIndex(Math.min(steps.length - 1, Math.max(0, index)));
+    },
+    [pause, steps.length],
+  );
+
+  const previous = useCallback(() => {
+    seek(currentStepIndex - 1);
+  }, [currentStepIndex, seek]);
+
+  const next = useCallback(() => {
+    seek(currentStepIndex + 1);
+  }, [currentStepIndex, seek]);
+
+  const jumpToStart = useCallback(() => {
+    seek(0);
+  }, [seek]);
+
+  const jumpToEnd = useCallback(() => {
+    seek(steps.length - 1);
+  }, [seek, steps.length]);
+
   return {
     steps,
     currentStep: currentStepIndex >= 0 ? steps[currentStepIndex] : null,
@@ -98,5 +123,10 @@ export function useStepPlayback<T>(speed: number) {
     load,
     reset,
     toggle,
+    seek,
+    previous,
+    next,
+    jumpToStart,
+    jumpToEnd,
   };
 }

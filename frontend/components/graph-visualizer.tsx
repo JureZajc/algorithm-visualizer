@@ -7,6 +7,7 @@ import { GraphCanvas } from "@/components/graph-canvas";
 import { GraphEditor } from "@/components/graph-editor";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { ErrorMessage } from "@/components/sorting-visualizer";
+import { StepControls } from "@/components/step-controls";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchGraphSteps } from "@/lib/api";
@@ -308,8 +309,21 @@ export function GraphVisualizer(props: MetadataSourceProps) {
             </span>
           )}
           <button className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`} type="button" disabled={editingDisabled || validationMessage !== null} onClick={startVisualization}>{isLoading ? "Loading steps..." : "Start visualization"}</button>
-          <button className={`${buttonClass} bg-indigo-50 text-indigo-700 hover:bg-indigo-100`} type="button" disabled={playback.steps.length === 0 || isLoading || playback.isComplete} onClick={playback.toggle}>{playback.isPlaying ? "Pause" : "Resume"}</button>
           <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={isLoading} onClick={playback.reset}>Reset</button>
+        </div>
+        <div className="md:col-span-2 xl:col-span-6">
+          <StepControls
+            currentStepIndex={playback.currentStepIndex}
+            totalSteps={playback.steps.length}
+            isLoading={isLoading}
+            isPlaying={playback.isPlaying}
+            onTogglePlayback={playback.toggle}
+            onPrevious={playback.previous}
+            onNext={playback.next}
+            onJumpToStart={playback.jumpToStart}
+            onJumpToEnd={playback.jumpToEnd}
+            onSeek={playback.seek}
+          />
         </div>
       </section>
 

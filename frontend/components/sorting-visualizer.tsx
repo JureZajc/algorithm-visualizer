@@ -86,8 +86,8 @@ export function SortingVisualizer(props: MetadataSourceProps) {
         speed={speed}
         isLoading={isLoading}
         isPlaying={playback.isPlaying}
-        hasSteps={playback.steps.length > 0}
-        isComplete={playback.isComplete}
+        currentStepIndex={playback.currentStepIndex}
+        totalSteps={playback.steps.length}
         presetId={presetId}
         presets={SORTING_PRESETS}
         onAlgorithmChange={changeAlgorithm}
@@ -99,6 +99,11 @@ export function SortingVisualizer(props: MetadataSourceProps) {
         onGenerate={handleGenerate}
         onStart={handleStart}
         onTogglePlayback={playback.toggle}
+        onPreviousStep={playback.previous}
+        onNextStep={playback.next}
+        onJumpToStart={playback.jumpToStart}
+        onJumpToEnd={playback.jumpToEnd}
+        onSeek={playback.seek}
         onReset={playback.reset}
         onPresetChange={loadPreset}
       />
