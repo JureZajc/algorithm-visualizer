@@ -1,4 +1,4 @@
-import type { GraphPreset } from "@/types/graph";
+import type { GraphEdge, GraphNodePosition, GraphPreset } from "@/types/graph";
 
 export const GRAPH_PRESETS: GraphPreset[] = [
   {
@@ -131,12 +131,17 @@ export const GRAPH_PRESETS: GraphPreset[] = [
   },
 ];
 
-export function createAdmissibleHeuristics(preset: GraphPreset, targetId: string): Record<string, number> {
-  const positions = new Map(preset.nodes.map((node) => [node.id, node]));
+export function createAdmissibleHeuristics(
+  nodes: GraphNodePosition[],
+  edges: GraphEdge[],
+  targetId: string,
+): Record<string, number> {
+  const positions = new Map(nodes.map((node) => [node.id, node]));
   const target = positions.get(targetId);
   if (!target) return {};
 
-  const ratios = preset.edges.flatMap((edge) => {
+  const ratios = edges.flatMap((edge) => {
+    if (edge.weight < 0) return [];
     const source = positions.get(edge.source);
     const edgeTarget = positions.get(edge.target);
     if (!source || !edgeTarget) return [];
@@ -145,7 +150,7 @@ export function createAdmissibleHeuristics(preset: GraphPreset, targetId: string
   });
   const scale = ratios.length > 0 ? Math.min(...ratios) : 0;
 
-  return Object.fromEntries(preset.nodes.map((node) => [
+  return Object.fromEntries(nodes.map((node) => [
     node.id,
     Math.floor(Math.hypot(node.x - target.x, node.y - target.y) * scale * 100) / 100,
   ]));

@@ -1,3 +1,5 @@
+import type { MouseEvent } from "react";
+
 import type { GraphEdge, GraphNodePosition, GraphStep, GraphStepType } from "@/types/graph";
 
 interface GraphCanvasProps {
@@ -9,6 +11,8 @@ interface GraphCanvasProps {
   showStart: boolean;
   showTarget: boolean;
   step: GraphStep | null;
+  isPlacementActive?: boolean;
+  onCanvasClick?: (x: number, y: number) => void;
 }
 
 interface GraphStepClasses {
@@ -58,7 +62,18 @@ function Marker({ id, colorClass }: { id: string; colorClass: string }) {
   );
 }
 
-export function GraphCanvas({ nodes, edges, start, target, directed, showStart, showTarget, step }: GraphCanvasProps) {
+export function GraphCanvas({
+  nodes,
+  edges,
+  start,
+  target,
+  directed,
+  showStart,
+  showTarget,
+  step,
+  isPlacementActive = false,
+  onCanvasClick,
+}: GraphCanvasProps) {
   const positions = new Map(nodes.map((node) => [node.id, node]));
   const visited = new Set(step?.visited ?? []);
   const frontier = new Set(step?.frontier ?? []);
@@ -70,6 +85,21 @@ export function GraphCanvas({ nodes, edges, start, target, directed, showStart, 
   const activeEdgeKey = step?.edge ? edgeKey(step.edge.source, step.edge.target, directed) : null;
   const activeClasses = step ? GRAPH_STEP_CLASSES[step.type] : null;
   const cycleDetected = step?.type === "cycle_detected";
+
+  function handleCanvasClick(event: MouseEvent<SVGRectElement>) {
+    const svg = event.currentTarget.ownerSVGElement;
+    const matrix = svg?.getScreenCTM();
+    if (!svg || !matrix || !onCanvasClick) return;
+
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const graphPoint = point.matrixTransform(matrix.inverse());
+    onCanvasClick(
+      Math.min(618, Math.max(32, graphPoint.x)),
+      Math.min(378, Math.max(32, graphPoint.y)),
+    );
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.10),transparent_64%)] shadow-inner">
@@ -85,6 +115,15 @@ export function GraphCanvas({ nodes, edges, start, target, directed, showStart, 
           <Marker id="arrow-result" colorClass="fill-teal-500" />
           <Marker id="arrow-candidate" colorClass="fill-cyan-500" />
         </defs>
+
+        <rect
+          x="0"
+          y="0"
+          width="650"
+          height="410"
+          className={isPlacementActive ? "cursor-crosshair fill-transparent" : "fill-transparent"}
+          onClick={isPlacementActive ? handleCanvasClick : undefined}
+        />
 
         {edges.map((edge, index) => {
           const source = positions.get(edge.source);
