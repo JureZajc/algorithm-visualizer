@@ -2,6 +2,10 @@ import type {
   AlgorithmsResponse,
 } from "@/types/algorithm";
 import type {
+  DynamicProgrammingRequest,
+  DynamicProgrammingResponse,
+} from "@/types/dynamic-programming";
+import type {
   RandomNumbersResponse,
   SortingAlgorithm,
   SortingStepsResponse,
@@ -64,6 +68,15 @@ export function fetchSearchingSteps(
 
 export function fetchGraphSteps(request: GraphRequest): Promise<GraphResponse> {
   return postJson<GraphResponse>("/graph/steps", request);
+}
+
+export function fetchDynamicProgrammingSteps(
+  request: DynamicProgrammingRequest,
+): Promise<DynamicProgrammingResponse> {
+  return postJson<DynamicProgrammingResponse>(
+    "/dynamic-programming/steps",
+    request,
+  );
 }
 
 export function generateRandomNumbers(size: number): Promise<RandomNumbersResponse> {

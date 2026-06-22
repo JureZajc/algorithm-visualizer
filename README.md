@@ -49,16 +49,32 @@ admissible heuristics, while Dijkstra and A* display live path costs.
 Topological results, candidate and accepted MST edges, and total forest weight
 are shown alongside the animation.
 
+### Dynamic Programming
+
+- Fibonacci DP
+- Coin Change
+- 0/1 Knapsack
+- Longest Common Subsequence
+- Edit Distance
+- Grid Unique Paths
+
+Dynamic programming visualizations use tables or grids with an active cell,
+related dependency cells, synchronized pseudocode, and the final computed
+result. Coin Change uses unlimited coins and displays impossible states as
+`inf`.
+
 ## API
 
 The backend exposes these main routes:
 
-- `GET /algorithms` lists supported sorting, searching, and graph algorithms with
-  descriptions, complexity bounds, notes or limitations, and ordered pseudocode.
+- `GET /algorithms` lists supported sorting, searching, graph, and dynamic
+  programming algorithms with descriptions, complexity bounds, notes or
+  limitations, and ordered pseudocode.
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
 - `POST /graph/steps` generates graph algorithm visualization steps.
+- `POST /dynamic-programming/steps` generates dynamic programming table steps.
 
 Each item returned by `GET /algorithms` has this shape:
 
@@ -205,24 +221,58 @@ Graph steps share the original pathfinding fields and also include `result`
 for topological order, `frontier_edges` for Prim candidates, `mst_edges` for
 accepted spanning-forest edges, and `total_weight` for the current forest.
 
+Dynamic Programming request example:
+
+```json
+{
+  "algorithm": "coin_change",
+  "coins": [1, 3, 4],
+  "amount": 6
+}
+```
+
+The dynamic programming endpoint accepts algorithm-specific fields: `n` for
+Fibonacci, `coins` and `amount` for Coin Change, `weights`, `values`, and
+`capacity` for Knapsack, `text_a` and `text_b` for LCS and Edit Distance, and
+`rows` and `cols` for Grid Unique Paths.
+
+Dynamic programming steps have this shape:
+
+```json
+{
+  "type": "update",
+  "table": [[0, 1, 1, 2]],
+  "active_cell": [0, 3],
+  "related_cells": [[0, 2], [0, 1]],
+  "description": "Store F(3) = 2.",
+  "pseudocode_line": 4,
+  "result": null
+}
+```
+
+`active_cell` and `related_cells` use zero-based `[row, column]` coordinates.
+The final `done` step contains the canonical `result`.
+
 Every visualization step contains its existing state fields and may also
 include a 1-based `pseudocode_line`. The frontend uses that number to highlight
 the matching line while the animation plays. Older clients can ignore the
 additive field, and steps without it remain valid. Responses also include the
 initial input and total step count.
 
-The pseudocode panel stays synchronized across sorting, searching, and graph
-visualizers, pairing highlighted algorithm steps with the existing descriptions,
-complexity details, notes, and live data-structure state.
+The pseudocode panel stays synchronized across sorting, searching, graph, and
+dynamic programming visualizers, pairing highlighted algorithm steps with the
+existing descriptions, complexity details, notes, and live data-structure state.
 
 ## Sample presets
 
 Each visualizer includes frontend-only sample presets for quickly loading useful
 inputs. Sorting examples cover common data shapes and array sizes, searching
 examples cover successful and unsuccessful target positions plus binary search,
-and graph examples cover paths, weights, disconnected components, cycles,
-topological sorting, minimum spanning trees, and A* search. Selecting a preset
-updates the current input while leaving the existing manual controls available.
+graph examples cover paths, weights, disconnected components, cycles,
+topological sorting, minimum spanning trees, and A* search, and dynamic
+programming examples cover one-dimensional, string, item, coin, and grid
+tables. Selecting a preset updates the current input while leaving the existing
+manual controls available.
 
 ## Custom graph editor
 
@@ -288,9 +338,8 @@ npm run dev
 The frontend is available at `http://localhost:3000` and expects the backend
 on port 8000 by default.
 
-Open `http://localhost:3000`, choose **Graph / Pathfinding**, select a preset or
-the custom graph editor, configure the available start/target/direction
-controls, and click **Start visualization**. Playback can be paused, resumed,
+Open `http://localhost:3000`, choose a visualizer mode, select a preset or edit
+the inputs, and click **Start visualization**. Playback can be paused, resumed,
 reset, and slowed down while the side panel reports algorithm-specific state.
 
 Run the production frontend check with:

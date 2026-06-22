@@ -17,7 +17,11 @@ export interface ArrayAlgorithmStep {
   pseudocode_line?: number;
 }
 
-export type VisualizerMode = "sorting" | "searching" | "graph";
+export type VisualizerMode =
+  | "sorting"
+  | "searching"
+  | "graph"
+  | "dynamic_programming";
 
 export type AlgorithmCategory = VisualizerMode;
 
@@ -43,6 +47,7 @@ export interface AlgorithmsResponse {
   sorting: AlgorithmMetadata[];
   searching: AlgorithmMetadata[];
   graph: AlgorithmMetadata[];
+  dynamic_programming: AlgorithmMetadata[];
 }
 
 export interface MetadataSourceProps {

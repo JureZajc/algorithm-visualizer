@@ -3,7 +3,12 @@ from typing import Literal
 from pydantic import BaseModel
 
 
-AlgorithmCategory = Literal["sorting", "searching", "graph"]
+AlgorithmCategory = Literal[
+    "sorting",
+    "searching",
+    "graph",
+    "dynamic_programming",
+]
 
 
 class TimeComplexity(BaseModel):
@@ -28,6 +33,7 @@ class AlgorithmsResponse(BaseModel):
     sorting: list[AlgorithmMetadata]
     searching: list[AlgorithmMetadata]
     graph: list[AlgorithmMetadata]
+    dynamic_programming: list[AlgorithmMetadata]
 
 
 def metadata(
@@ -159,6 +165,57 @@ ALGORITHM_PSEUDOCODE = {
         "  otherwise search the left half",
         "report that the target was not found",
         "finish the search",
+    ],
+    "fibonacci": [
+        "create a table for Fibonacci values from 0 through n",
+        "set F(0) to 0 and F(1) to 1 when needed",
+        "for each index from 2 through n",
+        "  store F(i) as F(i - 1) plus F(i - 2)",
+        "return F(n)",
+    ],
+    "coin_change": [
+        "create a table for coin prefixes and target amounts",
+        "set amount 0 to 0 coins and other amounts to infinity",
+        "for each coin row",
+        "  for each amount",
+        "    compare skipping the coin with using the coin again",
+        "    choose the smaller coin count",
+        "return the final count or report not possible",
+    ],
+    "knapsack": [
+        "create a table for item prefixes and capacities",
+        "for each item",
+        "  for each capacity",
+        "    compare the best value without and with the item",
+        "    choose the item when it improves the value",
+        "    otherwise carry forward the previous best",
+        "return the best value in the final cell",
+    ],
+    "lcs": [
+        "create a table for prefixes of both strings",
+        "for each character in the first string",
+        "  for each character in the second string",
+        "    if the characters match, extend the diagonal subsequence",
+        "    otherwise choose the longer top or left prefix",
+        "backtrack through the table to build a subsequence",
+        "return the subsequence",
+    ],
+    "edit_distance": [
+        "create a table for source and target prefixes",
+        "initialize empty-string row and column costs",
+        "for each source character",
+        "  for each target character",
+        "    if characters match, copy the diagonal cost",
+        "    otherwise choose insert, delete, or replace plus one",
+        "return the final edit distance",
+    ],
+    "unique_paths": [
+        "create a grid for path counts",
+        "set the first row and first column to 1",
+        "for each inner row",
+        "  for each inner column",
+        "    add paths from the cell above and the cell to the left",
+        "return the bottom-right count",
     ],
     "bfs": [
         "enqueue the start node",
@@ -481,8 +538,85 @@ GRAPH_ALGORITHM_METADATA = [
 ]
 
 
+DYNAMIC_PROGRAMMING_ALGORITHM_METADATA = [
+    metadata(
+        "fibonacci",
+        "Fibonacci DP",
+        "dynamic_programming",
+        "Builds Fibonacci numbers from smaller saved subproblems.",
+        "O(n)",
+        "O(n)",
+        "O(n)",
+        "O(n)",
+        "Demonstrates one-dimensional tabulation.",
+        "The table keeps every value so the visualization can show the recurrence.",
+    ),
+    metadata(
+        "coin_change",
+        "Coin Change",
+        "dynamic_programming",
+        "Finds the minimum number of unlimited coins needed for a target amount.",
+        "O(ca)",
+        "O(ca)",
+        "O(ca)",
+        "O(ca)",
+        "Here c is the number of coin types and a is the target amount.",
+        "Impossible amounts are displayed as infinity and reported as not possible.",
+    ),
+    metadata(
+        "knapsack",
+        "0/1 Knapsack",
+        "dynamic_programming",
+        "Chooses items to maximize value without exceeding a capacity limit.",
+        "O(nW)",
+        "O(nW)",
+        "O(nW)",
+        "O(nW)",
+        "Each item can be chosen at most once.",
+        "Here n is item count and W is the capacity.",
+    ),
+    metadata(
+        "lcs",
+        "Longest Common Subsequence",
+        "dynamic_programming",
+        "Finds a longest sequence that appears in both strings in order.",
+        "O(mn)",
+        "O(mn)",
+        "O(mn)",
+        "O(mn)",
+        "Subsequence characters do not need to be adjacent.",
+        "When several answers are valid, this implementation uses deterministic tie-breaking.",
+    ),
+    metadata(
+        "edit_distance",
+        "Edit Distance",
+        "dynamic_programming",
+        "Computes the fewest inserts, deletes, and replacements between two strings.",
+        "O(mn)",
+        "O(mn)",
+        "O(mn)",
+        "O(mn)",
+        "Also known as Levenshtein distance.",
+        "Every table cell represents the cost for a pair of string prefixes.",
+    ),
+    metadata(
+        "unique_paths",
+        "Grid Unique Paths",
+        "dynamic_programming",
+        "Counts paths across a grid when movement is limited to right and down.",
+        "O(rc)",
+        "O(rc)",
+        "O(rc)",
+        "O(rc)",
+        "Here r is row count and c is column count.",
+        "The first row and column each have exactly one route.",
+    ),
+]
+
+
 ALGORITHM_METADATA = [
     *SORTING_ALGORITHM_METADATA,
     *SEARCHING_ALGORITHM_METADATA,
     *GRAPH_ALGORITHM_METADATA,
+    *DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
 ]
