@@ -245,6 +245,14 @@ runs the graph as directed, while Kruskal and Prim temporarily run it as
 undirected; the editor preserves the user's graph type choice for other
 algorithms. Switching to a preset does not discard the custom draft.
 
+### Importing and exporting custom graphs
+
+The custom graph editor can save and load graphs as JSON. Use **Export JSON**
+to download the current custom graph, or **Copy JSON** to place the same JSON on
+the clipboard for sharing. To load a graph, paste JSON into the import box and
+click **Load JSON**. The saved JSON includes nodes, edges, node positions,
+directed mode, the selected start node, and the selected target node.
+
 ## Local development on macOS
 
 Run the backend and frontend in separate Terminal tabs from the repository
