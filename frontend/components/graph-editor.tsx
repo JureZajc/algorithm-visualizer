@@ -22,6 +22,9 @@ interface GraphEditorProps {
   onStartChange: (nodeId: string) => void;
   onTargetChange: (nodeId: string) => void;
   onDirectedChange: (directed: boolean) => void;
+  onExportJson: () => void;
+  onCopyJson: () => Promise<boolean>;
+  onLoadJson: (rawJson: string) => boolean;
 }
 
 const inputClass = "min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
@@ -47,11 +50,16 @@ export function GraphEditor({
   onStartChange,
   onTargetChange,
   onDirectedChange,
+  onExportJson,
+  onCopyJson,
+  onLoadJson,
 }: GraphEditorProps) {
   const [nodeId, setNodeId] = useState("");
   const [edgeSource, setEdgeSource] = useState("");
   const [edgeTarget, setEdgeTarget] = useState("");
   const [edgeWeight, setEdgeWeight] = useState("1");
+  const [jsonInput, setJsonInput] = useState("");
+  const [jsonStatus, setJsonStatus] = useState<string | null>(null);
 
   const source = nodes.some((node) => node.id === edgeSource) ? edgeSource : nodes[0]?.id ?? "";
   const targetCandidate = nodes.some((node) => node.id === edgeTarget) ? edgeTarget : "";
@@ -72,6 +80,25 @@ export function GraphEditor({
       return;
     }
     if (onAddEdge(source, edgeTargetValue, weight)) setEdgeWeight("1");
+  }
+
+  async function copyJson() {
+    setJsonStatus(null);
+    const copied = await onCopyJson();
+    setJsonStatus(copied ? "JSON copied to clipboard." : "Clipboard access failed. Use Export JSON instead.");
+  }
+
+  function loadJson(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setJsonStatus(null);
+    if (!jsonInput.trim()) {
+      setJsonStatus("Paste graph JSON before loading.");
+      return;
+    }
+    if (onLoadJson(jsonInput)) {
+      setJsonInput("");
+      setJsonStatus("Graph JSON loaded.");
+    }
   }
 
   return (
@@ -156,6 +183,36 @@ export function GraphEditor({
             <label className="text-xs font-bold text-slate-700">Target node<select className={`${inputClass} mt-2`} value={target} disabled={disabled || nodes.length === 0} onChange={(event) => onTargetChange(event.target.value)}>{nodes.map((node) => <option key={node.id} value={node.id}>{node.id}</option>)}</select></label>
           </div>
         </div>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4">
+        <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+          <div>
+            <h3 className="mb-1 mt-0 text-sm font-extrabold text-slate-900">4. Import and export</h3>
+            <p className="m-0 text-sm leading-6 text-slate-600">Save this custom graph as JSON, copy it, or paste JSON to load another graph.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45" type="button" disabled={disabled} onClick={onExportJson}>Export JSON</button>
+            <button className="min-h-10 rounded-lg border border-indigo-200 bg-indigo-50 px-3 text-sm font-bold text-indigo-700 transition hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-45" type="button" disabled={disabled} onClick={copyJson}>Copy JSON</button>
+          </div>
+        </div>
+        <form className="grid gap-3" onSubmit={loadJson}>
+          <label className="text-xs font-bold text-slate-700">
+            Import JSON
+            <textarea
+              className="mt-2 min-h-36 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-xs leading-5 text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60"
+              value={jsonInput}
+              disabled={disabled}
+              placeholder={'{\n  "nodes": [\n    { "id": "A", "x": 120, "y": 160 }\n  ],\n  "edges": [],\n  "directed": false,\n  "start": "A",\n  "target": "A"\n}'}
+              spellCheck={false}
+              onChange={(event) => setJsonInput(event.target.value)}
+            />
+          </label>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <button className="min-h-10 rounded-lg bg-slate-900 px-3 text-sm font-bold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-45" type="submit" disabled={disabled}>Load JSON</button>
+            {jsonStatus ? <span className="text-sm font-medium text-slate-600" aria-live="polite">{jsonStatus}</span> : null}
+          </div>
+        </form>
       </div>
     </section>
   );

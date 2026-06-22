@@ -70,6 +70,16 @@ export interface GraphNodePosition {
   y: number;
 }
 
+export type GraphExportNode = string | GraphNodePosition;
+
+export interface GraphExportData {
+  nodes: GraphExportNode[];
+  edges: GraphEdge[];
+  directed?: boolean;
+  start?: string;
+  target?: string;
+}
+
 export interface GraphPreset {
   id: string;
   label: string;
