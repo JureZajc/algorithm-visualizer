@@ -1,5 +1,5 @@
 import pytest
-from fastapi.testclient import TestClient
+from starlette.testclient import TestClient
 
 from app.main import app
 
@@ -31,6 +31,14 @@ EXPECTED_ALGORITHM_IDS = {
         "topological_sort",
         "kruskal",
         "prim",
+    ],
+    "dynamic_programming": [
+        "fibonacci",
+        "coin_change",
+        "knapsack",
+        "lcs",
+        "edit_distance",
+        "unique_paths",
     ],
 }
 
@@ -210,6 +218,90 @@ def test_graph_steps_endpoint_rejects_unsupported_algorithm() -> None:
     response = client.post(
         "/graph/steps",
         json={**GRAPH_REQUEST, "algorithm": "bellman_ford"},
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("payload", "expected_result"),
+    [
+        ({"algorithm": "fibonacci", "n": 8}, 21),
+        (
+            {"algorithm": "coin_change", "coins": [1, 3, 4], "amount": 6},
+            2,
+        ),
+        (
+            {
+                "algorithm": "knapsack",
+                "weights": [2, 3, 4, 5],
+                "values": [3, 4, 5, 6],
+                "capacity": 5,
+            },
+            7,
+        ),
+        ({"algorithm": "lcs", "text_a": "ABCDEF", "text_b": "ACE"}, "ACE"),
+        (
+            {
+                "algorithm": "edit_distance",
+                "text_a": "kitten",
+                "text_b": "sitting",
+            },
+            3,
+        ),
+        ({"algorithm": "unique_paths", "rows": 3, "cols": 7}, 28),
+    ],
+)
+def test_dynamic_programming_steps_endpoint(
+    payload: dict[str, object],
+    expected_result: int | str,
+) -> None:
+    response = client.post("/dynamic-programming/steps", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == payload["algorithm"]
+    assert body["input"]
+    assert body["steps"]
+    assert body["steps"][-1]["type"] == "done"
+    assert body["steps"][-1]["result"] == expected_result
+    assert body["step_count"] == len(body["steps"])
+
+    required_step_fields = {
+        "type",
+        "table",
+        "active_cell",
+        "related_cells",
+        "description",
+        "pseudocode_line",
+        "result",
+    }
+    assert set(body["steps"][0]) == required_step_fields
+
+
+def test_dynamic_programming_steps_endpoint_uses_defaults() -> None:
+    response = client.post(
+        "/dynamic-programming/steps",
+        json={"algorithm": "fibonacci"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["input"] == {"n": 8}
+
+
+def test_dynamic_programming_steps_endpoint_rejects_unsupported_algorithm() -> None:
+    response = client.post(
+        "/dynamic-programming/steps",
+        json={"algorithm": "matrix_chain"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_dynamic_programming_steps_endpoint_rejects_invalid_input() -> None:
+    response = client.post(
+        "/dynamic-programming/steps",
+        json={"algorithm": "fibonacci", "n": 41},
     )
 
     assert response.status_code == 422

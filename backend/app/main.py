@@ -4,11 +4,17 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, model_validator
 
+from app.algorithms.dynamic_programming import DYNAMIC_PROGRAMMING_ALGORITHMS
+from app.algorithms.dynamic_programming.types import (
+    DynamicProgrammingAlgorithm,
+    DynamicProgrammingStep,
+)
 from app.algorithms.graph import graph_algorithm_steps
 from app.algorithms.graph.types import GraphAlgorithm, GraphEdge, GraphStep
 from app.algorithms.graph.utils import validate_graph
 from app.algorithms.metadata import (
     AlgorithmsResponse,
+    DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     GRAPH_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
     SORTING_ALGORITHM_METADATA,
@@ -117,6 +123,145 @@ class GraphResponse(BaseModel):
     step_count: int
 
 
+class DynamicProgrammingRequest(BaseModel):
+    algorithm: DynamicProgrammingAlgorithm
+    n: int | None = None
+    coins: list[int] | None = None
+    amount: int | None = None
+    weights: list[int] | None = None
+    values: list[int] | None = None
+    capacity: int | None = None
+    text_a: str | None = None
+    text_b: str | None = None
+    rows: int | None = None
+    cols: int | None = None
+
+    @model_validator(mode="after")
+    def validate_algorithm_input(self) -> "DynamicProgrammingRequest":
+        """Apply algorithm defaults and validate bounded DP inputs."""
+
+        if self.algorithm == "fibonacci":
+            self.n = _validate_range(self.n if self.n is not None else 8, "n", 0, 40)
+        elif self.algorithm == "coin_change":
+            self.coins = _validate_positive_list(
+                self.coins if self.coins is not None else [1, 3, 4],
+                "coins",
+                1,
+                8,
+            )
+            self.amount = _validate_range(
+                self.amount if self.amount is not None else 6,
+                "amount",
+                0,
+                50,
+            )
+        elif self.algorithm == "knapsack":
+            self.weights = _validate_positive_list(
+                self.weights if self.weights is not None else [2, 3, 4, 5],
+                "weights",
+                1,
+                8,
+            )
+            self.values = _validate_nonnegative_list(
+                self.values if self.values is not None else [3, 4, 5, 6],
+                "values",
+                1,
+                8,
+            )
+            if len(self.weights) != len(self.values):
+                raise ValueError("Knapsack requires matching weights and values.")
+            self.capacity = _validate_range(
+                self.capacity if self.capacity is not None else 5,
+                "capacity",
+                0,
+                50,
+            )
+        elif self.algorithm == "lcs":
+            self.text_a = _validate_text(self.text_a if self.text_a is not None else "ABCDEF", "text_a")
+            self.text_b = _validate_text(self.text_b if self.text_b is not None else "ACE", "text_b")
+        elif self.algorithm == "edit_distance":
+            self.text_a = _validate_text(self.text_a if self.text_a is not None else "kitten", "text_a")
+            self.text_b = _validate_text(self.text_b if self.text_b is not None else "sitting", "text_b")
+        else:
+            self.rows = _validate_range(
+                self.rows if self.rows is not None else 3,
+                "rows",
+                1,
+                12,
+            )
+            self.cols = _validate_range(
+                self.cols if self.cols is not None else 7,
+                "cols",
+                1,
+                12,
+            )
+        return self
+
+    def algorithm_input(self) -> dict[str, object]:
+        if self.algorithm == "fibonacci":
+            return {"n": self.n}
+        if self.algorithm == "coin_change":
+            return {"coins": self.coins.copy() if self.coins else [], "amount": self.amount}
+        if self.algorithm == "knapsack":
+            return {
+                "weights": self.weights.copy() if self.weights else [],
+                "values": self.values.copy() if self.values else [],
+                "capacity": self.capacity,
+            }
+        if self.algorithm in {"lcs", "edit_distance"}:
+            return {"text_a": self.text_a, "text_b": self.text_b}
+        return {"rows": self.rows, "cols": self.cols}
+
+
+class DynamicProgrammingResponse(BaseModel):
+    algorithm: DynamicProgrammingAlgorithm
+    input: dict[str, object]
+    steps: list[DynamicProgrammingStep]
+    step_count: int
+
+
+def _validate_range(value: int, name: str, minimum: int, maximum: int) -> int:
+    if value < minimum or value > maximum:
+        raise ValueError(f"{name} must be between {minimum} and {maximum}.")
+    return value
+
+
+def _validate_positive_list(
+    values: list[int],
+    name: str,
+    minimum_length: int,
+    maximum_length: int,
+) -> list[int]:
+    if len(values) < minimum_length or len(values) > maximum_length:
+        raise ValueError(
+            f"{name} must include {minimum_length} to {maximum_length} values."
+        )
+    if any(value <= 0 for value in values):
+        raise ValueError(f"{name} must contain positive values.")
+    return values.copy()
+
+
+def _validate_nonnegative_list(
+    values: list[int],
+    name: str,
+    minimum_length: int,
+    maximum_length: int,
+) -> list[int]:
+    if len(values) < minimum_length or len(values) > maximum_length:
+        raise ValueError(
+            f"{name} must include {minimum_length} to {maximum_length} values."
+        )
+    if any(value < 0 for value in values):
+        raise ValueError(f"{name} must contain nonnegative values.")
+    return values.copy()
+
+
+def _validate_text(value: str, name: str) -> str:
+    if len(value) > 12:
+        raise ValueError(f"{name} must be 12 characters or fewer.")
+    return value
+
+
 @app.get("/")
 def root() -> dict[str, str]:
     return {"message": "Algorithm Visualizer API is running"}
@@ -128,6 +273,7 @@ def algorithms() -> AlgorithmsResponse:
         sorting=SORTING_ALGORITHM_METADATA,
         searching=SEARCHING_ALGORITHM_METADATA,
         graph=GRAPH_ALGORITHM_METADATA,
+        dynamic_programming=DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     )
 
 
@@ -206,6 +352,27 @@ def graph_steps(request: GraphRequest) -> GraphResponse:
         target=request.target,
         directed=request.directed,
         heuristics=request.heuristics.copy() if request.heuristics else None,
+        steps=steps,
+        step_count=len(steps),
+    )
+
+
+@app.post("/dynamic-programming/steps", response_model=DynamicProgrammingResponse)
+def dynamic_programming_steps(
+    request: DynamicProgrammingRequest,
+) -> DynamicProgrammingResponse:
+    algorithm_input = request.algorithm_input()
+
+    try:
+        steps = DYNAMIC_PROGRAMMING_ALGORITHMS[request.algorithm](
+            **algorithm_input,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+    return DynamicProgrammingResponse(
+        algorithm=request.algorithm,
+        input=algorithm_input,
         steps=steps,
         step_count=len(steps),
     )
