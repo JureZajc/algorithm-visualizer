@@ -38,28 +38,6 @@ VALID_STEP_TYPES = {
 }
 PSEUDOCODE_LENGTHS = {item.id: len(item.pseudocode) for item in ALGORITHM_METADATA}
 
-BACKTRACKING_CASES: list[
-    tuple[str, BacktrackingFunction, dict[str, object]]
-] = [
-    ("n_queens", n_queens_steps, {"size": 4}),
-    ("maze_solver", maze_solver_steps, {"rows": 5, "cols": 6, "preset": "classic"}),
-    ("permutations", permutations_steps, {"values": ["A", "B", "C"]}),
-    ("subsets", subsets_steps, {"values": ["A", "B", "C"]}),
-    ("sudoku_solver", sudoku_solver_steps, {}),
-]
-
-SUDOKU_PUZZLE = [
-    ["5", "3", ".", ".", "7", ".", ".", ".", "."],
-    ["6", ".", ".", "1", "9", "5", ".", ".", "."],
-    [".", "9", "8", ".", ".", ".", ".", "6", "."],
-    ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
-    ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
-    ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
-    [".", "6", ".", ".", ".", ".", "2", "8", "."],
-    [".", ".", ".", "4", "1", "9", ".", ".", "5"],
-    [".", ".", ".", ".", "8", ".", ".", "7", "9"],
-]
-
 SUDOKU_SOLUTION = [
     ["5", "3", "4", "6", "7", "8", "9", "1", "2"],
     ["6", "7", "2", "1", "9", "5", "3", "4", "8"],
@@ -70,6 +48,32 @@ SUDOKU_SOLUTION = [
     ["9", "6", "1", "5", "3", "7", "2", "8", "4"],
     ["2", "8", "7", "4", "1", "9", "6", "3", "5"],
     ["3", "4", "5", "2", "8", "6", "1", "7", "9"],
+]
+
+SUDOKU_PUZZLE = [
+    ["5", "3", "4", "6", "7", "8", "9", ".", "."],
+    ["6", "7", "2", "1", "9", "5", "3", "4", "8"],
+    ["1", "9", "8", "3", "4", "2", "5", "6", "7"],
+    ["8", "5", "9", "7", "6", "1", "4", "2", "3"],
+    ["4", "2", "6", "8", "5", "3", "7", "9", "1"],
+    ["7", "1", "3", "9", "2", "4", "8", "5", "6"],
+    ["9", "6", "1", "5", "3", "7", "2", "8", "4"],
+    ["2", "8", "7", "4", "1", "9", "6", "3", "5"],
+    ["3", "4", "5", "2", "8", "6", "1", "7", "9"],
+]
+
+BACKTRACKING_CASES: list[
+    tuple[str, BacktrackingFunction, dict[str, object]]
+] = [
+    ("n_queens", n_queens_steps, {"size": 4}),
+    ("maze_solver", maze_solver_steps, {"rows": 5, "cols": 6, "preset": "classic"}),
+    ("permutations", permutations_steps, {"values": ["A", "B", "C"]}),
+    ("subsets", subsets_steps, {"values": ["A", "B", "C"]}),
+    (
+        "sudoku_solver",
+        sudoku_solver_steps,
+        {"board": SUDOKU_PUZZLE, "max_steps": 100},
+    ),
 ]
 
 
@@ -243,3 +247,8 @@ def test_sudoku_solver_rejects_duplicate_givens() -> None:
 
     with pytest.raises(ValueError, match="duplicate value '5' in row 1"):
         sudoku_solver_steps(board)
+
+
+def test_sudoku_solver_can_limit_generated_steps() -> None:
+    with pytest.raises(ValueError, match="step limit"):
+        sudoku_solver_steps(SUDOKU_PUZZLE, max_steps=1)

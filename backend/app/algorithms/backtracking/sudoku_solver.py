@@ -28,7 +28,10 @@ DEFAULT_SUDOKU_BOARD: SudokuInputBoard = [
 ]
 
 
-def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[BacktrackingStep]:
+def sudoku_solver_steps(
+    board: SudokuInputBoard | None = None,
+    max_steps: int | None = None,
+) -> list[BacktrackingStep]:
     """Solve a 9x9 Sudoku puzzle with classic recursive backtracking."""
 
     initial_board = normalize_sudoku_board(board or DEFAULT_SUDOKU_BOARD)
@@ -36,7 +39,16 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
 
     working_board = [row.copy() for row in initial_board]
     fixed_cells = _fixed_cells(initial_board)
-    steps: list[BacktrackingStep] = [
+    steps: list[BacktrackingStep] = []
+
+    def add_step(step: BacktrackingStep) -> None:
+        if max_steps is not None and len(steps) >= max_steps:
+            raise ValueError(
+                f"Sudoku step limit of {max_steps} was exceeded."
+            )
+        steps.append(step)
+
+    add_step(
         _create_sudoku_step(
             "try",
             working_board,
@@ -45,7 +57,7 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
             "Start with the submitted Sudoku puzzle.",
             pseudocode_line=1,
         )
-    ]
+    )
     solution: SudokuBoard = []
 
     def solve() -> bool:
@@ -54,7 +66,7 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
         empty_cell = _find_empty_cell(working_board)
         if empty_cell is None:
             solution = [row.copy() for row in working_board]
-            steps.append(
+            add_step(
                 _create_sudoku_step(
                     "solution_found",
                     working_board,
@@ -74,7 +86,7 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
         for digit in DIGITS:
             conflicts = _conflicting_cells(working_board, row, column, digit)
             related_cells = conflicts or _peer_cells(row, column)
-            steps.append(
+            add_step(
                 _create_sudoku_step(
                     "try",
                     working_board,
@@ -90,7 +102,7 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
             )
 
             if conflicts:
-                steps.append(
+                add_step(
                     _create_sudoku_step(
                         "dead_end",
                         working_board,
@@ -107,7 +119,7 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
                 continue
 
             working_board[row][column] = digit
-            steps.append(
+            add_step(
                 _create_sudoku_step(
                     "place",
                     working_board,
@@ -125,7 +137,7 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
                 return True
 
             working_board[row][column] = "."
-            steps.append(
+            add_step(
                 _create_sudoku_step(
                     "remove",
                     working_board,
@@ -142,7 +154,7 @@ def sudoku_solver_steps(board: SudokuInputBoard | None = None) -> list[Backtrack
         return False
 
     solved = solve()
-    steps.append(
+    add_step(
         _create_sudoku_step(
             "done",
             solution if solved else working_board,
