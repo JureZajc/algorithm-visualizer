@@ -40,7 +40,13 @@ EXPECTED_ALGORITHM_IDS = {
         "edit_distance",
         "unique_paths",
     ],
-    "backtracking": ["n_queens", "maze_solver", "permutations", "subsets"],
+    "backtracking": [
+        "n_queens",
+        "maze_solver",
+        "permutations",
+        "subsets",
+        "sudoku_solver",
+    ],
 }
 
 GRAPH_REQUEST = {
@@ -451,6 +457,63 @@ def test_backtracking_steps_endpoint_supports_custom_maze() -> None:
         [1, 2],
         [2, 2],
     ]
+
+
+def test_backtracking_steps_endpoint_supports_sudoku_solver() -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={
+            "algorithm": "sudoku_solver",
+            "board": [
+                ["5", "3", ".", ".", "7", ".", ".", ".", "."],
+                ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+                [".", "9", "8", ".", ".", ".", ".", "6", "."],
+                ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+                ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+                ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+                [".", "6", ".", ".", ".", ".", "2", "8", "."],
+                [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+                [".", ".", ".", ".", "8", ".", ".", "7", "9"],
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == "sudoku_solver"
+    assert body["steps"]
+    assert body["steps"][-1]["type"] == "done"
+    assert body["steps"][-1]["result"]["solved"] is True
+    assert body["steps"][-1]["result"]["solution"][0] == [
+        "5",
+        "3",
+        "4",
+        "6",
+        "7",
+        "8",
+        "9",
+        "1",
+        "2",
+    ]
+    assert body["step_count"] == len(body["steps"])
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"algorithm": "sudoku_solver", "board": [["."] * 9 for _ in range(8)]},
+        {
+            "algorithm": "sudoku_solver",
+            "board": [["X", *["."] * 8], *(["."] * 9 for _ in range(8))],
+        },
+    ],
+)
+def test_backtracking_steps_endpoint_rejects_invalid_sudoku(
+    payload: dict[str, object],
+) -> None:
+    response = client.post("/backtracking/steps", json=payload)
+
+    assert response.status_code == 422
 
 
 def test_backtracking_steps_endpoint_rejects_overlapping_custom_maze_points() -> None:

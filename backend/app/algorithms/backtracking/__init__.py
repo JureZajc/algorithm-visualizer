@@ -4,6 +4,7 @@ from app.algorithms.backtracking.maze_solver import maze_solver_steps
 from app.algorithms.backtracking.n_queens import n_queens_steps
 from app.algorithms.backtracking.permutations import permutations_steps
 from app.algorithms.backtracking.subsets import subsets_steps
+from app.algorithms.backtracking.sudoku_solver import sudoku_solver_steps
 from app.algorithms.backtracking.types import (
     BacktrackingAlgorithm,
     BacktrackingStep,
@@ -20,6 +21,7 @@ BACKTRACKING_ALGORITHMS: dict[
     "maze_solver": maze_solver_steps,
     "permutations": permutations_steps,
     "subsets": subsets_steps,
+    "sudoku_solver": sudoku_solver_steps,
 }
 
 __all__ = [
@@ -28,4 +30,5 @@ __all__ = [
     "n_queens_steps",
     "permutations_steps",
     "subsets_steps",
+    "sudoku_solver_steps",
 ]

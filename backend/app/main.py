@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, model_validator
 
 from app.algorithms.backtracking import BACKTRACKING_ALGORITHMS
+from app.algorithms.backtracking.sudoku_solver import DEFAULT_SUDOKU_BOARD
 from app.algorithms.backtracking.types import (
     BacktrackingAlgorithm,
     BacktrackingStep,
@@ -231,6 +232,7 @@ class BacktrackingRequest(BaseModel):
     algorithm: BacktrackingAlgorithm
     size: int | None = None
     values: list[str] | None = None
+    board: list[list[int | str]] | None = None
     rows: int | None = None
     cols: int | None = None
     preset: MazePreset | None = None
@@ -279,6 +281,8 @@ class BacktrackingRequest(BaseModel):
                 _validate_position(self.end, "end", self.rows, self.cols)
             if self.start is not None and self.end is not None and self.start == self.end:
                 raise ValueError("Maze start and end must be different cells.")
+        elif self.algorithm == "sudoku_solver":
+            self.board = self.board or [row.copy() for row in DEFAULT_SUDOKU_BOARD]
         return self
 
     def algorithm_input(self) -> dict[str, object]:
@@ -286,6 +290,8 @@ class BacktrackingRequest(BaseModel):
             return {"size": self.size}
         if self.algorithm in {"permutations", "subsets"}:
             return {"values": self.values.copy() if self.values else []}
+        if self.algorithm == "sudoku_solver":
+            return {"board": [row.copy() for row in self.board or []]}
         algorithm_input: dict[str, object] = {
             "rows": self.rows,
             "cols": self.cols,
