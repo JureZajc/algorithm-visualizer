@@ -21,7 +21,8 @@ export type VisualizerMode =
   | "sorting"
   | "searching"
   | "graph"
-  | "dynamic_programming";
+  | "dynamic_programming"
+  | "backtracking";
 
 export type AlgorithmCategory = VisualizerMode;
 
@@ -48,6 +49,7 @@ export interface AlgorithmsResponse {
   searching: AlgorithmMetadata[];
   graph: AlgorithmMetadata[];
   dynamic_programming: AlgorithmMetadata[];
+  backtracking: AlgorithmMetadata[];
 }
 
 export interface MetadataSourceProps {

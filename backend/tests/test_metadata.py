@@ -1,10 +1,13 @@
 from typing import get_args
 
+from app.algorithms.backtracking import BACKTRACKING_ALGORITHMS
+from app.algorithms.backtracking.types import BacktrackingAlgorithm
 from app.algorithms.dynamic_programming import DYNAMIC_PROGRAMMING_ALGORITHMS
 from app.algorithms.dynamic_programming.types import DynamicProgrammingAlgorithm
 from app.algorithms.graph.types import GraphAlgorithm
 from app.algorithms.metadata import (
     ALGORITHM_METADATA,
+    BACKTRACKING_ALGORITHM_METADATA,
     DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     GRAPH_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
@@ -31,6 +34,9 @@ def test_metadata_covers_every_supported_algorithm_once() -> None:
     assert {item.id for item in DYNAMIC_PROGRAMMING_ALGORITHM_METADATA} == set(
         get_args(DynamicProgrammingAlgorithm)
     ) == set(DYNAMIC_PROGRAMMING_ALGORITHMS)
+    assert {item.id for item in BACKTRACKING_ALGORITHM_METADATA} == set(
+        get_args(BacktrackingAlgorithm)
+    ) == set(BACKTRACKING_ALGORITHMS)
 
 
 def test_metadata_has_consistent_display_fields_and_categories() -> None:
@@ -42,6 +48,7 @@ def test_metadata_has_consistent_display_fields_and_categories() -> None:
             item.id: "dynamic_programming"
             for item in DYNAMIC_PROGRAMMING_ALGORITHM_METADATA
         },
+        **{item.id: "backtracking" for item in BACKTRACKING_ALGORITHM_METADATA},
     }
 
     for item in ALGORITHM_METADATA:

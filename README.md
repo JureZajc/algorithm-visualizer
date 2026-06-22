@@ -63,18 +63,33 @@ related dependency cells, synchronized pseudocode, and the final computed
 result. Coin Change uses unlimited coins and displays impossible states as
 `inf`.
 
+### Backtracking
+
+- N-Queens
+- Maze Solver
+- Permutations
+- Subsets
+
+Backtracking visualizations use semantic grids with an active cell, related
+cells, synchronized pseudocode, and a structured final result. N-Queens stops
+after the first valid placement. Maze Solver uses deterministic generated maze
+presets so the same inputs always replay the same search. Permutations and
+Subsets use comma-separated list input such as `1,2,3`, `A,B,C`, or
+`red,green,blue`.
+
 ## API
 
 The backend exposes these main routes:
 
-- `GET /algorithms` lists supported sorting, searching, graph, and dynamic
-  programming algorithms with descriptions, complexity bounds, notes or
-  limitations, and ordered pseudocode.
+- `GET /algorithms` lists supported sorting, searching, graph, dynamic
+  programming, and backtracking algorithms with descriptions, complexity
+  bounds, notes or limitations, and ordered pseudocode.
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
 - `POST /graph/steps` generates graph algorithm visualization steps.
 - `POST /dynamic-programming/steps` generates dynamic programming table steps.
+- `POST /backtracking/steps` generates backtracking grid steps.
 
 Each item returned by `GET /algorithms` has this shape:
 
@@ -252,6 +267,113 @@ Dynamic programming steps have this shape:
 
 `active_cell` and `related_cells` use zero-based `[row, column]` coordinates.
 The final `done` step contains the canonical `result`.
+
+Backtracking request examples:
+
+```json
+{
+  "algorithm": "n_queens",
+  "size": 4
+}
+```
+
+```json
+{
+  "algorithm": "maze_solver",
+  "rows": 7,
+  "cols": 7,
+  "preset": "classic"
+}
+```
+
+The backtracking endpoint accepts algorithm-specific fields: `size` for
+N-Queens, `rows`, `cols`, and `preset` for Maze Solver, and `values` for
+Permutations and Subsets. Supported maze presets are `classic`, `open`, and
+`rooms`. Maze Solver also accepts optional custom maze fields while keeping
+preset requests valid:
+
+```json
+{
+  "algorithm": "maze_solver",
+  "rows": 3,
+  "cols": 4,
+  "grid": [
+    ["empty", "wall", "empty", "empty"],
+    ["start", "empty", "empty", "wall"],
+    ["wall", "empty", "end", "empty"]
+  ],
+  "start": [1, 0],
+  "end": [2, 2]
+}
+```
+
+When `grid`, `start`, and `end` are provided, the solver uses the submitted
+walls and endpoints instead of the default top-left to bottom-right route.
+
+Permutations and Subsets request example:
+
+```json
+{
+  "algorithm": "permutations",
+  "values": ["A", "B", "C"]
+}
+```
+
+The frontend parses comma-separated list input, trims whitespace, and rejects
+empty values. Permutations are limited to 6 input values, and Subsets are
+limited to 10 input values.
+
+Backtracking steps have this shape:
+
+```json
+{
+  "type": "try",
+  "grid": [
+    ["queen", "empty", "empty", "empty"],
+    ["empty", "conflict", "empty", "empty"]
+  ],
+  "active_cell": [1, 1],
+  "related_cells": [[0, 0]],
+  "description": "Try row 2, column 2.",
+  "pseudocode_line": 3,
+  "result": null
+}
+```
+
+Backtracking grids use semantic cell tokens such as `empty`, `wall`, `start`,
+`end`, `queen`, `attempt`, `conflict`, `visited`, `path`, `backtracked`, and
+`solution`. N-Queens `done` results have this shape:
+
+```json
+{
+  "solved": true,
+  "size": 4,
+  "solution": [[0, 1], [1, 3], [2, 0], [3, 2]]
+}
+```
+
+Maze Solver `done` results have this shape:
+
+```json
+{
+  "solved": true,
+  "rows": 7,
+  "cols": 7,
+  "preset": "classic",
+  "path": [[0, 0], [0, 1], [0, 2]]
+}
+```
+
+Permutations and Subsets return their generated results and counts in the final
+`done` result:
+
+```json
+{
+  "values": ["A", "B", "C"],
+  "permutations": [["A", "B", "C"], ["A", "C", "B"]],
+  "count": 6
+}
+```
 
 Every visualization step contains its existing state fields and may also
 include a 1-based `pseudocode_line`. The frontend uses that number to highlight

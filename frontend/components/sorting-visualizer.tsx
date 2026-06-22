@@ -150,6 +150,14 @@ export function VisualizerHeading({ title, description, legend }: { title: strin
     Found: "bg-emerald-500",
     Active: "bg-indigo-600",
     Related: "bg-amber-300",
+    Attempt: "bg-amber-400",
+    Conflict: "bg-rose-500",
+    Backtrack: "bg-violet-400",
+    Solution: "bg-emerald-500",
+    Wall: "bg-slate-900",
+    Visited: "bg-sky-300",
+    Path: "bg-indigo-500",
+    Chosen: "bg-emerald-500",
   };
   return (
     <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">

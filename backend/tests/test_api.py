@@ -40,6 +40,7 @@ EXPECTED_ALGORITHM_IDS = {
         "edit_distance",
         "unique_paths",
     ],
+    "backtracking": ["n_queens", "maze_solver", "permutations", "subsets"],
 }
 
 GRAPH_REQUEST = {
@@ -303,6 +304,186 @@ def test_dynamic_programming_steps_endpoint_rejects_invalid_input() -> None:
         "/dynamic-programming/steps",
         json={"algorithm": "fibonacci", "n": 41},
     )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("payload", "expected_result"),
+    [
+        (
+            {"algorithm": "n_queens", "size": 4},
+            {"solved": True, "size": 4, "solution": [[0, 1], [1, 3], [2, 0], [3, 2]]},
+        ),
+        (
+            {"algorithm": "maze_solver", "rows": 5, "cols": 6, "preset": "classic"},
+            {
+                "solved": True,
+                "rows": 5,
+                "cols": 6,
+                "preset": "classic",
+                "path": [
+                    [0, 0],
+                    [0, 1],
+                    [0, 2],
+                    [0, 3],
+                    [0, 4],
+                    [0, 5],
+                    [1, 5],
+                    [2, 5],
+                    [3, 5],
+                    [4, 5],
+                ],
+            },
+        ),
+        (
+            {"algorithm": "permutations", "values": ["A", "B", "C"]},
+            {
+                "values": ["A", "B", "C"],
+                "permutations": [
+                    ["A", "B", "C"],
+                    ["A", "C", "B"],
+                    ["B", "A", "C"],
+                    ["B", "C", "A"],
+                    ["C", "A", "B"],
+                    ["C", "B", "A"],
+                ],
+                "count": 6,
+            },
+        ),
+        (
+            {"algorithm": "subsets", "values": ["A", "B", "C"]},
+            {
+                "values": ["A", "B", "C"],
+                "subsets": [
+                    ["A", "B", "C"],
+                    ["A", "B"],
+                    ["A", "C"],
+                    ["A"],
+                    ["B", "C"],
+                    ["B"],
+                    ["C"],
+                    [],
+                ],
+                "count": 8,
+            },
+        ),
+    ],
+)
+def test_backtracking_steps_endpoint(
+    payload: dict[str, object],
+    expected_result: dict[str, object],
+) -> None:
+    response = client.post("/backtracking/steps", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == payload["algorithm"]
+    assert body["input"]
+    assert body["steps"]
+    assert body["steps"][-1]["type"] == "done"
+    assert body["steps"][-1]["result"] == expected_result
+    assert body["step_count"] == len(body["steps"])
+
+    required_step_fields = {
+        "type",
+        "grid",
+        "active_cell",
+        "related_cells",
+        "description",
+        "pseudocode_line",
+        "result",
+    }
+    assert set(body["steps"][0]) == required_step_fields
+
+
+def test_backtracking_steps_endpoint_uses_defaults() -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={"algorithm": "n_queens"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["input"] == {"size": 4}
+
+
+def test_backtracking_steps_endpoint_rejects_unsupported_algorithm() -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={"algorithm": "sudoku"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_backtracking_steps_endpoint_rejects_invalid_input() -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={"algorithm": "maze_solver", "rows": 16, "cols": 7},
+    )
+
+    assert response.status_code == 422
+
+
+def test_backtracking_steps_endpoint_supports_custom_maze() -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={
+            "algorithm": "maze_solver",
+            "rows": 3,
+            "cols": 4,
+            "preset": "classic",
+            "grid": [
+                ["empty", "wall", "empty", "empty"],
+                ["start", "empty", "empty", "wall"],
+                ["wall", "empty", "end", "empty"],
+            ],
+            "start": [1, 0],
+            "end": [2, 2],
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["steps"][-1]["result"]["path"] == [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [2, 2],
+    ]
+
+
+def test_backtracking_steps_endpoint_rejects_overlapping_custom_maze_points() -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={
+            "algorithm": "maze_solver",
+            "rows": 3,
+            "cols": 3,
+            "start": [1, 1],
+            "end": [1, 1],
+        },
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"algorithm": "permutations", "values": []},
+        {"algorithm": "permutations", "values": ["A", ""]},
+        {"algorithm": "permutations", "values": ["1", "2", "3", "4", "5", "6", "7"]},
+        {
+            "algorithm": "subsets",
+            "values": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
+        },
+    ],
+)
+def test_backtracking_steps_endpoint_rejects_invalid_list_values(
+    payload: dict[str, object],
+) -> None:
+    response = client.post("/backtracking/steps", json=payload)
 
     assert response.status_code == 422
 
