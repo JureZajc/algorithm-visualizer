@@ -2,7 +2,8 @@ export type BacktrackingAlgorithm =
   | "n_queens"
   | "maze_solver"
   | "permutations"
-  | "subsets";
+  | "subsets"
+  | "sudoku_solver";
 
 export type BacktrackingStepType =
   | "try"
@@ -31,6 +32,9 @@ export type BacktrackingCell =
 export type MazePreset = "classic" | "open" | "rooms";
 export type MazeTool = "empty" | "wall" | "start" | "end";
 export type GridPosition = [number, number];
+export type SudokuCell = "." | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+export type SudokuBoard = SudokuCell[][];
+export type BacktrackingStepGridCell = BacktrackingCell | SudokuCell;
 
 export interface NQueensResult {
   solved: boolean;
@@ -70,16 +74,27 @@ export interface SubsetsResult {
   count: number;
 }
 
+export interface SudokuResult {
+  solved: boolean;
+  board: SudokuBoard;
+  initial_board: SudokuBoard;
+  solution: SudokuBoard | [];
+  fixed_cells: GridPosition[];
+  tried_value: SudokuCell | null;
+  conflicts: GridPosition[];
+}
+
 export type BacktrackingResult =
   | NQueensResult
   | MazeSolverResult
   | ListBacktrackingState
   | PermutationsResult
-  | SubsetsResult;
+  | SubsetsResult
+  | SudokuResult;
 
 export interface BacktrackingStep {
   type: BacktrackingStepType;
-  grid: BacktrackingCell[][];
+  grid: BacktrackingStepGridCell[][];
   active_cell: GridPosition | null;
   related_cells: GridPosition[];
   description: string;
@@ -94,6 +109,7 @@ export interface BacktrackingRequest {
   cols?: number;
   preset?: MazePreset;
   values?: string[];
+  board?: SudokuBoard;
   grid?: BacktrackingCell[][];
   start?: GridPosition;
   end?: GridPosition;
@@ -114,6 +130,7 @@ export const BACKTRACKING_ALGORITHM_LABELS: Record<
   maze_solver: "Maze Solver",
   permutations: "Permutations",
   subsets: "Subsets",
+  sudoku_solver: "Sudoku Solver",
 };
 
 export const MAZE_PRESET_LABELS: Record<MazePreset, string> = {

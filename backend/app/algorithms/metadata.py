@@ -258,6 +258,16 @@ ALGORITHM_PSEUDOCODE = {
         "exclude the value and recurse",
         "finish after all include/exclude branches",
     ],
+    "sudoku_solver": [
+        "start with the Sudoku puzzle",
+        "find the next empty cell",
+        "try each digit from 1 through 9",
+        "check whether the digit is safe",
+        "place the digit and recurse",
+        "remove the digit when the branch fails",
+        "report the solution when no empty cells remain",
+        "finish the search",
+    ],
     "bfs": [
         "enqueue the start node",
         "dequeue the next node",
@@ -703,6 +713,18 @@ BACKTRACKING_ALGORITHM_METADATA = [
         "O(n)",
         "Input is limited to 10 values to keep output size bounded.",
         "The empty subset is included in the generated results.",
+    ),
+    metadata(
+        "sudoku_solver",
+        "Sudoku Solver",
+        "backtracking",
+        "Fills a 9 by 9 Sudoku board by trying safe digits and backtracking from contradictions.",
+        "O(1)",
+        "O(9ᵉ)",
+        "O(9ᵉ)",
+        "O(e)",
+        "Here e is the number of empty cells in the puzzle.",
+        "Accepts empty cells as 0 or '.'.",
     ),
 ]
 

@@ -7,6 +7,7 @@ BacktrackingAlgorithm = Literal[
     "maze_solver",
     "permutations",
     "subsets",
+    "sudoku_solver",
 ]
 
 BacktrackingStepType = Literal[

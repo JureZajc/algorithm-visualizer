@@ -43,8 +43,24 @@ async function postJson<T>(path: string, body: object): Promise<T> {
   if (!response.ok) {
     let detail = `The backend returned status ${response.status}.`;
     try {
-      const body = (await response.json()) as { detail?: string };
-      if (body.detail) detail = body.detail;
+      const body = (await response.json()) as { detail?: string | unknown[] };
+      if (typeof body.detail === "string") {
+        detail = body.detail;
+      } else if (Array.isArray(body.detail)) {
+        detail = body.detail
+          .map((item) => {
+            if (
+              typeof item === "object" &&
+              item !== null &&
+              "msg" in item &&
+              typeof item.msg === "string"
+            ) {
+              return item.msg;
+            }
+            return String(item);
+          })
+          .join(" ");
+      }
     } catch {
       // Keep the status-based message when the backend did not return JSON.
     }

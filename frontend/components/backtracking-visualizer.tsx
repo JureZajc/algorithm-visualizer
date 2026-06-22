@@ -8,6 +8,7 @@ import { BacktrackingListVisualizer } from "@/components/backtracking-list-visua
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { ErrorMessage, VisualizerHeading } from "@/components/sorting-visualizer";
 import { StepControls } from "@/components/step-controls";
+import { SudokuGrid } from "@/components/sudoku-grid";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchBacktrackingSteps } from "@/lib/api";
@@ -27,6 +28,8 @@ import {
   type GridPosition,
   type MazePreset,
   type MazeTool,
+  type SudokuBoard,
+  type SudokuCell,
 } from "@/types/backtracking";
 
 interface BacktrackingForm {
@@ -53,6 +56,7 @@ const DEFAULT_FIELDS: Record<
   maze_solver: { rows: "7", cols: "7", preset: "classic" },
   permutations: { values: "A, B, C" },
   subsets: { values: "A, B, C" },
+  sudoku_solver: {},
 };
 
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
@@ -78,6 +82,18 @@ const selectedToolClasses: Record<MazeTool, string> = {
   start: "border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-100",
   end: "border-rose-600 bg-rose-600 text-white shadow-lg shadow-rose-100",
 };
+
+const DEFAULT_SUDOKU_BOARD: SudokuBoard = [
+  ["5", "3", ".", ".", "7", ".", ".", ".", "."],
+  ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+  [".", "9", "8", ".", ".", ".", ".", "6", "."],
+  ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+  ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+  ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+  [".", "6", ".", ".", ".", ".", "2", "8", "."],
+  [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+  [".", ".", ".", ".", "8", ".", ".", "7", "9"],
+];
 
 function parseInteger(rawValue: string, label: string) {
   const value = Number(rawValue.trim());
@@ -112,10 +128,15 @@ function isListAlgorithm(algorithm: BacktrackingAlgorithm) {
   return algorithm === "permutations" || algorithm === "subsets";
 }
 
+function isSudokuAlgorithm(algorithm: BacktrackingAlgorithm) {
+  return algorithm === "sudoku_solver";
+}
+
 function createRequest(
   algorithm: BacktrackingAlgorithm,
   form: BacktrackingForm,
   mazeGrid?: BacktrackingCell[][],
+  sudokuBoard?: SudokuBoard,
 ): BacktrackingRequest {
   if (algorithm === "n_queens") {
     return {
@@ -135,6 +156,16 @@ function createRequest(
     return {
       algorithm,
       values: parseValueList(form.values, "Values", 10),
+    };
+  }
+
+  if (algorithm === "sudoku_solver") {
+    const board = sudokuBoard ?? cloneSudokuBoard(DEFAULT_SUDOKU_BOARD);
+    const validation = validateSudokuBoard(board);
+    if (validation) throw new Error(validation);
+    return {
+      algorithm,
+      board: cloneSudokuBoard(board),
     };
   }
 
@@ -160,7 +191,7 @@ function createDefaultRequest(algorithm: BacktrackingAlgorithm) {
   return createRequest(algorithm, {
     ...INITIAL_FORM,
     ...DEFAULT_FIELDS[algorithm],
-  });
+  }, undefined, algorithm === "sudoku_solver" ? DEFAULT_SUDOKU_BOARD : undefined);
 }
 
 function safeRequest(
@@ -200,6 +231,10 @@ function createPreviewGrid(
   }
 
   if (isListAlgorithm(algorithm)) {
+    return [];
+  }
+
+  if (isSudokuAlgorithm(algorithm)) {
     return [];
   }
 
@@ -245,6 +280,72 @@ function validateMazeGrid(grid: BacktrackingCell[][]) {
   if (!end) return "Place an End cell before running Maze Solver.";
   if (start[0] === end[0] && start[1] === end[1]) {
     return "Start and End must be different cells.";
+  }
+  return null;
+}
+
+function cloneSudokuBoard(board: SudokuBoard): SudokuBoard {
+  return board.map((row) => row.slice()) as SudokuBoard;
+}
+
+function isSudokuCell(value: string): value is SudokuCell {
+  return value === "." || /^[1-9]$/.test(value);
+}
+
+function validateSudokuBoard(board: SudokuBoard) {
+  if (board.length !== 9) return "Sudoku board must contain exactly 9 rows.";
+  for (let rowIndex = 0; rowIndex < board.length; rowIndex += 1) {
+    if (board[rowIndex].length !== 9) {
+      return `Sudoku row ${rowIndex + 1} must contain exactly 9 cells.`;
+    }
+    for (let columnIndex = 0; columnIndex < board[rowIndex].length; columnIndex += 1) {
+      if (!isSudokuCell(board[rowIndex][columnIndex])) {
+        return `Sudoku cell (${rowIndex + 1}, ${columnIndex + 1}) must be 1-9 or blank.`;
+      }
+    }
+  }
+
+  const rowError = validateSudokuUnits(
+    Array.from({ length: 9 }, (_, row) =>
+      Array.from({ length: 9 }, (_, column) => board[row][column]),
+    ),
+    "row",
+  );
+  if (rowError) return rowError;
+
+  const columnError = validateSudokuUnits(
+    Array.from({ length: 9 }, (_, column) =>
+      Array.from({ length: 9 }, (_, row) => board[row][column]),
+    ),
+    "column",
+  );
+  if (columnError) return columnError;
+
+  const boxes: SudokuCell[][] = [];
+  for (let boxRow = 0; boxRow < 9; boxRow += 3) {
+    for (let boxColumn = 0; boxColumn < 9; boxColumn += 3) {
+      const values: SudokuCell[] = [];
+      for (let row = boxRow; row < boxRow + 3; row += 1) {
+        for (let column = boxColumn; column < boxColumn + 3; column += 1) {
+          values.push(board[row][column]);
+        }
+      }
+      boxes.push(values);
+    }
+  }
+  return validateSudokuUnits(boxes, "box");
+}
+
+function validateSudokuUnits(units: SudokuCell[][], label: "row" | "column" | "box") {
+  for (let index = 0; index < units.length; index += 1) {
+    const seen = new Set<SudokuCell>();
+    for (const value of units[index]) {
+      if (value === ".") continue;
+      if (seen.has(value)) {
+        return `Sudoku ${label} ${index + 1} contains duplicate ${value}.`;
+      }
+      seen.add(value);
+    }
   }
   return null;
 }
@@ -303,6 +404,10 @@ function describeResult(
     return `${result.count} subsets`;
   }
 
+  if (algorithm === "sudoku_solver" && "fixed_cells" in result) {
+    return result.solved ? "Solved puzzle" : "No solution";
+  }
+
   const mazeResult = result as Extract<BacktrackingResult, { rows: number }>;
   return mazeResult.solved ? `${mazeResult.path.length} cells in path` : "No route";
 }
@@ -314,6 +419,9 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
     createPreviewMazeGrid(7, 7, "classic"),
   );
   const [mazeTool, setMazeTool] = useState<MazeTool>("wall");
+  const [sudokuBoard, setSudokuBoard] = useState<SudokuBoard>(() =>
+    cloneSudokuBoard(DEFAULT_SUDOKU_BOARD),
+  );
   const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(420);
   const [isLoading, setIsLoading] = useState(false);
@@ -332,7 +440,8 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
         }
       })()
     : [];
-  const grid = currentStep?.grid ?? (algorithm === "maze_solver" ? mazeGrid : createPreviewGrid(algorithm, form));
+  const grid = (currentStep?.grid ??
+    (algorithm === "maze_solver" ? mazeGrid : createPreviewGrid(algorithm, form))) as BacktrackingCell[][];
   const result = describeResult(
     algorithm,
     currentStep?.result ?? null,
@@ -359,6 +468,8 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
     if (next === "maze_solver") {
       setMazeGrid(createPreviewMazeGrid(7, 7, "classic"));
       setMazeTool("wall");
+    } else if (next === "sudoku_solver") {
+      setSudokuBoard(cloneSudokuBoard(DEFAULT_SUDOKU_BOARD));
     }
     setPresetId("");
     resetForInputChange();
@@ -396,6 +507,8 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
         ),
       );
       setMazeTool("wall");
+    } else if (preset.algorithm === "sudoku_solver" && preset.request.board) {
+      setSudokuBoard(cloneSudokuBoard(preset.request.board));
     }
     setPresetId(preset.id);
     resetForInputChange();
@@ -456,6 +569,33 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
     resetForInputChange();
   }
 
+  function editSudokuCell(row: number, column: number, value: SudokuCell) {
+    if (editingDisabled || algorithm !== "sudoku_solver") return;
+    setSudokuBoard((current) => {
+      const nextBoard = cloneSudokuBoard(current);
+      nextBoard[row][column] = value;
+      return nextBoard;
+    });
+    setPresetId("");
+    resetForInputChange();
+  }
+
+  function resetSudokuPuzzle() {
+    setSudokuBoard(cloneSudokuBoard(DEFAULT_SUDOKU_BOARD));
+    setPresetId("");
+    resetForInputChange();
+  }
+
+  function clearSudokuPuzzle() {
+    setSudokuBoard(
+      Array.from({ length: 9 }, () =>
+        Array.from({ length: 9 }, () => "." as SudokuCell),
+      ),
+    );
+    setPresetId("");
+    resetForInputChange();
+  }
+
   async function startVisualization() {
     setError(null);
     setIsLoading(true);
@@ -465,6 +605,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
         algorithm,
         form,
         algorithm === "maze_solver" ? mazeGrid : undefined,
+        algorithm === "sudoku_solver" ? sudokuBoard : undefined,
       );
       playback.load((await fetchBacktrackingSteps(request)).steps);
     } catch (requestError) {
@@ -480,7 +621,9 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
       ? ["Attempt", "Conflict", "Backtrack", "Solution"]
       : algorithm === "maze_solver"
         ? ["Wall", "Visited", "Path", "Backtrack", "Solution"]
-        : ["Active", "Chosen", "Backtrack", "Solution"];
+        : algorithm === "sudoku_solver"
+          ? ["Given", "Try", "Conflict", "Backtrack", "Solution"]
+          : ["Active", "Chosen", "Backtrack", "Solution"];
 
   return (
     <div>
@@ -579,6 +722,35 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
               </button>
             </div>
           </div>
+        ) : algorithm === "sudoku_solver" ? (
+          <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-6">
+            <div className="flex flex-col gap-1">
+              <p className="m-0 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
+                Sudoku puzzle
+              </p>
+              <p className="m-0 text-sm leading-6 text-slate-600">
+                Type digits into the board, or clear cells to leave them empty.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
+                type="button"
+                disabled={editingDisabled}
+                onClick={resetSudokuPuzzle}
+              >
+                Reset puzzle
+              </button>
+              <button
+                className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
+                type="button"
+                disabled={editingDisabled}
+                onClick={clearSudokuPuzzle}
+              >
+                Clear puzzle
+              </button>
+            </div>
+          </div>
         ) : null}
 
         <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
@@ -632,6 +804,13 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
               algorithm={algorithm}
               values={listValues}
               step={currentStep}
+            />
+          ) : algorithm === "sudoku_solver" ? (
+            <SudokuGrid
+              board={sudokuBoard}
+              step={currentStep}
+              editingDisabled={editingDisabled || playback.steps.length > 0}
+              onCellChange={editSudokuCell}
             />
           ) : (
             <BacktrackingGrid
@@ -697,6 +876,10 @@ function AlgorithmInputFields({
         />
       </label>
     );
+  }
+
+  if (algorithm === "sudoku_solver") {
+    return null;
   }
 
   return (
