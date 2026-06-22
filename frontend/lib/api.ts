@@ -2,6 +2,10 @@ import type {
   AlgorithmsResponse,
 } from "@/types/algorithm";
 import type {
+  BacktrackingRequest,
+  BacktrackingResponse,
+} from "@/types/backtracking";
+import type {
   DynamicProgrammingRequest,
   DynamicProgrammingResponse,
 } from "@/types/dynamic-programming";
@@ -77,6 +81,12 @@ export function fetchDynamicProgrammingSteps(
     "/dynamic-programming/steps",
     request,
   );
+}
+
+export function fetchBacktrackingSteps(
+  request: BacktrackingRequest,
+): Promise<BacktrackingResponse> {
+  return postJson<BacktrackingResponse>("/backtracking/steps", request);
 }
 
 export function generateRandomNumbers(size: number): Promise<RandomNumbersResponse> {

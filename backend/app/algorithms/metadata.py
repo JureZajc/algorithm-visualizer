@@ -8,6 +8,7 @@ AlgorithmCategory = Literal[
     "searching",
     "graph",
     "dynamic_programming",
+    "backtracking",
 ]
 
 
@@ -34,6 +35,7 @@ class AlgorithmsResponse(BaseModel):
     searching: list[AlgorithmMetadata]
     graph: list[AlgorithmMetadata]
     dynamic_programming: list[AlgorithmMetadata]
+    backtracking: list[AlgorithmMetadata]
 
 
 def metadata(
@@ -216,6 +218,45 @@ ALGORITHM_PSEUDOCODE = {
         "  for each inner column",
         "    add paths from the cell above and the cell to the left",
         "return the bottom-right count",
+    ],
+    "n_queens": [
+        "start with an empty chess board",
+        "for each row, try every column",
+        "  mark the candidate square",
+        "  if no queen attacks it, place a queen",
+        "  recursively solve the next row",
+        "  remove the queen when the branch fails",
+        "report the first complete placement",
+    ],
+    "maze_solver": [
+        "start at the maze entrance",
+        "mark the current cell as visited",
+        "move into the current cell",
+        "if this cell is the exit, report the path",
+        "try each neighboring cell",
+        "skip walls, boundaries, and visited cells",
+        "backtrack when no neighbor can continue",
+        "finish when a route is found or all branches fail",
+    ],
+    "permutations": [
+        "start with an empty permutation",
+        "if the permutation contains every value, record it",
+        "for each input value",
+        "  skip values already used in this branch",
+        "  choose the value and recurse",
+        "  return from recursion",
+        "  unchoose the value",
+        "finish after all choices have been explored",
+    ],
+    "subsets": [
+        "start with an empty subset",
+        "if every value has been considered, record the subset",
+        "otherwise inspect the next value",
+        "decide whether to include it",
+        "include the value and recurse",
+        "unchoose the value",
+        "exclude the value and recurse",
+        "finish after all include/exclude branches",
     ],
     "bfs": [
         "enqueue the start node",
@@ -614,9 +655,62 @@ DYNAMIC_PROGRAMMING_ALGORITHM_METADATA = [
 ]
 
 
+BACKTRACKING_ALGORITHM_METADATA = [
+    metadata(
+        "n_queens",
+        "N-Queens",
+        "backtracking",
+        "Places queens one row at a time so no two queens attack each other.",
+        "O(n!)",
+        "O(n!)",
+        "O(n!)",
+        "O(n)",
+        "Stops after the first valid placement.",
+        "Shows attempted squares, conflicts, placements, removals, and the final solution.",
+    ),
+    metadata(
+        "maze_solver",
+        "Maze Solver",
+        "backtracking",
+        "Uses depth-first search with backtracking to find a path through a maze.",
+        "O(rc)",
+        "O(rc)",
+        "O(rc)",
+        "O(rc)",
+        "Here r is row count and c is column count.",
+        "Uses deterministic generated maze presets for repeatable visualizations.",
+    ),
+    metadata(
+        "permutations",
+        "Permutations",
+        "backtracking",
+        "Builds every ordering of a list by choosing each unused value in turn.",
+        "O(n · n!)",
+        "O(n · n!)",
+        "O(n · n!)",
+        "O(n)",
+        "Input is limited to 6 values to keep the step stream readable.",
+        "Duplicate input values are treated as distinct positions.",
+    ),
+    metadata(
+        "subsets",
+        "Subsets",
+        "backtracking",
+        "Builds the power set by making an include or exclude decision for each value.",
+        "O(n · 2ⁿ)",
+        "O(n · 2ⁿ)",
+        "O(n · 2ⁿ)",
+        "O(n)",
+        "Input is limited to 10 values to keep output size bounded.",
+        "The empty subset is included in the generated results.",
+    ),
+]
+
+
 ALGORITHM_METADATA = [
     *SORTING_ALGORITHM_METADATA,
     *SEARCHING_ALGORITHM_METADATA,
     *GRAPH_ALGORITHM_METADATA,
     *DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
+    *BACKTRACKING_ALGORITHM_METADATA,
 ]

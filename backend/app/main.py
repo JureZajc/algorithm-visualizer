@@ -4,6 +4,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, model_validator
 
+from app.algorithms.backtracking import BACKTRACKING_ALGORITHMS
+from app.algorithms.backtracking.types import (
+    BacktrackingAlgorithm,
+    BacktrackingStep,
+    MazePreset,
+)
 from app.algorithms.dynamic_programming import DYNAMIC_PROGRAMMING_ALGORITHMS
 from app.algorithms.dynamic_programming.types import (
     DynamicProgrammingAlgorithm,
@@ -14,6 +20,7 @@ from app.algorithms.graph.types import GraphAlgorithm, GraphEdge, GraphStep
 from app.algorithms.graph.utils import validate_graph
 from app.algorithms.metadata import (
     AlgorithmsResponse,
+    BACKTRACKING_ALGORITHM_METADATA,
     DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     GRAPH_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
@@ -220,6 +227,86 @@ class DynamicProgrammingResponse(BaseModel):
     step_count: int
 
 
+class BacktrackingRequest(BaseModel):
+    algorithm: BacktrackingAlgorithm
+    size: int | None = None
+    values: list[str] | None = None
+    rows: int | None = None
+    cols: int | None = None
+    preset: MazePreset | None = None
+    grid: list[list[str]] | None = None
+    start: tuple[int, int] | None = None
+    end: tuple[int, int] | None = None
+
+    @model_validator(mode="after")
+    def validate_algorithm_input(self) -> "BacktrackingRequest":
+        """Apply algorithm defaults and validate bounded backtracking inputs."""
+
+        if self.algorithm == "n_queens":
+            self.size = _validate_range(
+                self.size if self.size is not None else 4,
+                "size",
+                1,
+                10,
+            )
+        elif self.algorithm in {"permutations", "subsets"}:
+            maximum = 6 if self.algorithm == "permutations" else 10
+            self.values = _validate_text_list(
+                self.values if self.values is not None else ["A", "B", "C"],
+                "values",
+                1,
+                maximum,
+            )
+        elif self.algorithm == "maze_solver":
+            self.rows = _validate_range(
+                self.rows if self.rows is not None else 7,
+                "rows",
+                2,
+                15,
+            )
+            self.cols = _validate_range(
+                self.cols if self.cols is not None else 7,
+                "cols",
+                2,
+                15,
+            )
+            self.preset = self.preset or "classic"
+            if self.grid is not None:
+                _validate_maze_grid(self.grid, self.rows, self.cols)
+            if self.start is not None:
+                _validate_position(self.start, "start", self.rows, self.cols)
+            if self.end is not None:
+                _validate_position(self.end, "end", self.rows, self.cols)
+            if self.start is not None and self.end is not None and self.start == self.end:
+                raise ValueError("Maze start and end must be different cells.")
+        return self
+
+    def algorithm_input(self) -> dict[str, object]:
+        if self.algorithm == "n_queens":
+            return {"size": self.size}
+        if self.algorithm in {"permutations", "subsets"}:
+            return {"values": self.values.copy() if self.values else []}
+        algorithm_input: dict[str, object] = {
+            "rows": self.rows,
+            "cols": self.cols,
+            "preset": self.preset,
+        }
+        if self.grid is not None:
+            algorithm_input["grid"] = [row.copy() for row in self.grid]
+        if self.start is not None:
+            algorithm_input["start"] = self.start
+        if self.end is not None:
+            algorithm_input["target"] = self.end
+        return algorithm_input
+
+
+class BacktrackingResponse(BaseModel):
+    algorithm: BacktrackingAlgorithm
+    input: dict[str, object]
+    steps: list[BacktrackingStep]
+    step_count: int
+
+
 def _validate_range(value: int, name: str, minimum: int, maximum: int) -> int:
     if value < minimum or value > maximum:
         raise ValueError(f"{name} must be between {minimum} and {maximum}.")
@@ -262,6 +349,59 @@ def _validate_text(value: str, name: str) -> str:
     return value
 
 
+def _validate_text_list(
+    values: list[str],
+    name: str,
+    minimum_length: int,
+    maximum_length: int,
+) -> list[str]:
+    if len(values) < minimum_length or len(values) > maximum_length:
+        raise ValueError(
+            f"{name} must include {minimum_length} to {maximum_length} values."
+        )
+    normalized = [value.strip() for value in values]
+    if any(not value for value in normalized):
+        raise ValueError(f"{name} must not contain empty values.")
+    return normalized
+
+
+def _validate_maze_grid(
+    grid: list[list[str]],
+    rows: int | None,
+    cols: int | None,
+) -> None:
+    if len(grid) != rows:
+        raise ValueError("Maze grid row count must match rows.")
+    if any(len(row) != cols for row in grid):
+        raise ValueError("Maze grid column count must match cols.")
+    valid_cells = {
+        "empty",
+        "wall",
+        "start",
+        "end",
+        "visited",
+        "path",
+        "backtracked",
+        "solution",
+    }
+    for row in grid:
+        invalid_cells = set(row) - valid_cells
+        if invalid_cells:
+            invalid = min(invalid_cells)
+            raise ValueError(f"Maze grid cell {invalid!r} is not supported.")
+
+
+def _validate_position(
+    position: tuple[int, int],
+    name: str,
+    rows: int | None,
+    cols: int | None,
+) -> None:
+    row, column = position
+    if rows is None or cols is None or row < 0 or row >= rows or column < 0 or column >= cols:
+        raise ValueError(f"Maze {name} must be inside the grid.")
+
+
 @app.get("/")
 def root() -> dict[str, str]:
     return {"message": "Algorithm Visualizer API is running"}
@@ -274,6 +414,7 @@ def algorithms() -> AlgorithmsResponse:
         searching=SEARCHING_ALGORITHM_METADATA,
         graph=GRAPH_ALGORITHM_METADATA,
         dynamic_programming=DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
+        backtracking=BACKTRACKING_ALGORITHM_METADATA,
     )
 
 
@@ -371,6 +512,23 @@ def dynamic_programming_steps(
         raise HTTPException(status_code=422, detail=str(error)) from error
 
     return DynamicProgrammingResponse(
+        algorithm=request.algorithm,
+        input=algorithm_input,
+        steps=steps,
+        step_count=len(steps),
+    )
+
+
+@app.post("/backtracking/steps", response_model=BacktrackingResponse)
+def backtracking_steps(request: BacktrackingRequest) -> BacktrackingResponse:
+    algorithm_input = request.algorithm_input()
+
+    try:
+        steps = BACKTRACKING_ALGORITHMS[request.algorithm](**algorithm_input)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+    return BacktrackingResponse(
         algorithm=request.algorithm,
         input=algorithm_input,
         steps=steps,
