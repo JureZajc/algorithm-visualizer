@@ -19,12 +19,13 @@ export interface ArrayAlgorithmStep {
 
 export type VisualizerMode =
   | "sorting"
+  | "compare"
   | "searching"
   | "graph"
   | "dynamic_programming"
   | "backtracking";
 
-export type AlgorithmCategory = VisualizerMode;
+export type AlgorithmCategory = Exclude<VisualizerMode, "compare">;
 
 export interface TimeComplexity {
   best: string;

@@ -6,12 +6,14 @@ import { BacktrackingVisualizer } from "@/components/backtracking-visualizer";
 import { DynamicProgrammingVisualizer } from "@/components/dynamic-programming-visualizer";
 import { GraphVisualizer } from "@/components/graph-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
+import { SortingComparison } from "@/components/sorting-comparison";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
 import { fetchAlgorithms } from "@/lib/api";
 import type { AlgorithmsResponse, VisualizerMode } from "@/types/algorithm";
 
 const MODES: { id: VisualizerMode; label: string; shortLabel: string }[] = [
   { id: "sorting", label: "Sorting", shortLabel: "Sort" },
+  { id: "compare", label: "Compare", shortLabel: "Compare" },
   { id: "searching", label: "Searching", shortLabel: "Search" },
   { id: "graph", label: "Graph / Pathfinding", shortLabel: "Graph" },
   { id: "dynamic_programming", label: "Dynamic Programming", shortLabel: "DP" },
@@ -54,7 +56,7 @@ export function AlgorithmVisualizer() {
         </div>
       </header>
 
-      <nav className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white/80 p-1.5 shadow-sm backdrop-blur sm:grid-cols-5" aria-label="Visualizer mode">
+      <nav className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white/80 p-1.5 shadow-sm backdrop-blur sm:grid-cols-3 lg:grid-cols-6" aria-label="Visualizer mode">
         {MODES.map((item) => (
           <button
             className={`min-h-11 rounded-xl px-3 text-sm font-extrabold transition ${mode === item.id ? "bg-slate-950 text-white shadow-lg shadow-slate-300" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
@@ -70,6 +72,7 @@ export function AlgorithmVisualizer() {
       </nav>
 
       {mode === "sorting" ? <SortingVisualizer algorithms={algorithms?.sorting ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
+      {mode === "compare" ? <SortingComparison algorithms={algorithms?.sorting ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
       {mode === "searching" ? <SearchingVisualizer algorithms={algorithms?.searching ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
       {mode === "graph" ? <GraphVisualizer algorithms={algorithms?.graph ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
       {mode === "dynamic_programming" ? <DynamicProgrammingVisualizer algorithms={algorithms?.dynamic_programming ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
