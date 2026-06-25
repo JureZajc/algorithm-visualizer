@@ -130,6 +130,15 @@ Sorting request example:
 }
 ```
 
+## Comparison mode
+
+The frontend includes a Compare tab for sorting algorithms. It lets you choose
+two to four sorting algorithms, runs each one against the same generated or
+preset array through `POST /sorting/steps`, and summarizes total steps,
+comparisons, swaps, overwrites, and average time complexity from the metadata
+catalog. A compact bar chart highlights the algorithm or algorithms with the
+fewest steps for that input.
+
 Searching request example:
 
 ```json
