@@ -9,6 +9,7 @@ AlgorithmCategory = Literal[
     "graph",
     "dynamic_programming",
     "backtracking",
+    "trees",
 ]
 
 
@@ -36,6 +37,7 @@ class AlgorithmsResponse(BaseModel):
     graph: list[AlgorithmMetadata]
     dynamic_programming: list[AlgorithmMetadata]
     backtracking: list[AlgorithmMetadata]
+    trees: list[AlgorithmMetadata]
 
 
 def metadata(
@@ -167,6 +169,48 @@ ALGORITHM_PSEUDOCODE = {
         "  otherwise search the left half",
         "report that the target was not found",
         "finish the search",
+    ],
+    "bst_insert": [
+        "start with an empty binary search tree",
+        "if the tree is empty, insert the value as root",
+        "compare the value with the current node",
+        "move left for smaller values, otherwise move right",
+        "insert the value at the first empty child",
+        "finish with the completed tree",
+    ],
+    "bst_search": [
+        "start at the root node",
+        "compare the target with the current node",
+        "if the target is smaller, move left",
+        "if the target matches, report success",
+        "if the target is larger, move right",
+        "repeat until a node or empty child is reached",
+        "report that the target was not found",
+        "finish the search",
+    ],
+    "inorder_traversal": [
+        "start at the root node",
+        "traverse the left subtree",
+        "visit the current node",
+        "traverse the right subtree",
+        "repeat recursively for every node",
+        "finish with the visited order",
+    ],
+    "preorder_traversal": [
+        "start at the root node",
+        "visit the current node",
+        "traverse the left subtree",
+        "traverse the right subtree",
+        "repeat recursively for every node",
+        "finish with the visited order",
+    ],
+    "postorder_traversal": [
+        "start at the root node",
+        "traverse the left subtree",
+        "traverse the right subtree",
+        "visit the current node",
+        "repeat recursively for every node",
+        "finish with the visited order",
     ],
     "fibonacci": [
         "create a table for Fibonacci values from 0 through n",
@@ -501,6 +545,70 @@ SEARCHING_ALGORITHM_METADATA = [
 ]
 
 
+TREES_ALGORITHM_METADATA = [
+    metadata(
+        "bst_insert",
+        "BST Insert",
+        "trees",
+        "Builds a binary search tree by inserting each value according to BST ordering.",
+        "O(log n)",
+        "O(log n)",
+        "O(n)",
+        "O(n)",
+        "Input values must be unique in this version.",
+        "Tree shape depends on insertion order; sorted input can create a tall tree.",
+    ),
+    metadata(
+        "bst_search",
+        "BST Search",
+        "trees",
+        "Searches a binary search tree by moving left or right after each comparison.",
+        "O(1)",
+        "O(log n)",
+        "O(n)",
+        "O(1)",
+        "Search performance depends on how balanced the tree is.",
+        "This is a tree search, not the existing array Binary Search algorithm.",
+    ),
+    metadata(
+        "inorder_traversal",
+        "Inorder Traversal",
+        "trees",
+        "Visits a binary search tree in left-node-right order.",
+        "O(n)",
+        "O(n)",
+        "O(n)",
+        "O(h)",
+        "For a BST, inorder traversal returns values in sorted order.",
+        "Here h is the tree height from recursive traversal.",
+    ),
+    metadata(
+        "preorder_traversal",
+        "Preorder Traversal",
+        "trees",
+        "Visits a binary tree in node-left-right order.",
+        "O(n)",
+        "O(n)",
+        "O(n)",
+        "O(h)",
+        "Useful for recording a tree before its children.",
+        "Here h is the tree height from recursive traversal.",
+    ),
+    metadata(
+        "postorder_traversal",
+        "Postorder Traversal",
+        "trees",
+        "Visits a binary tree in left-right-node order.",
+        "O(n)",
+        "O(n)",
+        "O(n)",
+        "O(h)",
+        "Useful when children must be processed before their parent.",
+        "Here h is the tree height from recursive traversal.",
+    ),
+]
+
+
 GRAPH_ALGORITHM_METADATA = [
     metadata(
         "bfs",
@@ -732,6 +840,7 @@ BACKTRACKING_ALGORITHM_METADATA = [
 ALGORITHM_METADATA = [
     *SORTING_ALGORITHM_METADATA,
     *SEARCHING_ALGORITHM_METADATA,
+    *TREES_ALGORITHM_METADATA,
     *GRAPH_ALGORITHM_METADATA,
     *DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     *BACKTRACKING_ALGORITHM_METADATA,

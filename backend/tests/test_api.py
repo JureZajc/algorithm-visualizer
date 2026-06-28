@@ -47,6 +47,13 @@ EXPECTED_ALGORITHM_IDS = {
         "subsets",
         "sudoku_solver",
     ],
+    "trees": [
+        "bst_insert",
+        "bst_search",
+        "inorder_traversal",
+        "preorder_traversal",
+        "postorder_traversal",
+    ],
 }
 
 GRAPH_REQUEST = {
@@ -163,6 +170,110 @@ def test_searching_steps_endpoint_rejects_unsupported_algorithm() -> None:
     response = client.post(
         "/searching/steps",
         json={"numbers": [1, 2, 3], "algorithm": "jump_search", "target": 2},
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("payload", "expected_result"),
+    [
+        (
+            {
+                "algorithm": "bst_insert",
+                "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
+            },
+            {"inorder": [1, 3, 4, 6, 7, 8, 10, 13, 14]},
+        ),
+        (
+            {
+                "algorithm": "bst_search",
+                "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
+                "target": 7,
+            },
+            {"found": True, "target": 7, "path": [8, 3, 6, 7]},
+        ),
+        (
+            {
+                "algorithm": "inorder_traversal",
+                "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
+            },
+            {"order": [1, 3, 4, 6, 7, 8, 10, 13, 14]},
+        ),
+        (
+            {
+                "algorithm": "preorder_traversal",
+                "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
+            },
+            {"order": [8, 3, 1, 6, 4, 7, 10, 14, 13]},
+        ),
+        (
+            {
+                "algorithm": "postorder_traversal",
+                "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
+            },
+            {"order": [1, 4, 7, 6, 3, 13, 14, 10, 8]},
+        ),
+    ],
+)
+def test_tree_steps_endpoint(
+    payload: dict[str, object],
+    expected_result: dict[str, object],
+) -> None:
+    response = client.post("/trees/steps", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == payload["algorithm"]
+    assert body["input"]["values"] == payload["values"]
+    assert body["steps"]
+    assert body["steps"][-1]["type"] == "done"
+    assert expected_result.items() <= body["steps"][-1]["result"].items()
+    assert body["step_count"] == len(body["steps"])
+
+
+def test_tree_steps_endpoint_returns_not_found_for_missing_target() -> None:
+    response = client.post(
+        "/trees/steps",
+        json={
+            "algorithm": "bst_search",
+            "values": [8, 3, 10, 1, 6],
+            "target": 5,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "not_found" in {step["type"] for step in body["steps"]}
+    assert body["steps"][-1]["result"] == {
+        "found": False,
+        "target": 5,
+        "path": [8, 3, 6],
+    }
+
+
+def test_tree_steps_endpoint_rejects_duplicate_values() -> None:
+    response = client.post(
+        "/trees/steps",
+        json={"algorithm": "bst_insert", "values": [8, 3, 8]},
+    )
+
+    assert response.status_code == 422
+
+
+def test_tree_steps_endpoint_requires_search_target() -> None:
+    response = client.post(
+        "/trees/steps",
+        json={"algorithm": "bst_search", "values": [8, 3, 10]},
+    )
+
+    assert response.status_code == 422
+
+
+def test_tree_steps_endpoint_rejects_unsupported_algorithm() -> None:
+    response = client.post(
+        "/trees/steps",
+        json={"algorithm": "avl_insert", "values": [8, 3, 10]},
     )
 
     assert response.status_code == 422

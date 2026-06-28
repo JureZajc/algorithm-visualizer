@@ -12,9 +12,12 @@ from app.algorithms.metadata import (
     GRAPH_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
     SORTING_ALGORITHM_METADATA,
+    TREES_ALGORITHM_METADATA,
 )
 from app.algorithms.searching import SEARCHING_ALGORITHMS
 from app.algorithms.sorting import SORTING_ALGORITHMS
+from app.algorithms.trees import TREES_ALGORITHMS
+from app.algorithms.trees.types import TreeAlgorithm
 from app.algorithms.types import SearchingAlgorithm, SortingAlgorithm
 
 
@@ -37,6 +40,9 @@ def test_metadata_covers_every_supported_algorithm_once() -> None:
     assert {item.id for item in BACKTRACKING_ALGORITHM_METADATA} == set(
         get_args(BacktrackingAlgorithm)
     ) == set(BACKTRACKING_ALGORITHMS)
+    assert {item.id for item in TREES_ALGORITHM_METADATA} == set(
+        get_args(TreeAlgorithm)
+    ) == set(TREES_ALGORITHMS)
 
 
 def test_metadata_has_consistent_display_fields_and_categories() -> None:
@@ -49,6 +55,7 @@ def test_metadata_has_consistent_display_fields_and_categories() -> None:
             for item in DYNAMIC_PROGRAMMING_ALGORITHM_METADATA
         },
         **{item.id: "backtracking" for item in BACKTRACKING_ALGORITHM_METADATA},
+        **{item.id: "trees" for item in TREES_ALGORITHM_METADATA},
     }
 
     for item in ALGORITHM_METADATA:

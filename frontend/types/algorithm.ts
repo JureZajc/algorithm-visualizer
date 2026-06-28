@@ -23,7 +23,8 @@ export type VisualizerMode =
   | "searching"
   | "graph"
   | "dynamic_programming"
-  | "backtracking";
+  | "backtracking"
+  | "trees";
 
 export type AlgorithmCategory = Exclude<VisualizerMode, "compare">;
 
@@ -51,6 +52,7 @@ export interface AlgorithmsResponse {
   graph: AlgorithmMetadata[];
   dynamic_programming: AlgorithmMetadata[];
   backtracking: AlgorithmMetadata[];
+  trees: AlgorithmMetadata[];
 }
 
 export interface MetadataSourceProps {

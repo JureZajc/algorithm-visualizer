@@ -23,7 +23,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
   const [count, setCount] = useState(DEFAULT_NUMBERS.length);
   const [countDraft, setCountDraft] = useState(String(DEFAULT_NUMBERS.length));
   const [presetId, setPresetId] = useState("");
-  const [target, setTarget] = useState(67);
+  const [targetInput, setTargetInput] = useState("67");
   const [numbers, setNumbers] = useState(DEFAULT_NUMBERS);
   const [speed, setSpeed] = useState(420);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +53,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
       let next = (await generateRandomNumbers(numberCount)).numbers;
       if (algorithm === "binary_search") next = [...next].sort((a, b) => a - b);
       setNumbers(next);
-      setTarget(next[Math.floor(next.length / 2)] ?? 0);
+      setTargetInput(String(next[Math.floor(next.length / 2)] ?? 0));
       setPresetId("");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Could not generate numbers.");
@@ -67,6 +67,10 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
     setIsLoading(true);
     playback.reset();
     try {
+      const target = Number(targetInput);
+      if (!Number.isInteger(target)) {
+        throw new Error("Enter an integer target value.");
+      }
       let next = numbers;
       if (next.length !== numberCount) {
         next = (await generateRandomNumbers(numberCount)).numbers;
@@ -94,7 +98,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
     if (!preset) return;
     setPresetId(preset.id);
     setNumbers([...preset.numbers]);
-    setTarget(preset.target);
+    setTargetInput(String(preset.target));
     setCount(preset.numbers.length);
     setCountDraft(String(preset.numbers.length));
     if (preset.algorithm) setAlgorithm(preset.algorithm);
@@ -104,8 +108,8 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
 
   const result = playback.isComplete
     ? notFound
-      ? `Target ${target} was not found`
-      : `Found ${target} at index ${foundIndex}`
+      ? `Target ${targetInput} was not found`
+      : `Found ${targetInput} at index ${foundIndex}`
     : "Waiting for completion";
 
   return (
@@ -126,7 +130,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
         </label>
         <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
           Target value
-          <input className={inputClass} type="number" value={target} disabled={playback.isPlaying || isLoading} onChange={(event) => { setTarget(Number(event.target.value)); setPresetId(""); playback.reset(); }} />
+          <input className={inputClass} type="number" value={targetInput} disabled={playback.isPlaying || isLoading} onChange={(event) => { setTargetInput(event.target.value); setPresetId(""); playback.reset(); }} />
         </label>
         <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
           Random values

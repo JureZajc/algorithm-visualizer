@@ -8,6 +8,7 @@ import { GraphVisualizer } from "@/components/graph-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
 import { SortingComparison } from "@/components/sorting-comparison";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
+import { TreesVisualizer } from "@/components/trees-visualizer";
 import { fetchAlgorithms } from "@/lib/api";
 import type { AlgorithmsResponse, VisualizerMode } from "@/types/algorithm";
 
@@ -18,6 +19,7 @@ const MODES: { id: VisualizerMode; label: string; shortLabel: string }[] = [
   { id: "graph", label: "Graph / Pathfinding", shortLabel: "Graph" },
   { id: "dynamic_programming", label: "Dynamic Programming", shortLabel: "DP" },
   { id: "backtracking", label: "Backtracking", shortLabel: "BT" },
+  { id: "trees", label: "Trees", shortLabel: "Trees" },
 ];
 
 export function AlgorithmVisualizer() {
@@ -48,7 +50,7 @@ export function AlgorithmVisualizer() {
         <div>
           <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-indigo-600">Open source learning tool</p>
           <h1 className="mb-3 text-[clamp(2.25rem,6vw,4.5rem)] font-black leading-[0.92] tracking-[-0.06em] text-slate-950">Algorithm<br className="hidden sm:block" /> Visualizer</h1>
-          <p className="m-0 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">See how data structures change at every step, from array operations to graph traversal, shortest paths, spanning trees, dynamic programming tables, and backtracking search.</p>
+          <p className="m-0 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">See how data structures change at every step, from array operations to tree traversal, graph traversal, shortest paths, spanning trees, dynamic programming tables, and backtracking search.</p>
         </div>
         <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
           <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.14)]" />
@@ -56,7 +58,7 @@ export function AlgorithmVisualizer() {
         </div>
       </header>
 
-      <nav className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white/80 p-1.5 shadow-sm backdrop-blur sm:grid-cols-3 lg:grid-cols-6" aria-label="Visualizer mode">
+      <nav className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white/80 p-1.5 shadow-sm backdrop-blur sm:grid-cols-3 lg:grid-cols-7" aria-label="Visualizer mode">
         {MODES.map((item) => (
           <button
             className={`min-h-11 rounded-xl px-3 text-sm font-extrabold transition ${mode === item.id ? "bg-slate-950 text-white shadow-lg shadow-slate-300" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
@@ -77,6 +79,7 @@ export function AlgorithmVisualizer() {
       {mode === "graph" ? <GraphVisualizer algorithms={algorithms?.graph ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
       {mode === "dynamic_programming" ? <DynamicProgrammingVisualizer algorithms={algorithms?.dynamic_programming ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
       {mode === "backtracking" ? <BacktrackingVisualizer algorithms={algorithms?.backtracking ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
+      {mode === "trees" ? <TreesVisualizer algorithms={algorithms?.trees ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}
     </main>
   );
 }

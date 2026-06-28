@@ -30,6 +30,19 @@ visualization step.
 Binary search requires its input array to already be sorted in ascending
 order. The API returns HTTP 422 for unsorted input.
 
+### Trees
+
+- Binary Search Tree Insert
+- Binary Search Tree Search
+- Inorder Traversal
+- Preorder Traversal
+- Postorder Traversal
+
+Tree visualizations build a Binary Search Tree from unique integer values.
+Duplicate values are rejected in this first version so each visual node can be
+identified clearly by its value. BST Search is a tree algorithm and is separate
+from the array-based Binary Search listed under Searching.
+
 ### Graph / Pathfinding
 
 - Breadth-First Search (BFS)
@@ -82,11 +95,12 @@ Subsets use comma-separated list input such as `1,2,3`, `A,B,C`, or
 The backend exposes these main routes:
 
 - `GET /algorithms` lists supported sorting, searching, graph, dynamic
-  programming, and backtracking algorithms with descriptions, complexity
+  programming, backtracking, and tree algorithms with descriptions, complexity
   bounds, notes or limitations, and ordered pseudocode.
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
+- `POST /trees/steps` generates Binary Search Tree visualization steps.
 - `POST /graph/steps` generates graph algorithm visualization steps.
 - `POST /dynamic-programming/steps` generates dynamic programming table steps.
 - `POST /backtracking/steps` generates backtracking grid steps.
@@ -148,6 +162,58 @@ Searching request example:
   "target": 7
 }
 ```
+
+Tree request examples:
+
+```json
+{
+  "algorithm": "bst_insert",
+  "values": [8, 3, 10, 1, 6, 14, 4, 7, 13]
+}
+```
+
+```json
+{
+  "algorithm": "bst_search",
+  "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
+  "target": 7
+}
+```
+
+```json
+{
+  "algorithm": "inorder_traversal",
+  "values": [8, 3, 10, 1, 6, 14, 4, 7, 13]
+}
+```
+
+Traversal algorithms also support `preorder_traversal` and
+`postorder_traversal`. Tree requests accept 1 to 31 unique integer values.
+`bst_search` requires `target`; other tree algorithms ignore it.
+
+Tree steps have this shape:
+
+```json
+{
+  "type": "compare",
+  "tree": {
+    "value": 8,
+    "left": { "value": 3, "left": null, "right": null },
+    "right": null
+  },
+  "current_node": 8,
+  "target": 7,
+  "visited": [],
+  "path": [8],
+  "result": null,
+  "description": "Compare 7 with 8 and move left.",
+  "pseudocode_line": 3
+}
+```
+
+Tree snapshots use recursive `{ "value", "left", "right" }` nodes. Insert
+results include the final root and inorder values, search results include
+`found`, `target`, and `path`, and traversal results include the final `order`.
 
 Graph request example:
 
@@ -390,16 +456,17 @@ the matching line while the animation plays. Older clients can ignore the
 additive field, and steps without it remain valid. Responses also include the
 initial input and total step count.
 
-The pseudocode panel stays synchronized across sorting, searching, graph, and
-dynamic programming visualizers, pairing highlighted algorithm steps with the
-existing descriptions, complexity details, notes, and live data-structure state.
+The pseudocode panel stays synchronized across sorting, searching, trees,
+graph, dynamic programming, and backtracking visualizers, pairing highlighted
+algorithm steps with the existing descriptions, complexity details, notes, and
+live data-structure state.
 
 ## Sample presets
 
 Each visualizer includes frontend-only sample presets for quickly loading useful
 inputs. Sorting examples cover common data shapes and array sizes, searching
 examples cover successful and unsuccessful target positions plus binary search,
-graph examples cover paths, weights, disconnected components, cycles,
+tree examples cover BST insertion, search paths, and traversal orders, graph examples cover paths, weights, disconnected components, cycles,
 topological sorting, minimum spanning trees, and A* search, and dynamic
 programming examples cover one-dimensional, string, item, coin, and grid
 tables. Selecting a preset updates the current input while leaving the existing
