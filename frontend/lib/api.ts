@@ -19,6 +19,7 @@ import type {
   SearchingAlgorithm,
   SearchingStepsResponse,
 } from "@/types/searching";
+import type { TreeRequest, TreeResponse } from "@/types/trees";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
@@ -103,6 +104,10 @@ export function fetchBacktrackingSteps(
   request: BacktrackingRequest,
 ): Promise<BacktrackingResponse> {
   return postJson<BacktrackingResponse>("/backtracking/steps", request);
+}
+
+export function fetchTreeSteps(request: TreeRequest): Promise<TreeResponse> {
+  return postJson<TreeResponse>("/trees/steps", request);
 }
 
 export function generateRandomNumbers(size: number): Promise<RandomNumbersResponse> {

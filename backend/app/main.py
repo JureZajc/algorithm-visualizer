@@ -26,11 +26,14 @@ from app.algorithms.metadata import (
     GRAPH_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
     SORTING_ALGORITHM_METADATA,
+    TREES_ALGORITHM_METADATA,
 )
 from app.algorithms.searching import (
     SEARCHING_ALGORITHMS,
 )
 from app.algorithms.sorting import SORTING_ALGORITHMS
+from app.algorithms.trees import TREES_ALGORITHMS
+from app.algorithms.trees.types import TreeAlgorithm, TreeStep
 from app.algorithms.types import (
     AlgorithmStep,
     SearchingAlgorithm,
@@ -313,6 +316,33 @@ class BacktrackingResponse(BaseModel):
     step_count: int
 
 
+class TreeRequest(BaseModel):
+    algorithm: TreeAlgorithm
+    values: list[int]
+    target: int | None = None
+
+    @model_validator(mode="after")
+    def validate_algorithm_input(self) -> "TreeRequest":
+        """Validate bounded BST inputs and algorithm-specific fields."""
+
+        self.values = _validate_unique_int_list(self.values, "values", 1, 31)
+        if self.algorithm == "bst_search" and self.target is None:
+            raise ValueError("BST search requires a target value.")
+        return self
+
+    def algorithm_input(self) -> dict[str, object]:
+        if self.algorithm == "bst_search":
+            return {"values": self.values.copy(), "target": self.target}
+        return {"values": self.values.copy()}
+
+
+class TreeResponse(BaseModel):
+    algorithm: TreeAlgorithm
+    input: dict[str, object]
+    steps: list[TreeStep]
+    step_count: int
+
+
 def _validate_range(value: int, name: str, minimum: int, maximum: int) -> int:
     if value < minimum or value > maximum:
         raise ValueError(f"{name} must be between {minimum} and {maximum}.")
@@ -346,6 +376,21 @@ def _validate_nonnegative_list(
         )
     if any(value < 0 for value in values):
         raise ValueError(f"{name} must contain nonnegative values.")
+    return values.copy()
+
+
+def _validate_unique_int_list(
+    values: list[int],
+    name: str,
+    minimum_length: int,
+    maximum_length: int,
+) -> list[int]:
+    if len(values) < minimum_length or len(values) > maximum_length:
+        raise ValueError(
+            f"{name} must include {minimum_length} to {maximum_length} values."
+        )
+    if len(values) != len(set(values)):
+        raise ValueError(f"{name} must contain unique values.")
     return values.copy()
 
 
@@ -421,6 +466,7 @@ def algorithms() -> AlgorithmsResponse:
         graph=GRAPH_ALGORITHM_METADATA,
         dynamic_programming=DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
         backtracking=BACKTRACKING_ALGORITHM_METADATA,
+        trees=TREES_ALGORITHM_METADATA,
     )
 
 
@@ -535,6 +581,23 @@ def backtracking_steps(request: BacktrackingRequest) -> BacktrackingResponse:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
     return BacktrackingResponse(
+        algorithm=request.algorithm,
+        input=algorithm_input,
+        steps=steps,
+        step_count=len(steps),
+    )
+
+
+@app.post("/trees/steps", response_model=TreeResponse)
+def tree_steps(request: TreeRequest) -> TreeResponse:
+    algorithm_input = request.algorithm_input()
+
+    try:
+        steps = TREES_ALGORITHMS[request.algorithm](**algorithm_input)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+    return TreeResponse(
         algorithm=request.algorithm,
         input=algorithm_input,
         steps=steps,
