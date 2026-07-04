@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Alert, Button, EmptyState, FormField, inputClassName, Panel } from "@/components/ui-primitives";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
 import { SORTING_PRESETS } from "@/lib/array-presets";
 import type { AlgorithmMetadata, MetadataSourceProps } from "@/types/algorithm";
@@ -20,11 +21,6 @@ const DEFAULT_SELECTION: SortingAlgorithm[] = [
 ];
 const MIN_SELECTED = 2;
 const MAX_SELECTED = 4;
-
-const inputClass =
-  "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
-const buttonClass =
-  "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
 
 interface ComparisonResult {
   algorithm: SortingAlgorithm;
@@ -52,16 +48,15 @@ export function SortingComparison(props: MetadataSourceProps) {
       ? Math.min(...results.map((result) => result.totalSteps))
       : null;
   const maxSteps = Math.max(...results.map((result) => result.totalSteps), 1);
+  const countValidation = validateCountDraft(countDraft);
+  const hasCountError = countValidation.error !== null;
 
-  function normalizeCount(): number {
-    const parsedCount = Number.parseInt(countDraft, 10);
-    const normalizedCount = Number.isNaN(parsedCount)
-      ? count
-      : Math.min(50, Math.max(5, parsedCount));
-    setCount(normalizedCount);
-    setCountDraft(String(normalizedCount));
-    if (normalizedCount !== initialNumbers.length) setPresetId("");
-    return normalizedCount;
+  function commitCount(): number {
+    if (countValidation.value === null) return count;
+    setCount(countValidation.value);
+    setCountDraft(String(countValidation.value));
+    if (countValidation.value !== initialNumbers.length) setPresetId("");
+    return countValidation.value;
   }
 
   function toggleAlgorithm(algorithm: SortingAlgorithm) {
@@ -132,18 +127,17 @@ export function SortingComparison(props: MetadataSourceProps) {
 
   return (
     <div>
-      <section className="mb-5 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur" aria-label="Sorting comparison controls">
+      <Panel className="mb-5 p-5" variant="control" aria-label="Sorting comparison controls">
         <div className="mb-5 flex flex-col gap-2">
           <span className="text-xs font-black uppercase tracking-[0.14em] text-indigo-600">Sorting comparison</span>
-          <h2 className="m-0 text-xl font-extrabold tracking-tight text-slate-950">Compare algorithms on one shared array</h2>
+          <h2 className="m-0 text-xl font-extrabold tracking-normal text-slate-950">Compare algorithms on one shared array</h2>
           <p className="m-0 max-w-3xl text-sm leading-6 text-slate-600">Select two to four sorting algorithms, generate one input, and compare the step counts returned by the API.</p>
         </div>
 
         <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-            Sample preset
+          <FormField label="Sample preset">
             <select
-              className={inputClass}
+              className={inputClassName()}
               value={presetId}
               disabled={isLoading}
               onChange={(event) => loadPreset(event.target.value)}
@@ -153,39 +147,42 @@ export function SortingComparison(props: MetadataSourceProps) {
                 <option key={preset.id} value={preset.id}>{preset.label}</option>
               ))}
             </select>
-          </label>
+          </FormField>
 
-          <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-            Random values
+          <FormField
+            error={countValidation.error}
+            helperText="Use 5 to 50 values."
+            label="Random values"
+            messageId="compare-count-validation"
+          >
             <input
-              className={inputClass}
+              aria-describedby="compare-count-validation"
+              aria-invalid={hasCountError}
+              className={inputClassName(hasCountError)}
               type="number"
               min={5}
               max={50}
               value={countDraft}
               disabled={isLoading}
-              onBlur={normalizeCount}
+              onBlur={commitCount}
               onChange={(event) => setCountDraft(event.target.value)}
             />
-          </label>
+          </FormField>
 
           <div className="flex items-end gap-2 md:col-span-2">
-            <button
-              className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-              type="button"
-              disabled={isLoading}
-              onClick={() => handleGenerate(normalizeCount())}
+            <Button
+              disabled={isLoading || hasCountError}
+              onClick={() => handleGenerate(commitCount())}
             >
               Generate shared input
-            </button>
-            <button
-              className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`}
-              type="button"
-              disabled={isLoading || selectedAlgorithms.length < MIN_SELECTED}
-              onClick={() => handleCompare(normalizeCount())}
+            </Button>
+            <Button
+              variant="primary"
+              disabled={isLoading || selectedAlgorithms.length < MIN_SELECTED || hasCountError}
+              onClick={() => handleCompare(commitCount())}
             >
               {isLoading ? "Comparing..." : "Run comparison"}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -222,22 +219,22 @@ export function SortingComparison(props: MetadataSourceProps) {
         </div>
 
         <SharedInputPreview numbers={initialNumbers} />
-      </section>
+      </Panel>
 
       {props.metadataError ? (
-        <p className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
-          Metadata unavailable: {props.metadataError}. Comparison still works, but complexity may be unavailable.
-        </p>
+        <Alert title="Metadata unavailable" variant="warning">
+          {props.metadataError}. Comparison still works, but complexity may be unavailable.
+        </Alert>
       ) : null}
 
       {error ? (
-        <p className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{error}</p>
+        <Alert title="Comparison unavailable">{error}</Alert>
       ) : null}
 
       {results.length > 0 ? (
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
-            <h2 className="mb-4 text-lg font-extrabold tracking-tight text-slate-950">Comparison summary</h2>
+          <Panel className="p-5">
+            <h2 className="mb-4 text-lg font-extrabold tracking-normal text-slate-950">Comparison summary</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {results.map((result) => (
                 <ComparisonCard
@@ -247,10 +244,10 @@ export function SortingComparison(props: MetadataSourceProps) {
                 />
               ))}
             </div>
-          </section>
+          </Panel>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
-            <h2 className="mb-4 text-lg font-extrabold tracking-tight text-slate-950">Step count</h2>
+          <Panel className="p-5">
+            <h2 className="mb-4 text-lg font-extrabold tracking-normal text-slate-950">Step count</h2>
             <div className="grid gap-4">
               {results.map((result) => (
                 <div className="grid gap-2" key={result.algorithm}>
@@ -267,16 +264,24 @@ export function SortingComparison(props: MetadataSourceProps) {
                 </div>
               ))}
             </div>
-          </section>
+          </Panel>
         </div>
       ) : (
-        <section className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-8 text-center">
-          <h2 className="mb-2 text-lg font-extrabold tracking-tight text-slate-950">Ready to compare</h2>
-          <p className="m-0 text-sm leading-6 text-slate-600">Choose algorithms, generate or select an input, then run the comparison.</p>
-        </section>
+        <EmptyState title="Ready to compare" description="Choose algorithms, generate or select an input, then run the comparison." />
       )}
     </div>
   );
+}
+
+function validateCountDraft(rawValue: string) {
+  const value = Number(rawValue.trim());
+  if (!Number.isInteger(value)) {
+    return { error: "Enter a whole number from 5 to 50.", value: null };
+  }
+  if (value < 5 || value > 50) {
+    return { error: "Random values must be between 5 and 50.", value: null };
+  }
+  return { error: null, value };
 }
 
 function summarizeResponse(
@@ -326,7 +331,7 @@ function ComparisonCard({
   return (
     <article className={isWinner ? "rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm" : "rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm"}>
       <div className="mb-4 flex items-start justify-between gap-3">
-        <h3 className="m-0 text-base font-extrabold tracking-tight text-slate-950">{result.algorithmName}</h3>
+        <h3 className="m-0 text-base font-extrabold tracking-normal text-slate-950">{result.algorithmName}</h3>
         {isWinner ? (
           <span className="shrink-0 rounded-full bg-emerald-600 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.08em] text-white">
             Fewest steps

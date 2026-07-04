@@ -5,8 +5,9 @@ import { useState } from "react";
 import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { HashTableView } from "@/components/hash-table-view";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
-import { ErrorMessage, VisualizerHeading } from "@/components/sorting-visualizer";
 import { StepControls } from "@/components/step-controls";
+import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchHashTableSteps } from "@/lib/api";
@@ -23,10 +24,6 @@ import {
 const DEFAULT_VALUES = "12, 22, 32, 5";
 const DEFAULT_TARGET = "32";
 const DEFAULT_TABLE_SIZE = "10";
-const inputBaseClass = "min-h-11 w-full rounded-xl border bg-slate-50 px-3 text-sm text-slate-900 transition focus:bg-white focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60";
-const neutralInputClass = "border-slate-300 focus:border-indigo-500 focus:ring-indigo-100";
-const invalidInputClass = "border-rose-300 focus:border-rose-500 focus:ring-rose-100";
-const buttonClass = "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
 
 export function HashTablesVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<HashTableAlgorithm>("hash_insert_chaining");
@@ -102,11 +99,10 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
 
   return (
     <div>
-      <section className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] md:grid-cols-2 xl:grid-cols-6">
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Hash table operation
+      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
+        <FormField label="Hash table operation" className="xl:col-span-2">
           <select
-            className={hashInputClass(false)}
+            className={inputClassName()}
             value={algorithm}
             disabled={editingDisabled}
             onChange={(event) => changeAlgorithm(event.target.value as HashTableAlgorithm)}
@@ -115,12 +111,17 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
               <option key={value} value={value}>{label}</option>
             ))}
           </select>
-        </label>
+        </FormField>
 
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Values
+        <FormField
+          className="xl:col-span-2"
+          error={!valuesValidation.ok ? valuesValidation.error : capacityError ?? undefined}
+          helperText="Use 1 to 31 comma-separated keys."
+          label="Values"
+          messageId="hash-values-validation"
+        >
           <input
-            className={hashInputClass(!valuesValidation.ok || capacityError !== null)}
+            className={inputClassName(!valuesValidation.ok || capacityError !== null)}
             value={valuesInput}
             disabled={editingDisabled}
             aria-invalid={!valuesValidation.ok || capacityError !== null}
@@ -130,15 +131,11 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
               resetForInputChange();
             }}
           />
-          <span id="hash-values-validation" className="min-h-5 text-xs font-semibold leading-5 text-rose-600" aria-live="polite">
-            {!valuesValidation.ok ? valuesValidation.error : capacityError ?? ""}
-          </span>
-        </label>
+        </FormField>
 
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-          Table size
+        <FormField error={tableSizeValidation.ok ? undefined : tableSizeValidation.error} helperText="Use a table size from 2 to 31." label="Table size" messageId="hash-table-size-validation">
           <input
-            className={hashInputClass(!tableSizeValidation.ok || capacityError !== null)}
+            className={inputClassName(!tableSizeValidation.ok || capacityError !== null)}
             type="number"
             min={2}
             max={31}
@@ -151,16 +148,12 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
               resetForInputChange();
             }}
           />
-          <span id="hash-table-size-validation" className="min-h-5 text-xs font-semibold leading-5 text-rose-600" aria-live="polite">
-            {tableSizeValidation.ok ? "" : tableSizeValidation.error}
-          </span>
-        </label>
+        </FormField>
 
         {isSearch ? (
-          <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-            Target
+          <FormField error={targetValidation.ok ? undefined : targetValidation.error} helperText="Use a number or string key." label="Target" messageId="hash-target-validation">
             <input
-              className={hashInputClass(!targetValidation.ok)}
+              className={inputClassName(!targetValidation.ok)}
               value={targetInput}
               disabled={editingDisabled}
               aria-invalid={!targetValidation.ok}
@@ -170,10 +163,7 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
                 resetForInputChange();
               }}
             />
-            <span id="hash-target-validation" className="min-h-5 text-xs font-semibold leading-5 text-rose-600" aria-live="polite">
-              {targetValidation.ok ? "" : targetValidation.error}
-            </span>
-          </label>
+          </FormField>
         ) : null}
 
         <label className="flex flex-col gap-3 text-xs font-bold text-slate-700">
@@ -193,22 +183,19 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
         </label>
 
         <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
-          <button
-            className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`}
-            type="button"
+          <Button
+            variant="primary"
             disabled={editingDisabled || hasValidationError}
             onClick={startVisualization}
           >
             {isLoading ? "Loading steps..." : "Start visualization"}
-          </button>
-          <button
-            className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-            type="button"
+          </Button>
+          <Button
             disabled={isLoading}
             onClick={playback.reset}
           >
             Reset
-          </button>
+          </Button>
         </div>
 
         <div className="md:col-span-2 xl:col-span-6">
@@ -225,21 +212,29 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
             onSeek={playback.seek}
           />
         </div>
-      </section>
+      </Panel>
 
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
-      {error ? <ErrorMessage message={error} /> : null}
+      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
-          <VisualizerHeading
-            title={HASH_TABLE_ALGORITHM_LABELS[algorithm]}
-            description={currentStep?.description ?? "Enter keys and start the hash table visualization."}
-            legend={["Hash", "Active", "Collision", "Probe", "Found", "Not found"]}
-          />
+        <VisualizationPanel
+          title={HASH_TABLE_ALGORITHM_LABELS[algorithm]}
+          status={playbackStatus({
+            hasError: error !== null,
+            hasValidationError,
+            isComplete: playback.isComplete,
+            isLoading,
+            isPlaying: playback.isPlaying,
+            totalSteps: playback.steps.length,
+          })}
+          description={currentStep?.description ?? "Enter keys and start the hash table visualization."}
+          legend={["Hash", "Active", "Collision", "Probe", "Found", "Not found"]}
+          resultSummary={playback.isComplete ? <span>{isSearch ? "Search result" : "Insert result"}: <span className="font-mono text-xs">{result}</span></span> : null}
+        >
           <HashTableView table={displayedTable} step={currentStep} />
-        </section>
+        </VisualizationPanel>
 
         <div className="grid gap-5 self-start">
           <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line ?? undefined} isLoading={props.isMetadataLoading} error={props.metadataError} />
@@ -273,10 +268,6 @@ type ParsedTableSize =
 type ParsedTarget =
   | { ok: true; target: HashKey | null }
   | { ok: false; error: string };
-
-function hashInputClass(isInvalid: boolean) {
-  return `${inputBaseClass} ${isInvalid ? invalidInputClass : neutralInputClass}`;
-}
 
 function validateHashValues(raw: string): ParsedValues {
   const trimmed = raw.trim();

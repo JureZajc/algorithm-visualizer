@@ -5,8 +5,9 @@ import { useState } from "react";
 import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { DynamicProgrammingTable } from "@/components/dynamic-programming-table";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
-import { ErrorMessage, VisualizerHeading } from "@/components/sorting-visualizer";
 import { StepControls } from "@/components/step-controls";
+import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
+import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchDynamicProgrammingSteps } from "@/lib/api";
@@ -66,8 +67,6 @@ const DEFAULT_FIELDS: Record<
   unique_paths: { rows: "3", cols: "7" },
 };
 
-const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
-const buttonClass = "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
 const FIBONACCI_COLUMNS_PER_ROW = 8;
 
 function parseInteger(rawValue: string, label: string) {
@@ -413,6 +412,8 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
   const result = playback.isComplete
     ? String(currentStep?.result ?? "No result")
     : "Waiting for completion";
+  const formErrors = validateDynamicProgrammingForm(algorithm, form);
+  const hasValidationError = Object.keys(formErrors).length > 0;
 
   function resetForInputChange() {
     setError(null);
@@ -447,6 +448,8 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
   }
 
   async function startVisualization() {
+    if (hasValidationError) return;
+
     setError(null);
     setIsLoading(true);
     playback.reset();
@@ -464,11 +467,10 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
 
   return (
     <div>
-      <section className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] md:grid-cols-2 xl:grid-cols-6">
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Dynamic programming algorithm
+      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
+        <FormField label="Dynamic programming algorithm" className="xl:col-span-2">
           <select
-            className={inputClass}
+            className={inputClassName()}
             value={algorithm}
             disabled={editingDisabled}
             onChange={(event) => changeAlgorithm(event.target.value as DynamicProgrammingAlgorithm)}
@@ -477,12 +479,11 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
               <option key={value} value={value}>{label}</option>
             ))}
           </select>
-        </label>
+        </FormField>
 
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Sample preset
+        <FormField label="Sample preset" className="xl:col-span-2">
           <select
-            className={inputClass}
+            className={inputClassName()}
             value={presetId}
             disabled={editingDisabled}
             onChange={(event) => loadPreset(event.target.value)}
@@ -492,7 +493,7 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
               <option key={preset.id} value={preset.id}>{preset.label}</option>
             ))}
           </select>
-        </label>
+        </FormField>
 
         <label className="flex flex-col gap-3 text-xs font-bold text-slate-700 xl:col-span-2">
           <span className="flex justify-between gap-3">
@@ -512,28 +513,32 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
 
         <AlgorithmInputFields
           algorithm={algorithm}
+          errors={formErrors}
           form={form}
           disabled={editingDisabled}
           onChange={updateField}
         />
 
+        {formErrors.form ? (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
+            <InlineMessage tone="error">{formErrors.form}</InlineMessage>
+          </div>
+        ) : null}
+
         <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
-          <button
-            className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`}
-            type="button"
-            disabled={editingDisabled}
+          <Button
+            variant="primary"
+            disabled={editingDisabled || hasValidationError}
             onClick={startVisualization}
           >
             {isLoading ? "Loading steps..." : "Start visualization"}
-          </button>
-          <button
-            className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-            type="button"
+          </Button>
+          <Button
             disabled={isLoading}
             onClick={playback.reset}
           >
             Reset
-          </button>
+          </Button>
         </div>
 
         <div className="md:col-span-2 xl:col-span-6">
@@ -550,19 +555,27 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
             onSeek={playback.seek}
           />
         </div>
-      </section>
+      </Panel>
 
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
-      {error ? <ErrorMessage message={error} /> : null}
+      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
-        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
-          <VisualizerHeading
-            title={DYNAMIC_PROGRAMMING_ALGORITHM_LABELS[algorithm]}
-            description={currentStep?.description ?? "Set the inputs and start the table visualization."}
-            legend={["Active", "Related"]}
-          />
+        <VisualizationPanel
+          title={DYNAMIC_PROGRAMMING_ALGORITHM_LABELS[algorithm]}
+          status={playbackStatus({
+            hasError: error !== null,
+            hasValidationError,
+            isComplete: playback.isComplete,
+            isLoading,
+            isPlaying: playback.isPlaying,
+            totalSteps: playback.steps.length,
+          })}
+          description={currentStep?.description ?? "Set the inputs and start the table visualization."}
+          legend={["Active", "Related"]}
+          resultSummary={playback.isComplete ? <span>DP result: <span className="font-mono text-xs">{result}</span></span> : null}
+        >
           <DynamicProgrammingTable
             table={table}
             step={displayStep}
@@ -570,7 +583,7 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
             columnLabels={columnLabels}
             variant={algorithm === "fibonacci" ? "compact" : "standard"}
           />
-        </section>
+        </VisualizationPanel>
         <div className="grid gap-5 self-start">
           <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line ?? undefined} isLoading={props.isMetadataLoading} error={props.metadataError} />
           <VisualizerStats
@@ -589,11 +602,13 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
 
 function AlgorithmInputFields({
   algorithm,
+  errors,
   form,
   disabled,
   onChange,
 }: {
   algorithm: DynamicProgrammingAlgorithm;
+  errors: Partial<Record<keyof DynamicProgrammingForm | "form", string>>;
   form: DynamicProgrammingForm;
   disabled: boolean;
   onChange: (field: keyof DynamicProgrammingForm, value: string) => void;
@@ -605,6 +620,7 @@ function AlgorithmInputFields({
         value={form.n}
         min={0}
         max={40}
+        error={errors.n}
         disabled={disabled}
         onChange={(value) => onChange("n", value)}
       />
@@ -617,6 +633,8 @@ function AlgorithmInputFields({
         <TextField
           label="Coins"
           value={form.coins}
+          error={errors.coins}
+          helperText="Comma-separated positive values, up to 8 coins."
           disabled={disabled}
           onChange={(value) => onChange("coins", value)}
         />
@@ -625,6 +643,7 @@ function AlgorithmInputFields({
           value={form.amount}
           min={0}
           max={50}
+          error={errors.amount}
           disabled={disabled}
           onChange={(value) => onChange("amount", value)}
         />
@@ -638,12 +657,16 @@ function AlgorithmInputFields({
         <TextField
           label="Weights"
           value={form.weights}
+          error={errors.weights}
+          helperText="Comma-separated positive weights, up to 8 values."
           disabled={disabled}
           onChange={(value) => onChange("weights", value)}
         />
         <TextField
           label="Values"
           value={form.values}
+          error={errors.values}
+          helperText="Comma-separated nonnegative values, up to 8 values."
           disabled={disabled}
           onChange={(value) => onChange("values", value)}
         />
@@ -652,6 +675,7 @@ function AlgorithmInputFields({
           value={form.capacity}
           min={0}
           max={50}
+          error={errors.capacity}
           disabled={disabled}
           onChange={(value) => onChange("capacity", value)}
         />
@@ -665,12 +689,16 @@ function AlgorithmInputFields({
         <TextField
           label="First string"
           value={form.textA}
+          error={errors.textA}
+          helperText="12 characters or fewer."
           disabled={disabled}
           onChange={(value) => onChange("textA", value)}
         />
         <TextField
           label="Second string"
           value={form.textB}
+          error={errors.textB}
+          helperText="12 characters or fewer."
           disabled={disabled}
           onChange={(value) => onChange("textB", value)}
         />
@@ -684,12 +712,16 @@ function AlgorithmInputFields({
         <TextField
           label="Source string"
           value={form.textA}
+          error={errors.textA}
+          helperText="12 characters or fewer."
           disabled={disabled}
           onChange={(value) => onChange("textA", value)}
         />
         <TextField
           label="Target string"
           value={form.textB}
+          error={errors.textB}
+          helperText="12 characters or fewer."
           disabled={disabled}
           onChange={(value) => onChange("textB", value)}
         />
@@ -704,6 +736,7 @@ function AlgorithmInputFields({
         value={form.rows}
         min={1}
         max={12}
+        error={errors.rows}
         disabled={disabled}
         onChange={(value) => onChange("rows", value)}
       />
@@ -712,6 +745,7 @@ function AlgorithmInputFields({
         value={form.cols}
         min={1}
         max={12}
+        error={errors.cols}
         disabled={disabled}
         onChange={(value) => onChange("cols", value)}
       />
@@ -724,6 +758,7 @@ function NumberField({
   value,
   min,
   max,
+  error,
   disabled,
   onChange,
 }: {
@@ -731,14 +766,17 @@ function NumberField({
   value: string;
   min: number;
   max: number;
+  error?: string;
   disabled: boolean;
   onChange: (value: string) => void;
 }) {
+  const messageId = `dp-${label.toLowerCase().replace(/\s+/g, "-")}-validation`;
   return (
-    <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-      {label}
+    <FormField error={error} helperText={`Use ${min} to ${max}.`} label={label} messageId={messageId}>
       <input
-        className={inputClass}
+        aria-describedby={messageId}
+        aria-invalid={error !== undefined}
+        className={inputClassName(error !== undefined)}
         type="number"
         min={min}
         max={max}
@@ -746,31 +784,65 @@ function NumberField({
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       />
-    </label>
+    </FormField>
   );
 }
 
 function TextField({
   label,
   value,
+  error,
+  helperText,
   disabled,
   onChange,
 }: {
   label: string;
   value: string;
+  error?: string;
+  helperText?: string;
   disabled: boolean;
   onChange: (value: string) => void;
 }) {
+  const messageId = `dp-${label.toLowerCase().replace(/\s+/g, "-")}-validation`;
   return (
-    <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-      {label}
+    <FormField error={error} helperText={helperText} label={label} messageId={messageId}>
       <input
-        className={inputClass}
+        aria-describedby={messageId}
+        aria-invalid={error !== undefined}
+        className={inputClassName(error !== undefined)}
         type="text"
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       />
-    </label>
+    </FormField>
   );
+}
+
+function validateDynamicProgrammingForm(
+  algorithm: DynamicProgrammingAlgorithm,
+  form: DynamicProgrammingForm,
+): Partial<Record<keyof DynamicProgrammingForm | "form", string>> {
+  try {
+    createRequest(algorithm, form);
+    return {};
+  } catch (validationError) {
+    const message = validationError instanceof Error ? validationError.message : "Check the highlighted inputs.";
+    const field = dynamicProgrammingErrorField(message);
+    return field ? { [field]: message } : { form: message };
+  }
+}
+
+function dynamicProgrammingErrorField(message: string): keyof DynamicProgrammingForm | null {
+  if (message.startsWith("n ")) return "n";
+  if (message.startsWith("Coins")) return "coins";
+  if (message.startsWith("Amount")) return "amount";
+  if (message.startsWith("Weights")) return "weights";
+  if (message.startsWith("Values")) return "values";
+  if (message.startsWith("Capacity")) return "capacity";
+  if (message.startsWith("First string") || message.startsWith("Source string")) return "textA";
+  if (message.startsWith("Second string") || message.startsWith("Target string")) return "textB";
+  if (message.startsWith("Rows")) return "rows";
+  if (message.startsWith("Columns")) return "cols";
+  return null;
 }

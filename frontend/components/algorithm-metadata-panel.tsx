@@ -1,3 +1,4 @@
+import { Alert, Panel } from "@/components/ui-primitives";
 import type { AlgorithmMetadata } from "@/types/algorithm";
 
 interface AlgorithmMetadataPanelProps {
@@ -18,31 +19,30 @@ export function AlgorithmMetadataPanel(props: AlgorithmMetadataPanelProps) {
 
   if (props.isLoading) {
     return (
-      <section className="mb-5 rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm" aria-live="polite" aria-label="Loading algorithm details">
+      <Panel className="mb-5 p-5" variant="subtle" aria-live="polite" aria-label="Loading algorithm details">
         <div className="mb-3 h-4 w-28 animate-pulse rounded bg-slate-200" />
         <div className="mb-2 h-6 w-52 animate-pulse rounded bg-slate-200" />
         <div className="h-4 max-w-2xl animate-pulse rounded bg-slate-100" />
-      </section>
+      </Panel>
     );
   }
 
   if (!metadata) {
     return (
-      <section className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900" aria-live="polite">
-        <span className="font-bold">Algorithm details unavailable.</span>{" "}
+      <Alert title="Algorithm details unavailable" variant="warning">
         {props.error ?? "The selected algorithm was not present in the metadata catalog."} Visualizations remain available.
-      </section>
+      </Alert>
     );
   }
 
   return (
-    <section className="mb-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]" aria-labelledby={`metadata-${metadata.id}`}>
+    <Panel className="mb-5 p-5" aria-labelledby={`metadata-${metadata.id}`}>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">
           <span className="mb-2 inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-indigo-700">
             {metadata.category}
           </span>
-          <h2 id={`metadata-${metadata.id}`} className="mb-1 text-xl font-extrabold tracking-tight text-slate-950">{metadata.name}</h2>
+          <h2 id={`metadata-${metadata.id}`} className="mb-1 text-xl font-extrabold tracking-normal text-slate-950">{metadata.name}</h2>
           <p className="m-0 text-sm leading-6 text-slate-600">{metadata.description}</p>
         </div>
         <p className="m-0 max-w-xs text-xs leading-5 text-slate-500">Complexities describe the algorithm itself and exclude animation snapshot overhead.</p>
@@ -61,7 +61,7 @@ export function AlgorithmMetadataPanel(props: AlgorithmMetadataPanelProps) {
           {metadata.notes.map((note) => <li key={note}>{note}</li>)}
         </ul>
       </div>
-    </section>
+    </Panel>
   );
 }
 

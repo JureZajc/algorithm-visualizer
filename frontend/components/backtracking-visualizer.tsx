@@ -6,9 +6,10 @@ import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { BacktrackingGrid } from "@/components/backtracking-grid";
 import { BacktrackingListVisualizer } from "@/components/backtracking-list-visualizer";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
-import { ErrorMessage, VisualizerHeading } from "@/components/sorting-visualizer";
 import { StepControls } from "@/components/step-controls";
 import { SudokuGrid } from "@/components/sudoku-grid";
+import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
+import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchBacktrackingSteps } from "@/lib/api";
@@ -58,9 +59,6 @@ const DEFAULT_FIELDS: Record<
   subsets: { values: "A, B, C" },
   sudoku_solver: {},
 };
-
-const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
-const buttonClass = "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
 
 const MAZE_TOOLS: { id: MazeTool; label: string }[] = [
   { id: "empty", label: "Empty cell" },
@@ -426,6 +424,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
   const [speed, setSpeed] = useState(420);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [controlMessage, setControlMessage] = useState<string | null>(null);
   const playback = useStepPlayback<BacktrackingStep>(speed);
   const currentStep = playback.currentStep;
   const availablePresets = BACKTRACKING_PRESETS.filter(
@@ -447,9 +446,17 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
     currentStep?.result ?? null,
     playback.isComplete,
   );
+  const formErrors = validateBacktrackingForm(
+    algorithm,
+    form,
+    algorithm === "maze_solver" ? mazeGrid : undefined,
+    algorithm === "sudoku_solver" ? sudokuBoard : undefined,
+  );
+  const hasValidationError = Object.keys(formErrors).length > 0;
 
   function resetForInputChange() {
     setError(null);
+    setControlMessage(null);
     playback.reset();
   }
 
@@ -520,11 +527,11 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
       const currentCell = current[row]?.[column];
       if (!currentCell) return current;
       if (mazeTool === "start" && currentCell === "end") {
-        setError("Start and End must be different cells.");
+        setControlMessage("Start and End must be different cells.");
         return current;
       }
       if (mazeTool === "end" && currentCell === "start") {
-        setError("Start and End must be different cells.");
+        setControlMessage("Start and End must be different cells.");
         return current;
       }
 
@@ -545,6 +552,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
       }
 
       nextGrid[row][column] = mazeTool;
+      setControlMessage(null);
       setError(null);
       playback.reset();
       return nextGrid;
@@ -597,6 +605,8 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
   }
 
   async function startVisualization() {
+    if (hasValidationError) return;
+
     setError(null);
     setIsLoading(true);
     playback.reset();
@@ -627,11 +637,10 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
 
   return (
     <div>
-      <section className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] md:grid-cols-2 xl:grid-cols-6">
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Backtracking algorithm
+      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
+        <FormField label="Backtracking algorithm" className="xl:col-span-2">
           <select
-            className={inputClass}
+            className={inputClassName()}
             value={algorithm}
             disabled={editingDisabled}
             onChange={(event) => changeAlgorithm(event.target.value as BacktrackingAlgorithm)}
@@ -640,12 +649,11 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
               <option key={value} value={value}>{label}</option>
             ))}
           </select>
-        </label>
+        </FormField>
 
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Sample preset
+        <FormField label="Sample preset" className="xl:col-span-2">
           <select
-            className={inputClass}
+            className={inputClassName()}
             value={presetId}
             disabled={editingDisabled}
             onChange={(event) => loadPreset(event.target.value)}
@@ -655,7 +663,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
               <option key={preset.id} value={preset.id}>{preset.label}</option>
             ))}
           </select>
-        </label>
+        </FormField>
 
         <label className="flex flex-col gap-3 text-xs font-bold text-slate-700 xl:col-span-2">
           <span className="flex justify-between gap-3">
@@ -675,6 +683,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
 
         <AlgorithmInputFields
           algorithm={algorithm}
+          errors={formErrors}
           form={form}
           disabled={editingDisabled}
           onChange={updateField}
@@ -703,23 +712,20 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
                 </button>
               ))}
             </div>
+            {controlMessage ? <InlineMessage tone="error">{controlMessage}</InlineMessage> : null}
             <div className="flex flex-wrap gap-2">
-              <button
-                className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-                type="button"
+              <Button
                 disabled={editingDisabled}
                 onClick={resetMaze}
               >
                 Reset maze
-              </button>
-              <button
-                className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-                type="button"
+              </Button>
+              <Button
                 disabled={editingDisabled}
                 onClick={clearWalls}
               >
                 Clear walls
-              </button>
+              </Button>
             </div>
           </div>
         ) : algorithm === "sudoku_solver" ? (
@@ -733,43 +739,42 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button
-                className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-                type="button"
+              <Button
                 disabled={editingDisabled}
                 onClick={resetSudokuPuzzle}
               >
                 Reset puzzle
-              </button>
-              <button
-                className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-                type="button"
+              </Button>
+              <Button
                 disabled={editingDisabled}
                 onClick={clearSudokuPuzzle}
               >
                 Clear puzzle
-              </button>
+              </Button>
             </div>
           </div>
         ) : null}
 
+        {formErrors.form ? (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
+            <InlineMessage tone="error">{formErrors.form}</InlineMessage>
+          </div>
+        ) : null}
+
         <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
-          <button
-            className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`}
-            type="button"
-            disabled={editingDisabled}
+          <Button
+            variant="primary"
+            disabled={editingDisabled || hasValidationError}
             onClick={startVisualization}
           >
             {isLoading ? "Loading steps..." : "Start visualization"}
-          </button>
-          <button
-            className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}
-            type="button"
+          </Button>
+          <Button
             disabled={isLoading}
             onClick={playback.reset}
           >
             Reset
-          </button>
+          </Button>
         </div>
 
         <div className="md:col-span-2 xl:col-span-6">
@@ -786,19 +791,27 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
             onSeek={playback.seek}
           />
         </div>
-      </section>
+      </Panel>
 
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
-      {error ? <ErrorMessage message={error} /> : null}
+      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
-        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
-          <VisualizerHeading
-            title={BACKTRACKING_ALGORITHM_LABELS[algorithm]}
-            description={currentStep?.description ?? "Choose an input and start the backtracking visualization."}
-            legend={legend}
-          />
+        <VisualizationPanel
+          title={BACKTRACKING_ALGORITHM_LABELS[algorithm]}
+          status={playbackStatus({
+            hasError: error !== null,
+            hasValidationError,
+            isComplete: playback.isComplete,
+            isLoading,
+            isPlaying: playback.isPlaying,
+            totalSteps: playback.steps.length,
+          })}
+          description={currentStep?.description ?? "Choose an input and start the backtracking visualization."}
+          legend={legend}
+          resultSummary={playback.isComplete ? <span>{result}</span> : null}
+        >
           {isListAlgorithm(algorithm) ? (
             <BacktrackingListVisualizer
               algorithm={algorithm}
@@ -821,7 +834,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
               onCellClick={algorithm === "maze_solver" ? editMazeCell : undefined}
             />
           )}
-        </section>
+        </VisualizationPanel>
         <div className="grid gap-5 self-start">
           <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line ?? undefined} isLoading={props.isMetadataLoading} error={props.metadataError} />
           <VisualizerStats
@@ -840,11 +853,13 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
 
 function AlgorithmInputFields({
   algorithm,
+  errors,
   form,
   disabled,
   onChange,
 }: {
   algorithm: BacktrackingAlgorithm;
+  errors: Partial<Record<keyof BacktrackingForm | "form", string>>;
   form: BacktrackingForm;
   disabled: boolean;
   onChange: (field: keyof BacktrackingForm, value: string | MazePreset) => void;
@@ -856,6 +871,7 @@ function AlgorithmInputFields({
         value={form.size}
         min={1}
         max={10}
+        error={errors.size}
         disabled={disabled}
         onChange={(value) => onChange("size", value)}
       />
@@ -863,18 +879,26 @@ function AlgorithmInputFields({
   }
 
   if (algorithm === "permutations" || algorithm === "subsets") {
+    const messageId = "backtracking-values-validation";
     return (
-      <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 md:col-span-2 xl:col-span-3">
-        Comma-separated values
+      <FormField
+        className="md:col-span-2 xl:col-span-3"
+        error={errors.values}
+        helperText={algorithm === "permutations" ? "Use 1 to 6 comma-separated values." : "Use 1 to 10 comma-separated values."}
+        label="Comma-separated values"
+        messageId={messageId}
+      >
         <input
-          className={inputClass}
+          aria-describedby={messageId}
+          aria-invalid={errors.values !== undefined}
+          className={inputClassName(errors.values !== undefined)}
           type="text"
           value={form.values}
           disabled={disabled}
           placeholder="A, B, C"
           onChange={(event) => onChange("values", event.target.value)}
         />
-      </label>
+      </FormField>
     );
   }
 
@@ -884,10 +908,9 @@ function AlgorithmInputFields({
 
   return (
     <>
-      <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-        Maze pattern
+      <FormField label="Maze pattern">
         <select
-          className={inputClass}
+          className={inputClassName()}
           value={form.preset}
           disabled={disabled}
           onChange={(event) => onChange("preset", event.target.value as MazePreset)}
@@ -896,12 +919,13 @@ function AlgorithmInputFields({
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
-      </label>
+      </FormField>
       <NumberField
         label="Rows"
         value={form.rows}
         min={2}
         max={15}
+        error={errors.rows}
         disabled={disabled}
         onChange={(value) => onChange("rows", value)}
       />
@@ -910,6 +934,7 @@ function AlgorithmInputFields({
         value={form.cols}
         min={2}
         max={15}
+        error={errors.cols}
         disabled={disabled}
         onChange={(value) => onChange("cols", value)}
       />
@@ -922,6 +947,7 @@ function NumberField({
   value,
   min,
   max,
+  error,
   disabled,
   onChange,
 }: {
@@ -929,14 +955,17 @@ function NumberField({
   value: string;
   min: number;
   max: number;
+  error?: string;
   disabled: boolean;
   onChange: (value: string) => void;
 }) {
+  const messageId = `backtracking-${label.toLowerCase().replace(/\s+/g, "-")}-validation`;
   return (
-    <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-      {label}
+    <FormField error={error} helperText={`Use ${min} to ${max}.`} label={label} messageId={messageId}>
       <input
-        className={inputClass}
+        aria-describedby={messageId}
+        aria-invalid={error !== undefined}
+        className={inputClassName(error !== undefined)}
         type="number"
         min={min}
         max={max}
@@ -944,6 +973,30 @@ function NumberField({
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       />
-    </label>
+    </FormField>
   );
+}
+
+function validateBacktrackingForm(
+  algorithm: BacktrackingAlgorithm,
+  form: BacktrackingForm,
+  mazeGrid?: BacktrackingCell[][],
+  sudokuBoard?: SudokuBoard,
+): Partial<Record<keyof BacktrackingForm | "form", string>> {
+  try {
+    createRequest(algorithm, form, mazeGrid, sudokuBoard);
+    return {};
+  } catch (validationError) {
+    const message = validationError instanceof Error ? validationError.message : "Check the highlighted inputs.";
+    const field = backtrackingErrorField(message);
+    return field ? { [field]: message } : { form: message };
+  }
+}
+
+function backtrackingErrorField(message: string): keyof BacktrackingForm | null {
+  if (message.startsWith("Board size")) return "size";
+  if (message.startsWith("Rows")) return "rows";
+  if (message.startsWith("Columns")) return "cols";
+  if (message.startsWith("Values")) return "values";
+  return null;
 }
