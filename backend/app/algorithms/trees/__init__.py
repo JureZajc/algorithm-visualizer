@@ -1,5 +1,6 @@
 from collections.abc import Callable
 
+from app.algorithms.trees.avl_tree import avl_insert_steps
 from app.algorithms.trees.binary_search_tree import (
     bst_insert_steps,
     bst_search_steps,
@@ -14,6 +15,7 @@ TreeFunction = Callable[..., list[TreeStep]]
 
 TREES_ALGORITHMS: dict[TreeAlgorithm, TreeFunction] = {
     "bst_insert": bst_insert_steps,
+    "avl_insert": avl_insert_steps,
     "bst_search": bst_search_steps,
     "inorder_traversal": inorder_traversal_steps,
     "preorder_traversal": preorder_traversal_steps,
@@ -22,6 +24,7 @@ TREES_ALGORITHMS: dict[TreeAlgorithm, TreeFunction] = {
 
 __all__ = [
     "TREES_ALGORITHMS",
+    "avl_insert_steps",
     "bst_insert_steps",
     "bst_search_steps",
     "inorder_traversal_steps",

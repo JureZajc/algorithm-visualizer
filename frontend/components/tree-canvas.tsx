@@ -12,6 +12,8 @@ interface PositionedNode {
   depth: number;
   left: number | null;
   right: number | null;
+  height?: number;
+  balanceFactor?: number;
 }
 
 interface Edge {
@@ -56,6 +58,21 @@ const TREE_STEP_CLASSES: Record<TreeStepType, TreeStepClasses> = {
     ring: "stroke-indigo-300",
     text: "fill-white",
   },
+  balance_check: {
+    node: "fill-cyan-500 stroke-cyan-700",
+    ring: "stroke-cyan-300",
+    text: "fill-white",
+  },
+  imbalance: {
+    node: "fill-rose-500 stroke-rose-700",
+    ring: "stroke-rose-300",
+    text: "fill-white",
+  },
+  rotate: {
+    node: "fill-fuchsia-500 stroke-fuchsia-700",
+    ring: "stroke-fuchsia-300",
+    text: "fill-white",
+  },
   done: {
     node: "fill-emerald-500 stroke-emerald-700",
     ring: "stroke-emerald-300",
@@ -75,12 +92,25 @@ const VISITED_NODE_CLASSES = {
   node: "fill-sky-500 stroke-sky-700",
   text: "fill-white",
 };
+const IMBALANCED_NODE_CLASSES = {
+  node: "fill-rose-500 stroke-rose-700",
+  ring: "stroke-rose-300",
+  text: "fill-white",
+};
+const ROTATION_NODE_CLASSES = {
+  node: "fill-fuchsia-500 stroke-fuchsia-700",
+  ring: "stroke-fuchsia-300",
+  text: "fill-white",
+};
+const ROTATION_EDGE_CLASS = "stroke-fuchsia-500";
 
 export function TreeCanvas({ tree, step }: TreeCanvasProps) {
   const layout = createTreeLayout(tree);
   const positions = new Map(layout.nodes.map((node) => [node.value, node]));
   const path = new Set(step?.path ?? []);
   const visited = new Set(step?.visited ?? []);
+  const rotationValues = new Set(step?.rotation_nodes ?? []);
+  const imbalancedValue = step?.imbalanced_node ?? null;
   const activeValue = step?.current_node;
   const activeClasses = step ? TREE_STEP_CLASSES[step.type] : null;
   const pathValues = step?.path ?? [];
@@ -105,12 +135,15 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
           const target = positions.get(edge.target);
           if (!source || !target) return null;
           const isPath = activePathEdges.has(edgeKey(edge.source, edge.target));
+          const isRotationEdge = rotationValues.has(edge.source) && rotationValues.has(edge.target);
           const isVisitedEdge = visited.has(edge.source) && visited.has(edge.target);
-          const edgeClass = isPath
-            ? "stroke-indigo-500"
-            : isVisitedEdge
-              ? "stroke-sky-400"
-              : "stroke-slate-300";
+          const edgeClass = isRotationEdge
+            ? ROTATION_EDGE_CLASS
+            : isPath
+              ? "stroke-indigo-500"
+              : isVisitedEdge
+                ? "stroke-sky-400"
+                : "stroke-slate-300";
 
           return (
             <line
@@ -120,47 +153,65 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
               x2={target.x}
               y2={target.y - 25}
               strokeLinecap="round"
-              strokeWidth={isPath ? 6 : isVisitedEdge ? 5 : 3}
+              strokeWidth={isRotationEdge ? 7 : isPath ? 6 : isVisitedEdge ? 5 : 3}
               className={`${edgeClass} transition-all duration-200`}
             />
           );
         })}
 
         {layout.nodes.map((node) => {
+          const isImbalanced = imbalancedValue === node.value;
+          const isRotationNode = rotationValues.has(node.value);
           const isActive = activeValue === node.value && activeClasses !== null;
           const isVisited = visited.has(node.value);
           const isPath = path.has(node.value);
-          const nodeClasses = isActive
-            ? activeClasses.node
-            : isVisited
-              ? VISITED_NODE_CLASSES.node
-              : isPath
-                ? PATH_NODE_CLASSES.node
-                : DEFAULT_NODE_CLASSES.node;
-          const textClass = isActive
-            ? activeClasses.text
-            : isVisited
-              ? VISITED_NODE_CLASSES.text
-              : isPath
-                ? PATH_NODE_CLASSES.text
-                : DEFAULT_NODE_CLASSES.text;
+          const nodeClasses = isImbalanced
+            ? IMBALANCED_NODE_CLASSES.node
+            : isRotationNode
+              ? ROTATION_NODE_CLASSES.node
+              : isActive
+                ? activeClasses.node
+                : isVisited
+                  ? VISITED_NODE_CLASSES.node
+                  : isPath
+                    ? PATH_NODE_CLASSES.node
+                    : DEFAULT_NODE_CLASSES.node;
+          const textClass = isImbalanced
+            ? IMBALANCED_NODE_CLASSES.text
+            : isRotationNode
+              ? ROTATION_NODE_CLASSES.text
+              : isActive
+                ? activeClasses.text
+                : isVisited
+                  ? VISITED_NODE_CLASSES.text
+                  : isPath
+                    ? PATH_NODE_CLASSES.text
+                    : DEFAULT_NODE_CLASSES.text;
+          const ringClass = isImbalanced
+            ? IMBALANCED_NODE_CLASSES.ring
+            : isRotationNode
+              ? ROTATION_NODE_CLASSES.ring
+              : isActive
+                ? activeClasses.ring
+                : null;
+          const metrics = formatNodeMetrics(node);
 
           return (
             <g key={node.value} className="transition-all duration-200">
-              {isActive && activeClasses ? (
+              {ringClass ? (
                 <circle
                   cx={node.x}
                   cy={node.y}
                   r="34"
                   strokeWidth="4"
-                  className={`fill-none ${activeClasses.ring}`}
+                  className={`fill-none ${ringClass}`}
                 />
               ) : null}
               <circle
                 cx={node.x}
                 cy={node.y}
                 r="25"
-                strokeWidth={isActive ? 6 : 2.5}
+                strokeWidth={isImbalanced || isRotationNode || isActive ? 6 : 2.5}
                 className={`${nodeClasses} drop-shadow-sm`}
               />
               <text
@@ -171,7 +222,27 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
               >
                 {node.value}
               </text>
-              <title>{`Node ${node.value}`}</title>
+              {metrics ? (
+                <g>
+                  <rect
+                    x={node.x - 39}
+                    y={node.y + 34}
+                    width="78"
+                    height="20"
+                    rx="8"
+                    className="fill-white stroke-slate-200"
+                  />
+                  <text
+                    x={node.x}
+                    y={node.y + 48}
+                    textAnchor="middle"
+                    className="fill-slate-600 font-mono text-[10px] font-bold"
+                  >
+                    {metrics}
+                  </text>
+                </g>
+              ) : null}
+              <title>{metrics ? `Node ${node.value}, ${metrics}` : `Node ${node.value}`}</title>
             </g>
           );
         })}
@@ -193,6 +264,16 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
 
 function edgeKey(source: number, target: number) {
   return `${source}->${target}`;
+}
+
+function formatNodeMetrics(node: PositionedNode) {
+  if (typeof node.height !== "number" && typeof node.balanceFactor !== "number") {
+    return null;
+  }
+
+  const heightLabel = typeof node.height === "number" ? `h${node.height}` : "";
+  const balanceLabel = typeof node.balanceFactor === "number" ? `bf${node.balanceFactor}` : "";
+  return [heightLabel, balanceLabel].filter(Boolean).join(" ");
 }
 
 function createTreeLayout(tree: TreeNode | null) {
@@ -219,6 +300,8 @@ function createTreeLayout(tree: TreeNode | null) {
       depth,
       left,
       right,
+      height: node.height,
+      balanceFactor: node.balance_factor,
     });
     nodes[nodes.length - 1].x = currentColumn;
     return node.value;
