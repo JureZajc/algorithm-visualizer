@@ -24,7 +24,8 @@ export type VisualizerMode =
   | "graph"
   | "dynamic_programming"
   | "backtracking"
-  | "trees";
+  | "trees"
+  | "hash_tables";
 
 export type AlgorithmCategory = Exclude<VisualizerMode, "compare">;
 
@@ -53,6 +54,7 @@ export interface AlgorithmsResponse {
   dynamic_programming: AlgorithmMetadata[];
   backtracking: AlgorithmMetadata[];
   trees: AlgorithmMetadata[];
+  hash_tables: AlgorithmMetadata[];
 }
 
 export interface MetadataSourceProps {

@@ -10,6 +10,7 @@ AlgorithmCategory = Literal[
     "dynamic_programming",
     "backtracking",
     "trees",
+    "hash_tables",
 ]
 
 
@@ -38,6 +39,7 @@ class AlgorithmsResponse(BaseModel):
     dynamic_programming: list[AlgorithmMetadata]
     backtracking: list[AlgorithmMetadata]
     trees: list[AlgorithmMetadata]
+    hash_tables: list[AlgorithmMetadata]
 
 
 def metadata(
@@ -168,6 +170,40 @@ ALGORITHM_PSEUDOCODE = {
         "  if it is smaller, search the right half",
         "  otherwise search the left half",
         "report that the target was not found",
+        "finish the search",
+    ],
+    "hash_insert_chaining": [
+        "start with an empty table of buckets",
+        "for each key, compute hash(key) modulo table size",
+        "inspect the target bucket",
+        "if the bucket already contains items, note the collision",
+        "append the key to the bucket's chain",
+        "finish with the completed hash table",
+    ],
+    "hash_search_chaining": [
+        "compute hash(target) modulo table size",
+        "inspect the target bucket",
+        "compare each item in that chain with the target",
+        "if an item matches, report it found",
+        "if the chain ends, report not found",
+        "finish the search",
+    ],
+    "hash_insert_linear_probing": [
+        "start with an empty table of slots",
+        "for each key, compute hash(key) modulo table size",
+        "inspect the hashed slot",
+        "if occupied, record the collision",
+        "probe the next slot in sequence",
+        "insert the key into the first empty slot",
+        "finish with the completed hash table",
+    ],
+    "hash_search_linear_probing": [
+        "compute hash(target) modulo table size",
+        "inspect the current slot",
+        "compare an occupied slot with the target",
+        "if the slot matches, report it found",
+        "if the slot is occupied by another key, probe the next slot",
+        "if an empty slot or full cycle is reached, report not found",
         "finish the search",
     ],
     "bst_insert": [
@@ -557,6 +593,58 @@ SEARCHING_ALGORITHM_METADATA = [
 ]
 
 
+HASH_TABLE_ALGORITHM_METADATA = [
+    metadata(
+        "hash_insert_chaining",
+        "Insert - Separate Chaining",
+        "hash_tables",
+        "Inserts keys into buckets and stores collisions as chains inside each bucket.",
+        "O(1)",
+        "O(1)",
+        "O(n)",
+        "O(n)",
+        "Uses modulo hashing for integer keys.",
+        "Colliding keys stay together in the same bucket list.",
+    ),
+    metadata(
+        "hash_search_chaining",
+        "Search - Separate Chaining",
+        "hash_tables",
+        "Searches the hashed bucket and scans its chain for the target key.",
+        "O(1)",
+        "O(1)",
+        "O(n)",
+        "O(n)",
+        "Search returns the first matching key in the bucket chain.",
+        "Worst-case time occurs when many keys land in one bucket.",
+    ),
+    metadata(
+        "hash_insert_linear_probing",
+        "Insert - Linear Probing",
+        "hash_tables",
+        "Inserts keys into slots, moving forward one slot at a time after collisions.",
+        "O(1)",
+        "O(1)",
+        "O(n)",
+        "O(n)",
+        "The table is bounded so every probe sequence remains readable.",
+        "Clustering can make later insertions slower.",
+    ),
+    metadata(
+        "hash_search_linear_probing",
+        "Search - Linear Probing",
+        "hash_tables",
+        "Searches from the hashed slot through the probe path until the key or an empty slot is reached.",
+        "O(1)",
+        "O(1)",
+        "O(n)",
+        "O(n)",
+        "This version has no deletion, so an empty slot ends an unsuccessful search.",
+        "Search returns the first matching key along the probe path.",
+    ),
+]
+
+
 TREES_ALGORITHM_METADATA = [
     metadata(
         "bst_insert",
@@ -865,6 +953,7 @@ BACKTRACKING_ALGORITHM_METADATA = [
 ALGORITHM_METADATA = [
     *SORTING_ALGORITHM_METADATA,
     *SEARCHING_ALGORITHM_METADATA,
+    *HASH_TABLE_ALGORITHM_METADATA,
     *TREES_ALGORITHM_METADATA,
     *GRAPH_ALGORITHM_METADATA,
     *DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,

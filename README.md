@@ -30,6 +30,19 @@ visualization step.
 Binary search requires its input array to already be sorted in ascending
 order. The API returns HTTP 422 for unsorted input.
 
+### Hash Tables
+
+- Hash Insert with Separate Chaining
+- Hash Search with Separate Chaining
+- Hash Insert with Linear Probing
+- Hash Search with Linear Probing
+
+Hash table visualizations accept integer or string keys, a table size, and a
+search target for search operations. Integer keys hash with `key % table_size`;
+string keys hash by summing character codes modulo the table size. Separate
+chaining shows colliding keys inside bucket lists, while linear probing shows
+one key per slot and highlights the probe path.
+
 ### Trees
 
 - Binary Search Tree Insert
@@ -100,6 +113,7 @@ The backend exposes these main routes:
 - `POST /numbers/random` generates an array of random integers.
 - `POST /sorting/steps` generates visualization steps for a sorting algorithm.
 - `POST /searching/steps` generates visualization steps for a search.
+- `POST /hash-tables/steps` generates hash table operation steps.
 - `POST /trees/steps` generates Binary Search Tree visualization steps.
 - `POST /graph/steps` generates graph algorithm visualization steps.
 - `POST /dynamic-programming/steps` generates dynamic programming table steps.
@@ -162,6 +176,54 @@ Searching request example:
   "target": 7
 }
 ```
+
+Hash table request examples:
+
+```json
+{
+  "algorithm": "hash_insert_chaining",
+  "values": [12, 22, 32, 5],
+  "table_size": 10
+}
+```
+
+```json
+{
+  "algorithm": "hash_search_linear_probing",
+  "values": [12, 22, 32, 5],
+  "table_size": 10,
+  "target": 32
+}
+```
+
+Hash table steps have this shape:
+
+```json
+{
+  "type": "probe",
+  "table": {
+    "strategy": "linear_probing",
+    "size": 10,
+    "buckets": [
+      { "index": 0, "items": [] },
+      { "index": 1, "items": [] },
+      { "index": 2, "items": [12] }
+    ]
+  },
+  "key": 32,
+  "hash_index": 2,
+  "active_bucket": 4,
+  "active_item": null,
+  "visited_buckets": [2, 3, 4],
+  "result": null,
+  "description": "Probe slot 4.",
+  "pseudocode_line": 5
+}
+```
+
+The final `done` step includes a result object. Insert results include the
+strategy, table size, inserted values, and load factor. Search results include
+`found`, `target`, `bucket`, and `visited_buckets`.
 
 Tree request examples:
 
