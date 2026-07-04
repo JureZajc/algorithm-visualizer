@@ -1,5 +1,6 @@
 export type TreeAlgorithm =
   | "bst_insert"
+  | "avl_insert"
   | "bst_search"
   | "inorder_traversal"
   | "preorder_traversal"
@@ -12,12 +13,23 @@ export type TreeStepType =
   | "found"
   | "not_found"
   | "traverse"
+  | "balance_check"
+  | "imbalance"
+  | "rotate"
   | "done";
+
+export type TreeRotationType =
+  | "left"
+  | "right"
+  | "left_right"
+  | "right_left";
 
 export interface TreeNode {
   value: number;
   left: TreeNode | null;
   right: TreeNode | null;
+  height?: number;
+  balance_factor?: number;
 }
 
 export interface TreeStep {
@@ -30,6 +42,9 @@ export interface TreeStep {
   result: Record<string, unknown> | null;
   description: string;
   pseudocode_line: number | null;
+  imbalanced_node?: number | null;
+  rotation_type?: TreeRotationType | null;
+  rotation_nodes?: number[];
 }
 
 export interface TreeRequest {
@@ -47,6 +62,7 @@ export interface TreeResponse {
 
 export const TREE_ALGORITHM_LABELS: Record<TreeAlgorithm, string> = {
   bst_insert: "BST Insert",
+  avl_insert: "AVL Tree Insert",
   bst_search: "BST Search",
   inorder_traversal: "Inorder Traversal",
   preorder_traversal: "Preorder Traversal",

@@ -49,6 +49,7 @@ EXPECTED_ALGORITHM_IDS = {
     ],
     "trees": [
         "bst_insert",
+        "avl_insert",
         "bst_search",
         "inorder_traversal",
         "preorder_traversal",
@@ -187,6 +188,13 @@ def test_searching_steps_endpoint_rejects_unsupported_algorithm() -> None:
         ),
         (
             {
+                "algorithm": "avl_insert",
+                "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
+            },
+            {"inorder": [1, 3, 4, 6, 7, 8, 10, 13, 14], "balanced": True},
+        ),
+        (
+            {
                 "algorithm": "bst_search",
                 "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
                 "target": 7,
@@ -273,7 +281,7 @@ def test_tree_steps_endpoint_requires_search_target() -> None:
 def test_tree_steps_endpoint_rejects_unsupported_algorithm() -> None:
     response = client.post(
         "/trees/steps",
-        json={"algorithm": "avl_insert", "values": [8, 3, 10]},
+        json={"algorithm": "red_black_insert", "values": [8, 3, 10]},
     )
 
     assert response.status_code == 422
