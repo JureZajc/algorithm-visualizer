@@ -5,11 +5,14 @@ from app.algorithms.backtracking.types import BacktrackingAlgorithm
 from app.algorithms.dynamic_programming import DYNAMIC_PROGRAMMING_ALGORITHMS
 from app.algorithms.dynamic_programming.types import DynamicProgrammingAlgorithm
 from app.algorithms.graph.types import GraphAlgorithm
+from app.algorithms.hash_tables import HASH_TABLE_ALGORITHMS
+from app.algorithms.hash_tables.types import HashTableAlgorithm
 from app.algorithms.metadata import (
     ALGORITHM_METADATA,
     BACKTRACKING_ALGORITHM_METADATA,
     DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     GRAPH_ALGORITHM_METADATA,
+    HASH_TABLE_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
     SORTING_ALGORITHM_METADATA,
     TREES_ALGORITHM_METADATA,
@@ -43,6 +46,9 @@ def test_metadata_covers_every_supported_algorithm_once() -> None:
     assert {item.id for item in TREES_ALGORITHM_METADATA} == set(
         get_args(TreeAlgorithm)
     ) == set(TREES_ALGORITHMS)
+    assert {item.id for item in HASH_TABLE_ALGORITHM_METADATA} == set(
+        get_args(HashTableAlgorithm)
+    ) == set(HASH_TABLE_ALGORITHMS)
 
 
 def test_metadata_has_consistent_display_fields_and_categories() -> None:
@@ -56,6 +62,7 @@ def test_metadata_has_consistent_display_fields_and_categories() -> None:
         },
         **{item.id: "backtracking" for item in BACKTRACKING_ALGORITHM_METADATA},
         **{item.id: "trees" for item in TREES_ALGORITHM_METADATA},
+        **{item.id: "hash_tables" for item in HASH_TABLE_ALGORITHM_METADATA},
     }
 
     for item in ALGORITHM_METADATA:

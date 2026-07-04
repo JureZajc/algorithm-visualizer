@@ -19,11 +19,18 @@ from app.algorithms.dynamic_programming.types import (
 from app.algorithms.graph import graph_algorithm_steps
 from app.algorithms.graph.types import GraphAlgorithm, GraphEdge, GraphStep
 from app.algorithms.graph.utils import validate_graph
+from app.algorithms.hash_tables import HASH_TABLE_ALGORITHMS
+from app.algorithms.hash_tables.types import (
+    HashKey,
+    HashTableAlgorithm,
+    HashTableStep,
+)
 from app.algorithms.metadata import (
     AlgorithmsResponse,
     BACKTRACKING_ALGORITHM_METADATA,
     DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     GRAPH_ALGORITHM_METADATA,
+    HASH_TABLE_ALGORITHM_METADATA,
     SEARCHING_ALGORITHM_METADATA,
     SORTING_ALGORITHM_METADATA,
     TREES_ALGORITHM_METADATA,
@@ -343,6 +350,55 @@ class TreeResponse(BaseModel):
     step_count: int
 
 
+class HashTableRequest(BaseModel):
+    algorithm: HashTableAlgorithm
+    values: list[HashKey]
+    table_size: int = 10
+    target: HashKey | None = None
+
+    @model_validator(mode="after")
+    def validate_algorithm_input(self) -> "HashTableRequest":
+        """Validate bounded hash table inputs and algorithm-specific fields."""
+
+        self.table_size = _validate_range(self.table_size, "table_size", 2, 31)
+        self.values = _validate_hash_key_list(self.values, "values", 1, 31)
+        if self.algorithm in {
+            "hash_search_chaining",
+            "hash_search_linear_probing",
+        }:
+            if self.target is None:
+                raise ValueError("Hash table search requires a target key.")
+            self.target = _validate_hash_key(self.target, "target")
+        if (
+            self.algorithm
+            in {"hash_insert_linear_probing", "hash_search_linear_probing"}
+            and len(self.values) > self.table_size
+        ):
+            raise ValueError(
+                "Linear probing requires values count to fit within table_size."
+            )
+        return self
+
+    def algorithm_input(self) -> dict[str, object]:
+        algorithm_input: dict[str, object] = {
+            "values": self.values.copy(),
+            "table_size": self.table_size,
+        }
+        if self.algorithm in {
+            "hash_search_chaining",
+            "hash_search_linear_probing",
+        }:
+            algorithm_input["target"] = self.target
+        return algorithm_input
+
+
+class HashTableResponse(BaseModel):
+    algorithm: HashTableAlgorithm
+    input: dict[str, object]
+    steps: list[HashTableStep]
+    step_count: int
+
+
 def _validate_range(value: int, name: str, minimum: int, maximum: int) -> int:
     if value < minimum or value > maximum:
         raise ValueError(f"{name} must be between {minimum} and {maximum}.")
@@ -416,6 +472,31 @@ def _validate_text_list(
     return normalized
 
 
+def _validate_hash_key(value: HashKey, name: str) -> HashKey:
+    if isinstance(value, bool):
+        raise ValueError(f"{name} must be an integer or non-empty string key.")
+    if isinstance(value, int):
+        return value
+
+    normalized = value.strip()
+    if not normalized:
+        raise ValueError(f"{name} must be an integer or non-empty string key.")
+    return normalized
+
+
+def _validate_hash_key_list(
+    values: list[HashKey],
+    name: str,
+    minimum_length: int,
+    maximum_length: int,
+) -> list[HashKey]:
+    if len(values) < minimum_length or len(values) > maximum_length:
+        raise ValueError(
+            f"{name} must include {minimum_length} to {maximum_length} keys."
+        )
+    return [_validate_hash_key(value, name) for value in values]
+
+
 def _validate_maze_grid(
     grid: list[list[str]],
     rows: int | None,
@@ -467,6 +548,7 @@ def algorithms() -> AlgorithmsResponse:
         dynamic_programming=DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
         backtracking=BACKTRACKING_ALGORITHM_METADATA,
         trees=TREES_ALGORITHM_METADATA,
+        hash_tables=HASH_TABLE_ALGORITHM_METADATA,
     )
 
 
@@ -598,6 +680,23 @@ def tree_steps(request: TreeRequest) -> TreeResponse:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
     return TreeResponse(
+        algorithm=request.algorithm,
+        input=algorithm_input,
+        steps=steps,
+        step_count=len(steps),
+    )
+
+
+@app.post("/hash-tables/steps", response_model=HashTableResponse)
+def hash_table_steps(request: HashTableRequest) -> HashTableResponse:
+    algorithm_input = request.algorithm_input()
+
+    try:
+        steps = HASH_TABLE_ALGORITHMS[request.algorithm](**algorithm_input)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+    return HashTableResponse(
         algorithm=request.algorithm,
         input=algorithm_input,
         steps=steps,

@@ -1,12 +1,15 @@
 # Algorithm Visualizer Frontend
 
-Next.js frontend for animating sorting, searching, graph/pathfinding, and
-dynamic programming steps produced by the FastAPI backend.
+Next.js frontend for animating sorting, searching, hash table,
+graph/pathfinding, and dynamic programming steps produced by the FastAPI
+backend.
 
 ## Features
 
 - Sorting visualizations for all algorithms exposed by the backend
 - Linear and Binary Search with found and not-found states
+- Hash table insert/search visualizations for separate chaining and linear
+  probing
 - SVG graph visualizations for BFS, DFS, Dijkstra, A*, Topological Sort,
   Kruskal, and Prim
 - Dynamic programming table visualizations for Fibonacci, Coin Change,
@@ -15,6 +18,7 @@ dynamic programming steps produced by the FastAPI backend.
   including a directed acyclic graph
 - Start, pause, resume, reset, animation speed, elapsed time, and step progress
 - Algorithm-aware controls for pathfinding, topological ordering, and MSTs
+- Algorithm-aware controls for hash table values, table size, and search target
 - Algorithm-aware controls for one-dimensional tables, string tables, item
   tables, and grid path counts
 - Live path costs and A* heuristics, topological order and cycle status, plus
@@ -43,7 +47,9 @@ set `NEXT_PUBLIC_API_URL` before starting or building the app.
 On macOS, open `http://localhost:3000`. The available controls change with the
 selected algorithm. Graph algorithms adapt start, target, directed, and MST
 controls. Dynamic Programming algorithms adapt numeric, list, string, and grid
-inputs for the selected table.
+inputs for the selected table. Hash Table algorithms adapt target input for
+search operations and show chaining or probing layouts based on the selected
+operation.
 
 Run a production build with:
 

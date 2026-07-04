@@ -158,6 +158,10 @@ export function VisualizerHeading({ title, description, legend }: { title: strin
     Visited: "bg-sky-300",
     Path: "bg-indigo-500",
     Chosen: "bg-emerald-500",
+    Hash: "bg-sky-400",
+    Collision: "bg-rose-500",
+    Probe: "bg-cyan-500",
+    "Not found": "bg-slate-500",
   };
   return (
     <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">

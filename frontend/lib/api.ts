@@ -16,6 +16,10 @@ import type {
 } from "@/types/sorting";
 import type { GraphRequest, GraphResponse } from "@/types/graph";
 import type {
+  HashTableRequest,
+  HashTableResponse,
+} from "@/types/hash-tables";
+import type {
   SearchingAlgorithm,
   SearchingStepsResponse,
 } from "@/types/searching";
@@ -108,6 +112,12 @@ export function fetchBacktrackingSteps(
 
 export function fetchTreeSteps(request: TreeRequest): Promise<TreeResponse> {
   return postJson<TreeResponse>("/trees/steps", request);
+}
+
+export function fetchHashTableSteps(
+  request: HashTableRequest,
+): Promise<HashTableResponse> {
+  return postJson<HashTableResponse>("/hash-tables/steps", request);
 }
 
 export function generateRandomNumbers(size: number): Promise<RandomNumbersResponse> {

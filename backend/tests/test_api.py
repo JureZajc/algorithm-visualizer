@@ -55,6 +55,12 @@ EXPECTED_ALGORITHM_IDS = {
         "preorder_traversal",
         "postorder_traversal",
     ],
+    "hash_tables": [
+        "hash_insert_chaining",
+        "hash_search_chaining",
+        "hash_insert_linear_probing",
+        "hash_search_linear_probing",
+    ],
 }
 
 GRAPH_REQUEST = {
@@ -282,6 +288,133 @@ def test_tree_steps_endpoint_rejects_unsupported_algorithm() -> None:
     response = client.post(
         "/trees/steps",
         json={"algorithm": "red_black_insert", "values": [8, 3, 10]},
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("payload", "expected_result"),
+    [
+        (
+            {
+                "algorithm": "hash_insert_chaining",
+                "values": [12, 22, 32, 5],
+                "table_size": 10,
+            },
+            {"strategy": "separate_chaining", "table_size": 10},
+        ),
+        (
+            {
+                "algorithm": "hash_search_chaining",
+                "values": [12, 22, 32, 5],
+                "table_size": 10,
+                "target": 32,
+            },
+            {"found": True, "target": 32, "bucket": 2},
+        ),
+        (
+            {
+                "algorithm": "hash_insert_linear_probing",
+                "values": [12, 22, 32, 5],
+                "table_size": 10,
+            },
+            {"strategy": "linear_probing", "table_size": 10},
+        ),
+        (
+            {
+                "algorithm": "hash_search_linear_probing",
+                "values": [12, 22, 32, 5],
+                "table_size": 10,
+                "target": 32,
+            },
+            {"found": True, "target": 32, "bucket": 4},
+        ),
+    ],
+)
+def test_hash_table_steps_endpoint(
+    payload: dict[str, object],
+    expected_result: dict[str, object],
+) -> None:
+    response = client.post("/hash-tables/steps", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["algorithm"] == payload["algorithm"]
+    assert body["input"]["values"] == payload["values"]
+    assert body["input"]["table_size"] == payload["table_size"]
+    assert body["steps"]
+    assert body["steps"][-1]["type"] == "done"
+    assert expected_result.items() <= body["steps"][-1]["result"].items()
+    assert body["step_count"] == len(body["steps"])
+
+    required_step_fields = {
+        "type",
+        "table",
+        "key",
+        "hash_index",
+        "active_bucket",
+        "active_item",
+        "visited_buckets",
+        "result",
+        "description",
+        "pseudocode_line",
+    }
+    assert set(body["steps"][0]) == required_step_fields
+
+
+def test_hash_table_steps_endpoint_returns_not_found_for_missing_target() -> None:
+    response = client.post(
+        "/hash-tables/steps",
+        json={
+            "algorithm": "hash_search_linear_probing",
+            "values": [12, 22, 32, 5],
+            "table_size": 10,
+            "target": 42,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "not_found" in {step["type"] for step in body["steps"]}
+    assert body["steps"][-1]["result"] == {
+        "found": False,
+        "target": 42,
+        "bucket": 6,
+        "visited_buckets": [2, 3, 4, 5, 6],
+    }
+
+
+def test_hash_table_steps_endpoint_requires_search_target() -> None:
+    response = client.post(
+        "/hash-tables/steps",
+        json={
+            "algorithm": "hash_search_chaining",
+            "values": [12, 22, 32],
+            "table_size": 10,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_hash_table_steps_endpoint_rejects_overfull_linear_table() -> None:
+    response = client.post(
+        "/hash-tables/steps",
+        json={
+            "algorithm": "hash_insert_linear_probing",
+            "values": [1, 2, 3],
+            "table_size": 2,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_hash_table_steps_endpoint_rejects_unsupported_algorithm() -> None:
+    response = client.post(
+        "/hash-tables/steps",
+        json={"algorithm": "hash_delete", "values": [12], "table_size": 10},
     )
 
     assert response.status_code == 422
