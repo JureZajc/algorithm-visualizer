@@ -1,3 +1,4 @@
+import { Panel } from "@/components/ui-primitives";
 import type { AlgorithmMetadata } from "@/types/algorithm";
 
 interface PseudocodePanelProps {
@@ -13,8 +14,8 @@ export function PseudocodePanel(props: PseudocodePanelProps) {
 
   if (props.isLoading) {
     return (
-      <section
-        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]"
+      <Panel
+        className="p-5"
         aria-label="Loading pseudocode"
         aria-live="polite"
       >
@@ -24,46 +25,46 @@ export function PseudocodePanel(props: PseudocodePanelProps) {
           <div className="h-8 animate-pulse rounded-lg bg-slate-100" />
           <div className="h-8 animate-pulse rounded-lg bg-slate-100" />
         </div>
-      </section>
+      </Panel>
     );
   }
 
   if (!metadata?.pseudocode.length) {
     return (
-      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900" aria-live="polite">
+      <Panel className="p-5 text-sm leading-6 text-amber-900" variant="warning" aria-live="polite">
         <h2 className="mb-1 font-extrabold">Pseudocode unavailable</h2>
         <p className="m-0">{props.error ?? "The selected algorithm does not include pseudocode metadata."}</p>
-      </section>
+      </Panel>
     );
   }
 
   return (
-    <section
-      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.07)]"
+    <Panel
+      className="overflow-hidden"
       aria-labelledby={`pseudocode-${metadata.id}`}
     >
       <div className="border-b border-slate-100 px-5 py-4">
         <p className="mb-1 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-indigo-600">Follow the steps</p>
-        <h2 id={`pseudocode-${metadata.id}`} className="m-0 text-base font-extrabold text-slate-900">Pseudocode</h2>
+        <h2 id={`pseudocode-${metadata.id}`} className="m-0 text-base font-extrabold tracking-normal text-slate-900">Pseudocode</h2>
       </div>
-      <ol className="m-0 grid list-none gap-1 p-3 font-mono text-xs leading-5">
+      <ol className="m-0 grid list-none gap-1.5 p-3 font-mono text-xs leading-5">
         {metadata.pseudocode.map((line, index) => {
           const lineNumber = index + 1;
           const isCurrent = props.currentLine === lineNumber;
           return (
             <li
               className={isCurrent
-                ? "grid grid-cols-[2rem_minmax(0,1fr)] rounded-lg bg-indigo-600 px-2 py-2 text-white shadow-sm"
-                : "grid grid-cols-[2rem_minmax(0,1fr)] rounded-lg px-2 py-2 text-slate-600"}
+                ? "grid grid-cols-[2rem_minmax(0,1fr)] rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-2 text-indigo-950 shadow-sm"
+                : "grid grid-cols-[2rem_minmax(0,1fr)] rounded-lg border border-transparent px-2 py-2 text-slate-600"}
               key={`${lineNumber}-${line}`}
               aria-current={isCurrent ? "step" : undefined}
             >
-              <span className={isCurrent ? "select-none text-indigo-200" : "select-none text-slate-400"}>{lineNumber}</span>
+              <span className={isCurrent ? "select-none font-bold text-indigo-600" : "select-none text-slate-400"}>{lineNumber}</span>
               <span className="whitespace-pre-wrap break-words">{line.trimStart()}</span>
             </li>
           );
         })}
       </ol>
-    </section>
+    </Panel>
   );
 }

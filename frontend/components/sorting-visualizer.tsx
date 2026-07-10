@@ -5,7 +5,9 @@ import { useState } from "react";
 import { ArrayBars } from "@/components/array-bars";
 import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
+import { Alert } from "@/components/ui-primitives";
 import { VisualizerControls } from "@/components/visualizer-controls";
+import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
@@ -110,17 +112,24 @@ export function SortingVisualizer(props: MetadataSourceProps) {
 
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
-      {error ? <ErrorMessage message={error} /> : null}
+      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
-        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
-          <VisualizerHeading
-            title={ALGORITHM_LABELS[algorithm]}
-            description={playback.currentStep?.description ?? "Generate a new array or start with the sample values."}
-            legend={["Compare", "Swap", "Overwrite"]}
-          />
+        <VisualizationPanel
+          title={ALGORITHM_LABELS[algorithm]}
+          status={playbackStatus({
+            hasError: error !== null,
+            isComplete: playback.isComplete,
+            isLoading,
+            isPlaying: playback.isPlaying,
+            totalSteps: playback.steps.length,
+          })}
+          description={playback.currentStep?.description ?? "Generate a new array or start with the sample values."}
+          legend={["Compare", "Swap", "Overwrite"]}
+          resultSummary={finalArray ? <span>Final sorted array: <span className="font-mono text-xs">[{finalArray.join(", ")}]</span></span> : null}
+        >
           <ArrayBars values={displayedNumbers} step={playback.currentStep} />
-        </section>
+        </VisualizationPanel>
         <div className="grid gap-5 self-start">
           <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={playback.currentStep?.pseudocode_line} isLoading={props.isMetadataLoading} error={props.metadataError} />
           <VisualizerStats
@@ -132,49 +141,6 @@ export function SortingVisualizer(props: MetadataSourceProps) {
             result={<span className="font-mono text-xs font-medium">{finalArray ? `[${finalArray.join(", ")}]` : "Waiting for completion"}</span>}
           />
         </div>
-      </div>
-    </div>
-  );
-}
-
-export function ErrorMessage({ message }: { message: string }) {
-  return <p className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{message}</p>;
-}
-
-export function VisualizerHeading({ title, description, legend }: { title: string; description: string; legend: string[] }) {
-  const legendClasses: Record<string, string> = {
-    Compare: "bg-amber-400",
-    Swap: "bg-rose-500",
-    Overwrite: "bg-violet-500",
-    Inspect: "bg-sky-500",
-    Found: "bg-emerald-500",
-    Active: "bg-indigo-600",
-    Related: "bg-amber-300",
-    Attempt: "bg-amber-400",
-    Conflict: "bg-rose-500",
-    Backtrack: "bg-violet-400",
-    Solution: "bg-emerald-500",
-    Wall: "bg-slate-900",
-    Visited: "bg-sky-300",
-    Path: "bg-indigo-500",
-    Chosen: "bg-emerald-500",
-    Hash: "bg-sky-400",
-    Collision: "bg-rose-500",
-    Probe: "bg-cyan-500",
-    "Not found": "bg-slate-500",
-  };
-  return (
-    <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-      <div>
-        <h2 className="mb-1 text-lg font-extrabold tracking-tight text-slate-900">{title}</h2>
-        <p className="m-0 min-h-5 text-sm leading-6 text-slate-500" aria-live="polite">{description}</p>
-      </div>
-      <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-500">
-        {legend.map((item) => (
-          <span className="inline-flex items-center gap-1.5" key={item}>
-            <span className={`h-2.5 w-2.5 rounded-sm ${legendClasses[item] ?? "bg-slate-400"}`} />{item}
-          </span>
-        ))}
       </div>
     </div>
   );

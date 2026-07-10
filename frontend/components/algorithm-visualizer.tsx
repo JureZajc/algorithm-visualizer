@@ -51,7 +51,7 @@ export function AlgorithmVisualizer() {
       <header className="mb-6 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
         <div>
           <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-indigo-600">Open source learning tool</p>
-          <h1 className="mb-3 text-[clamp(2.25rem,6vw,4.5rem)] font-black leading-[0.92] tracking-[-0.06em] text-slate-950">Algorithm<br className="hidden sm:block" /> Visualizer</h1>
+          <h1 className="mb-3 text-[clamp(2.25rem,6vw,4.5rem)] font-black leading-[0.92] tracking-normal text-slate-950">Algorithm<br className="hidden sm:block" /> Visualizer</h1>
           <p className="m-0 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">See how data structures change at every step, from array operations to tree traversal, hash tables, graph traversal, shortest paths, spanning trees, dynamic programming tables, and backtracking search.</p>
         </div>
         <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
@@ -60,10 +60,10 @@ export function AlgorithmVisualizer() {
         </div>
       </header>
 
-      <nav className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white/80 p-1.5 shadow-sm backdrop-blur sm:grid-cols-4 lg:grid-cols-8" aria-label="Visualizer mode">
+      <nav className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white/85 p-1.5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur sm:grid-cols-4 lg:grid-cols-8" aria-label="Visualizer mode">
         {MODES.map((item) => (
           <button
-            className={`min-h-11 rounded-xl px-3 text-sm font-extrabold transition ${mode === item.id ? "bg-slate-950 text-white shadow-lg shadow-slate-300" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
+            className={`min-h-11 rounded-xl px-3 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-100 ${mode === item.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
             type="button"
             key={item.id}
             aria-current={mode === item.id ? "page" : undefined}

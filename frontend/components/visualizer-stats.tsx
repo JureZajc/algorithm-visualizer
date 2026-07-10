@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { panelClassName } from "@/components/ui-primitives";
+
 interface VisualizerStatsProps {
   algorithmName: string;
   currentStep: number;
@@ -13,14 +15,20 @@ interface VisualizerStatsProps {
 export function VisualizerStats(props: VisualizerStatsProps) {
   return (
     <aside
-      className="self-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.07)] sm:grid sm:grid-cols-2 lg:block"
+      className={panelClassName("default", "self-start overflow-hidden")}
       aria-label="Visualization statistics"
     >
-      <Stat label="Algorithm">{props.algorithmName}</Stat>
-      <Stat label="Progress">{props.currentStep} / {props.totalSteps}</Stat>
-      <Stat label="Elapsed time">{(props.elapsedMs / 1000).toFixed(1)} s</Stat>
-      <Stat label={props.resultLabel}>{props.result}</Stat>
-      {props.children}
+      <div className="border-b border-slate-100 px-5 py-4">
+        <p className="mb-1 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-indigo-600">Run details</p>
+        <h2 className="m-0 text-base font-extrabold tracking-normal text-slate-900">Stats and result</h2>
+      </div>
+      <div className="sm:grid sm:grid-cols-2 lg:block">
+        <Stat label="Algorithm">{props.algorithmName}</Stat>
+        <Stat label="Progress">{props.currentStep} / {props.totalSteps}</Stat>
+        <Stat label="Elapsed time">{(props.elapsedMs / 1000).toFixed(1)} s</Stat>
+        <Stat label={props.resultLabel}>{props.result}</Stat>
+        {props.children}
+      </div>
     </aside>
   );
 }

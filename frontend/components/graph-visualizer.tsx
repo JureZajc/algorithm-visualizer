@@ -6,8 +6,9 @@ import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { GraphCanvas } from "@/components/graph-canvas";
 import { GraphEditor } from "@/components/graph-editor";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
-import { ErrorMessage } from "@/components/sorting-visualizer";
 import { StepControls } from "@/components/step-controls";
+import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
+import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchGraphSteps } from "@/lib/api";
@@ -33,8 +34,6 @@ interface ActiveGraph {
 }
 
 const CUSTOM_GRAPH_ID = "custom";
-const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
-const buttonClass = "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
 const PATH_ALGORITHMS = new Set<GraphAlgorithm>(["bfs", "dfs", "dijkstra", "a_star"]);
 const WEIGHTED_PATH_ALGORITHMS = new Set<GraphAlgorithm>(["dijkstra", "a_star"]);
 const MST_ALGORITHMS = new Set<GraphAlgorithm>(["kruskal", "prim"]);
@@ -43,14 +42,7 @@ const GRAPH_CANVAS_MAX_X = 618;
 const GRAPH_CANVAS_MIN_Y = 32;
 const GRAPH_CANVAS_MAX_Y = 378;
 
-const LEGEND_ITEMS = [
-  { id: "current", label: "Current", className: "bg-amber-400" },
-  { id: "visited", label: "Visited", className: "bg-sky-500" },
-  { id: "frontier", label: "Frontier", className: "bg-violet-500" },
-  { id: "path", label: "Path / MST", className: "bg-emerald-500" },
-  { id: "candidate", label: "Candidate", className: "bg-cyan-400" },
-  { id: "rejected", label: "Rejected", className: "bg-rose-500" },
-] as const;
+const LEGEND_ITEMS = ["Current", "Visited", "Frontier", "Path / MST", "Candidate", "Rejected"] as const;
 
 function graphFromPreset(preset: GraphPreset): ActiveGraph {
   return {
@@ -410,7 +402,6 @@ export function GraphVisualizer(props: MetadataSourceProps) {
 
   async function startVisualization() {
     if (validationMessage) {
-      setError(validationMessage);
       return;
     }
     setError(null);
@@ -452,35 +443,31 @@ export function GraphVisualizer(props: MetadataSourceProps) {
 
   return (
     <div>
-      <section className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] md:grid-cols-2 xl:grid-cols-6">
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Graph
-          <select className={inputClass} value={graphId} disabled={editingDisabled} onChange={(event) => selectGraph(event.target.value)}>
+      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
+        <FormField label="Graph" className="xl:col-span-2">
+          <select className={inputClassName()} value={graphId} disabled={editingDisabled} onChange={(event) => selectGraph(event.target.value)}>
             {GRAPH_PRESETS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
             <option value={CUSTOM_GRAPH_ID}>Custom graph</option>
           </select>
-        </label>
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Algorithm
-          <select className={inputClass} value={algorithm} disabled={editingDisabled} onChange={(event) => selectAlgorithm(event.target.value as GraphAlgorithm)}>
+        </FormField>
+        <FormField label="Algorithm" className="xl:col-span-2">
+          <select className={inputClassName()} value={algorithm} disabled={editingDisabled} onChange={(event) => selectAlgorithm(event.target.value as GraphAlgorithm)}>
             {Object.entries(GRAPH_ALGORITHM_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
-        </label>
+        </FormField>
         {!isCustom && needsStart ? (
-          <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-            Start node
-            <select className={inputClass} value={activeGraph.start} disabled={editingDisabled} onChange={(event) => updateGraph((graph) => ({ ...graph, start: event.target.value }))}>
+          <FormField label="Start node">
+            <select className={inputClassName()} value={activeGraph.start} disabled={editingDisabled} onChange={(event) => updateGraph((graph) => ({ ...graph, start: event.target.value }))}>
               {activeGraph.nodes.map((node) => <option key={node.id} value={node.id}>{node.id}</option>)}
             </select>
-          </label>
+          </FormField>
         ) : null}
         {!isCustom && needsTarget ? (
-          <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-            Target node
-            <select className={inputClass} value={activeGraph.target} disabled={editingDisabled} onChange={(event) => updateGraph((graph) => ({ ...graph, target: event.target.value }))}>
+          <FormField label="Target node">
+            <select className={inputClassName()} value={activeGraph.target} disabled={editingDisabled} onChange={(event) => updateGraph((graph) => ({ ...graph, target: event.target.value }))}>
               {activeGraph.nodes.map((node) => <option key={node.id} value={node.id}>{node.id}</option>)}
             </select>
-          </label>
+          </FormField>
         ) : null}
         <label className="flex flex-col gap-3 text-xs font-bold text-slate-700 xl:col-span-2">
           <span className="flex justify-between"><span>Animation speed</span><span className="font-mono text-indigo-600">{speed} ms</span></span>
@@ -496,9 +483,14 @@ export function GraphVisualizer(props: MetadataSourceProps) {
               {algorithm === "topological_sort" ? "Directed graph required" : isMstAlgorithm ? "Undirected graph required" : effectiveDirected ? "Directed graph" : "Undirected graph"}
             </span>
           )}
-          <button className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`} type="button" disabled={editingDisabled || validationMessage !== null} onClick={startVisualization}>{isLoading ? "Loading steps..." : "Start visualization"}</button>
-          <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={isLoading} onClick={playback.reset}>Reset</button>
+          <Button variant="primary" disabled={editingDisabled || validationMessage !== null} onClick={startVisualization}>{isLoading ? "Loading steps..." : "Start visualization"}</Button>
+          <Button disabled={isLoading} onClick={playback.reset}>Reset</Button>
         </div>
+        {validationMessage ? (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
+            <InlineMessage tone="error">{validationMessage}</InlineMessage>
+          </div>
+        ) : null}
         <div className="md:col-span-2 xl:col-span-6">
           <StepControls
             currentStepIndex={playback.currentStepIndex}
@@ -513,7 +505,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
             onSeek={playback.seek}
           />
         </div>
-      </section>
+      </Panel>
 
       {isCustom ? (
         <GraphEditor
@@ -544,21 +536,24 @@ export function GraphVisualizer(props: MetadataSourceProps) {
 
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
-      {error ? <ErrorMessage message={error} /> : validationMessage && isCustom ? <ErrorMessage message={validationMessage} /> : null}
+      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.07)] sm:p-5">
-          <div className="mb-5 flex flex-col justify-between gap-4 xl:flex-row xl:items-start">
-            <div>
-              <h2 className="mb-1 text-lg font-extrabold tracking-tight text-slate-900">{GRAPH_ALGORITHM_LABELS[algorithm]}</h2>
-              <p className="m-0 min-h-6 text-sm leading-6 text-slate-500" aria-live="polite">{currentStep?.description ?? (pendingNodeId ? `Click the canvas to place node ${pendingNodeId}.` : activeGraph.description)}</p>
-            </div>
-            <div className="flex max-w-md flex-wrap gap-x-3 gap-y-2 text-xs font-medium text-slate-500">
-              {LEGEND_ITEMS.filter((item) => isMstAlgorithm || (item.id !== "candidate" && item.id !== "rejected")).map((item) => (
-                <span className="inline-flex items-center gap-1.5" key={item.id}><span className={`h-2.5 w-2.5 rounded-full ${item.className}`} />{item.label}</span>
-              ))}
-            </div>
-          </div>
+        <VisualizationPanel
+          title={GRAPH_ALGORITHM_LABELS[algorithm]}
+          className="min-w-0 p-4 sm:p-5"
+          status={playbackStatus({
+            hasError: error !== null,
+            hasValidationError: validationMessage !== null,
+            isComplete: playback.isComplete,
+            isLoading,
+            isPlaying: playback.isPlaying,
+            totalSteps: playback.steps.length,
+          })}
+          description={currentStep?.description ?? (pendingNodeId ? `Click the canvas to place node ${pendingNodeId}.` : activeGraph.description)}
+          legend={LEGEND_ITEMS.filter((item) => isMstAlgorithm || (item !== "Candidate" && item !== "Rejected"))}
+          resultSummary={playback.isComplete ? <span>{resultLabel}: <span className="font-mono text-xs">{result}</span></span> : null}
+        >
           <GraphCanvas
             nodes={activeGraph.nodes}
             edges={activeGraph.edges}
@@ -571,7 +566,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
             isPlacementActive={isCustom && pendingNodeId !== null && !editingDisabled}
             onCanvasClick={isCustom ? placeNode : undefined}
           />
-        </section>
+        </VisualizationPanel>
 
         <div className="grid gap-5 self-start">
           <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line} isLoading={props.isMetadataLoading} error={props.metadataError} />

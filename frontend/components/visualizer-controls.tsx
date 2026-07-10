@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { StepControls } from "@/components/step-controls";
+import { Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
 import type { SortingPreset } from "@/lib/array-presets";
 import { ALGORITHM_LABELS, type SortingAlgorithm } from "@/types/sorting";
 
@@ -29,33 +30,27 @@ interface VisualizerControlsProps {
   onPresetChange: (presetId: string) => void;
 }
 
-const inputClass =
-  "min-h-11 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
-const buttonClass =
-  "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
-
 export function VisualizerControls(props: VisualizerControlsProps) {
   const [countDraft, setCountDraft] = useState(String(props.count));
+  const countValidation = validateCountDraft(countDraft);
+  const hasCountError = countValidation.error !== null;
 
-  function normalizeCount(): number {
-    const parsedCount = Number.parseInt(countDraft, 10);
-    const normalizedCount = Number.isNaN(parsedCount)
-      ? props.count
-      : Math.min(50, Math.max(5, parsedCount));
-    setCountDraft(String(normalizedCount));
-    props.onCountChange(normalizedCount);
-    return normalizedCount;
+  function commitCount(): number {
+    if (countValidation.value === null) return props.count;
+    setCountDraft(String(countValidation.value));
+    props.onCountChange(countValidation.value);
+    return countValidation.value;
   }
 
   return (
-    <section
-      className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur md:grid-cols-2 xl:grid-cols-4"
+    <Panel
+      className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-4"
+      variant="control"
       aria-label="Sorting visualization controls"
     >
-      <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-        Sorting algorithm
+      <FormField label="Sorting algorithm">
         <select
-          className={inputClass}
+          className={inputClassName()}
           value={props.algorithm}
           disabled={props.isPlaying || props.isLoading}
           onChange={(event) =>
@@ -66,12 +61,11 @@ export function VisualizerControls(props: VisualizerControlsProps) {
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
-      </label>
+      </FormField>
 
-      <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-        Sample preset
+      <FormField label="Sample preset">
         <select
-          className={inputClass}
+          className={inputClassName()}
           value={props.presetId}
           disabled={props.isPlaying || props.isLoading}
           onChange={(event) => props.onPresetChange(event.target.value)}
@@ -81,21 +75,27 @@ export function VisualizerControls(props: VisualizerControlsProps) {
             <option key={preset.id} value={preset.id}>{preset.label}</option>
           ))}
         </select>
-      </label>
+      </FormField>
 
-      <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-        Random values
+      <FormField
+        error={countValidation.error}
+        helperText="Use 5 to 50 values."
+        label="Random values"
+        messageId="sorting-count-validation"
+      >
         <input
-          className={inputClass}
+          aria-describedby="sorting-count-validation"
+          aria-invalid={hasCountError}
+          className={inputClassName(hasCountError)}
           type="number"
           min={5}
           max={50}
           value={countDraft}
           disabled={props.isPlaying || props.isLoading}
-          onBlur={normalizeCount}
+          onBlur={commitCount}
           onChange={(event) => setCountDraft(event.target.value)}
         />
-      </label>
+      </FormField>
 
       <label className="flex flex-col gap-3 text-xs font-bold text-slate-700">
         <span className="flex justify-between gap-3">
@@ -114,15 +114,15 @@ export function VisualizerControls(props: VisualizerControlsProps) {
       </label>
 
       <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-4">
-        <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={props.isPlaying || props.isLoading} onClick={() => props.onGenerate(normalizeCount())}>
+        <Button disabled={props.isPlaying || props.isLoading || hasCountError} onClick={() => props.onGenerate(commitCount())}>
           Generate numbers
-        </button>
-        <button className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`} type="button" disabled={props.isPlaying || props.isLoading} onClick={() => props.onStart(normalizeCount())}>
+        </Button>
+        <Button variant="primary" disabled={props.isPlaying || props.isLoading || hasCountError} onClick={() => props.onStart(commitCount())}>
           {props.isLoading ? "Loading steps..." : "Start visualization"}
-        </button>
-        <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={props.isLoading} onClick={props.onReset}>
+        </Button>
+        <Button disabled={props.isLoading} onClick={props.onReset}>
           Reset
-        </button>
+        </Button>
       </div>
 
       <div className="md:col-span-2 xl:col-span-4">
@@ -139,6 +139,17 @@ export function VisualizerControls(props: VisualizerControlsProps) {
           onSeek={props.onSeek}
         />
       </div>
-    </section>
+    </Panel>
   );
+}
+
+function validateCountDraft(rawValue: string) {
+  const value = Number(rawValue.trim());
+  if (!Number.isInteger(value)) {
+    return { error: "Enter a whole number from 5 to 50.", value: null };
+  }
+  if (value < 5 || value > 50) {
+    return { error: "Random values must be between 5 and 50.", value: null };
+  }
+  return { error: null, value };
 }

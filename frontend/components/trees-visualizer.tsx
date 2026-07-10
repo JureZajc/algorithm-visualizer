@@ -4,9 +4,10 @@ import { useState } from "react";
 
 import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
-import { ErrorMessage } from "@/components/sorting-visualizer";
 import { StepControls } from "@/components/step-controls";
 import { TreeCanvas } from "@/components/tree-canvas";
+import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
 import { fetchTreeSteps } from "@/lib/api";
@@ -20,10 +21,6 @@ import {
 
 const DEFAULT_VALUES = "8, 3, 10, 1, 6, 14, 4, 7, 13";
 const DEFAULT_TARGET = 7;
-const inputBaseClass = "min-h-11 w-full rounded-xl border bg-slate-50 px-3 text-sm text-slate-900 transition focus:bg-white focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60";
-const neutralInputClass = "border-slate-300 focus:border-indigo-500 focus:ring-indigo-100";
-const invalidInputClass = "border-rose-300 focus:border-rose-500 focus:ring-rose-100";
-const buttonClass = "min-h-11 rounded-xl px-4 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0";
 const ROTATION_LABELS: Record<TreeRotationType, string> = {
   left: "Left rotation",
   right: "Right rotation",
@@ -90,17 +87,15 @@ export function TreesVisualizer(props: MetadataSourceProps) {
 
   return (
     <div>
-      <section className="mb-5 grid gap-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] md:grid-cols-2 xl:grid-cols-6">
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Tree algorithm
-          <select className={treeInputClass(false)} value={algorithm} disabled={editingDisabled} onChange={(event) => changeAlgorithm(event.target.value as TreeAlgorithm)}>
+      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
+        <FormField label="Tree algorithm" className="xl:col-span-2">
+          <select className={inputClassName()} value={algorithm} disabled={editingDisabled} onChange={(event) => changeAlgorithm(event.target.value as TreeAlgorithm)}>
             {Object.entries(TREE_ALGORITHM_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
-        </label>
-        <label className="flex flex-col gap-2 text-xs font-bold text-slate-700 xl:col-span-2">
-          Values
+        </FormField>
+        <FormField className="xl:col-span-2" error={valuesValidation.ok ? undefined : valuesValidation.error} helperText="Use 1 to 31 unique comma-separated integers." label="Values" messageId="tree-values-validation">
           <input
-            className={treeInputClass(!valuesValidation.ok)}
+            className={inputClassName(!valuesValidation.ok)}
             value={valuesInput}
             disabled={editingDisabled}
             aria-invalid={!valuesValidation.ok}
@@ -110,15 +105,11 @@ export function TreesVisualizer(props: MetadataSourceProps) {
               resetForInputChange();
             }}
           />
-          <span id="tree-values-validation" className="min-h-5 text-xs font-semibold leading-5 text-rose-600" aria-live="polite">
-            {valuesValidation.ok ? "" : valuesValidation.error}
-          </span>
-        </label>
+        </FormField>
         {isSearch ? (
-          <label className="flex flex-col gap-2 text-xs font-bold text-slate-700">
-            Target
+          <FormField error={targetValidation.ok ? undefined : targetValidation.error} helperText="Use an integer target." label="Target" messageId="tree-target-validation">
             <input
-              className={treeInputClass(!targetValidation.ok)}
+              className={inputClassName(!targetValidation.ok)}
               type="number"
               value={targetInput}
               disabled={editingDisabled}
@@ -129,18 +120,15 @@ export function TreesVisualizer(props: MetadataSourceProps) {
                 resetForInputChange();
               }}
             />
-            <span id="tree-target-validation" className="min-h-5 text-xs font-semibold leading-5 text-rose-600" aria-live="polite">
-              {targetValidation.ok ? "" : targetValidation.error}
-            </span>
-          </label>
+          </FormField>
         ) : null}
         <label className="flex flex-col gap-3 text-xs font-bold text-slate-700">
           <span className="flex justify-between"><span>Animation speed</span><span className="font-mono text-indigo-600">{speed} ms</span></span>
           <input className="w-full accent-indigo-600" type="range" min={120} max={1200} step={20} value={speed} onChange={(event) => setSpeed(Number(event.target.value))} />
         </label>
         <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
-          <button className={`${buttonClass} bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700`} type="button" disabled={editingDisabled || hasValidationError} onClick={startVisualization}>{isLoading ? "Loading steps..." : "Start visualization"}</button>
-          <button className={`${buttonClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`} type="button" disabled={isLoading} onClick={playback.reset}>Reset</button>
+          <Button variant="primary" disabled={editingDisabled || hasValidationError} onClick={startVisualization}>{isLoading ? "Loading steps..." : "Start visualization"}</Button>
+          <Button disabled={isLoading} onClick={playback.reset}>Reset</Button>
         </div>
         <div className="md:col-span-2 xl:col-span-6">
           <StepControls
@@ -156,31 +144,30 @@ export function TreesVisualizer(props: MetadataSourceProps) {
             onSeek={playback.seek}
           />
         </div>
-      </section>
+      </Panel>
 
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
-      {error ? <ErrorMessage message={error} /> : null}
+      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.07)] sm:p-5">
-          <div className="mb-5 flex flex-col justify-between gap-4 xl:flex-row xl:items-start">
-            <div>
-              <h2 className="mb-1 text-lg font-extrabold tracking-tight text-slate-900">{TREE_ALGORITHM_LABELS[algorithm]}</h2>
-              <p className="m-0 min-h-6 text-sm leading-6 text-slate-500" aria-live="polite">{currentStep?.description ?? "Enter unique values and start the tree visualization."}</p>
-            </div>
-            <div className="flex max-w-md flex-wrap gap-x-3 gap-y-2 text-xs font-medium text-slate-500">
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-400" />Current</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-violet-500" />Inserted</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-sky-500" />Visited</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />Path</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />Found</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-rose-500" />Imbalanced</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-fuchsia-500" />Rotation</span>
-            </div>
-          </div>
+        <VisualizationPanel
+          title={TREE_ALGORITHM_LABELS[algorithm]}
+          className="min-w-0 p-4 sm:p-5"
+          status={playbackStatus({
+            hasError: error !== null,
+            hasValidationError,
+            isComplete: playback.isComplete,
+            isLoading,
+            isPlaying: playback.isPlaying,
+            totalSteps: playback.steps.length,
+          })}
+          description={currentStep?.description ?? "Enter unique values and start the tree visualization."}
+          legend={["Current", "Inserted", "Visited", "Path", "Found", "Imbalanced", "Rotation"]}
+          resultSummary={playback.isComplete ? <span>{resultLabel}: <span className="font-mono text-xs">{result}</span></span> : null}
+        >
           <TreeCanvas tree={displayedTree} step={currentStep} />
-        </section>
+        </VisualizationPanel>
 
         <div className="grid gap-5 self-start">
           <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line ?? undefined} isLoading={props.isMetadataLoading} error={props.metadataError} />
@@ -203,10 +190,6 @@ type ParsedValues =
 type ParsedTarget =
   | { ok: true; target: number | null }
   | { ok: false; error: string };
-
-function treeInputClass(isInvalid: boolean) {
-  return `${inputBaseClass} ${isInvalid ? invalidInputClass : neutralInputClass}`;
-}
 
 function validateTreeValues(raw: string): ParsedValues {
   const trimmed = raw.trim();
