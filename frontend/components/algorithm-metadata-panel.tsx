@@ -42,13 +42,14 @@ export function AlgorithmMetadataPanel(props: AlgorithmMetadataPanelProps) {
           <span className="mb-2 inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-indigo-700">
             {metadata.category}
           </span>
-          <h2 id={`metadata-${metadata.id}`} className="mb-1 text-xl font-extrabold tracking-normal text-slate-950">{metadata.name}</h2>
+          <h2 id={`metadata-${metadata.id}`} className="mb-1 text-xl font-extrabold tracking-normal text-slate-950">Algorithm overview</h2>
+          <h3 className="mb-1 text-lg font-extrabold tracking-normal text-slate-900">{metadata.name}</h3>
           <p className="m-0 text-sm leading-6 text-slate-600">{metadata.description}</p>
         </div>
         <p className="m-0 max-w-xs text-xs leading-5 text-slate-500">Complexities describe the algorithm itself and exclude animation snapshot overhead.</p>
       </div>
 
-      <div className="mb-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-5 grid grid-cols-2 gap-2 lg:grid-cols-4">
         {complexityLabels.map(([label, key]) => (
           <Complexity key={key} label={label} value={metadata.time_complexity[key]} />
         ))}

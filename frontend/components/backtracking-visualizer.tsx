@@ -773,7 +773,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
             disabled={isLoading}
             onClick={playback.reset}
           >
-            Reset
+            Reset run
           </Button>
         </div>
 
@@ -788,12 +788,11 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
             onNext={playback.next}
             onJumpToStart={playback.jumpToStart}
             onJumpToEnd={playback.jumpToEnd}
+            onRestart={playback.restart}
             onSeek={playback.seek}
           />
         </div>
       </Panel>
-
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
@@ -847,6 +846,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
           />
         </div>
       </div>
+      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
     </div>
   );
 }

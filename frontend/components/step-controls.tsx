@@ -10,6 +10,7 @@ interface StepControlsProps {
   onNext: () => void;
   onJumpToStart: () => void;
   onJumpToEnd: () => void;
+  onRestart: () => void;
   onSeek: (index: number) => void;
 }
 
@@ -33,69 +34,75 @@ export function StepControls(props: StepControlsProps) {
     : !hasSteps
       ? "No steps yet"
       : props.isPlaying
-        ? "Playing"
+        ? "Running"
         : isAtEnd
           ? "Complete"
           : "Paused";
-  const playLabel = props.isPlaying
-    ? "Pause"
-    : props.currentStepIndex <= 0
-      ? "Play"
-      : "Resume";
+  const playLabel = props.isPlaying ? "Pause" : hasSteps && isAtEnd ? "Replay" : props.currentStepIndex <= 0 ? "Play" : "Resume";
 
   return (
-    <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3 md:grid-cols-[auto_minmax(12rem,1fr)] md:items-center">
-      <div className="flex flex-wrap gap-2" aria-label="Step navigation controls">
+    <div className="grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3 md:grid-cols-[auto_minmax(12rem,1fr)] md:items-center">
+      <div className="grid grid-cols-5 gap-1.5 sm:flex sm:flex-wrap sm:gap-2" aria-label="Step navigation controls">
         <Button
           size="sm"
+          className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
+          aria-label="Jump to first step"
           disabled={controlsDisabled || isAtStart}
           onClick={props.onJumpToStart}
         >
-          Jump to start
+          First
         </Button>
         <Button
           size="sm"
+          className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
+          aria-label="Previous step"
           disabled={controlsDisabled || isAtStart}
           onClick={props.onPrevious}
         >
-          Previous step
+          Prev
         </Button>
         <Button
           size="sm"
+          className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           variant="soft"
           type="button"
-          disabled={controlsDisabled || (!props.isPlaying && isAtEnd)}
-          onClick={props.onTogglePlayback}
+          aria-label={playLabel === "Replay" ? "Replay loaded steps" : playLabel === "Resume" ? "Resume playback" : `${playLabel} playback`}
+          disabled={controlsDisabled}
+          onClick={isAtEnd && !props.isPlaying ? props.onRestart : props.onTogglePlayback}
         >
           {playLabel}
         </Button>
         <Button
           size="sm"
+          className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
+          aria-label="Next step"
           disabled={controlsDisabled || isAtEnd}
           onClick={props.onNext}
         >
-          Next step
+          Next
         </Button>
         <Button
           size="sm"
+          className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
+          aria-label="Jump to last step"
           disabled={controlsDisabled || isAtEnd}
           onClick={props.onJumpToEnd}
         >
-          Jump to end
+          Last
         </Button>
       </div>
 
       <label className="flex min-w-0 flex-col gap-2 text-xs font-bold text-slate-700">
-        <span className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2">
+        <span className="flex flex-wrap items-center justify-between gap-2">
+          <span className="inline-flex min-w-0 flex-wrap items-center gap-2">
             Choose a step
             <StatusBadge label={statusLabel} variant={statusVariant} />
           </span>
-          <span className="whitespace-nowrap font-mono text-sm text-indigo-600" aria-live="polite">
+          <span className="min-w-0 max-w-full break-all text-right font-mono text-sm text-indigo-600" aria-live="polite">
             Step {displayedStep} / {props.totalSteps}
           </span>
         </span>
