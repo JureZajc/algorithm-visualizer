@@ -13,15 +13,15 @@ import { TreesVisualizer } from "@/components/trees-visualizer";
 import { fetchAlgorithms } from "@/lib/api";
 import type { AlgorithmsResponse, VisualizerMode } from "@/types/algorithm";
 
-const MODES: { id: VisualizerMode; label: string; shortLabel: string }[] = [
-  { id: "sorting", label: "Sorting", shortLabel: "Sort" },
-  { id: "compare", label: "Compare", shortLabel: "Compare" },
-  { id: "searching", label: "Searching", shortLabel: "Search" },
-  { id: "graph", label: "Graph / Pathfinding", shortLabel: "Graph" },
-  { id: "dynamic_programming", label: "Dynamic Programming", shortLabel: "DP" },
-  { id: "backtracking", label: "Backtracking", shortLabel: "BT" },
-  { id: "trees", label: "Trees", shortLabel: "Trees" },
-  { id: "hash_tables", label: "Hash Tables", shortLabel: "Hash" },
+const MODES: { id: VisualizerMode; label: string }[] = [
+  { id: "sorting", label: "Sorting" },
+  { id: "compare", label: "Compare" },
+  { id: "searching", label: "Searching" },
+  { id: "graph", label: "Graph / Pathfinding" },
+  { id: "dynamic_programming", label: "Dynamic Programming" },
+  { id: "backtracking", label: "Backtracking" },
+  { id: "trees", label: "Trees" },
+  { id: "hash_tables", label: "Hash Tables" },
 ];
 
 export function AlgorithmVisualizer() {
@@ -48,31 +48,36 @@ export function AlgorithmVisualizer() {
 
   return (
     <main className="mx-auto min-h-screen w-[min(1240px,calc(100%-24px))] py-6 sm:w-[min(1240px,calc(100%-40px))] sm:py-10">
-      <header className="mb-6 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-        <div>
+      <header className="mb-6">
+        <div className="max-w-3xl">
           <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-indigo-600">Open source learning tool</p>
-          <h1 className="mb-3 text-[clamp(2.25rem,6vw,4.5rem)] font-black leading-[0.92] tracking-normal text-slate-950">Algorithm<br className="hidden sm:block" /> Visualizer</h1>
+          <h1 className="mb-3 text-[clamp(2.25rem,5vw,4rem)] font-black leading-[0.92] tracking-normal text-slate-950">Algorithm<br className="hidden sm:block" /> Visualizer</h1>
           <p className="m-0 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">See how data structures change at every step, from array operations to tree traversal, hash tables, graph traversal, shortest paths, spanning trees, dynamic programming tables, and backtracking search.</p>
-        </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.14)]" />
-          API-backed steps
+          <div className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.14)]" />
+            Interactive step by step
+          </div>
         </div>
       </header>
 
-      <nav className="mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white/85 p-1.5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur sm:grid-cols-4 lg:grid-cols-8" aria-label="Visualizer mode">
-        {MODES.map((item) => (
-          <button
-            className={`min-h-11 rounded-xl px-3 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-100 ${mode === item.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
-            type="button"
-            key={item.id}
-            aria-current={mode === item.id ? "page" : undefined}
-            onClick={() => setMode(item.id)}
-          >
-            <span className="sm:hidden">{item.shortLabel}</span>
-            <span className="hidden sm:inline">{item.label}</span>
-          </button>
-        ))}
+      <nav className="relative mb-5 rounded-2xl border border-slate-200 bg-white/85 p-1.5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur" aria-label="Visualizer mode">
+        <div className="flex snap-x snap-mandatory gap-1 overflow-x-auto overscroll-x-contain pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 xl:grid-cols-[0.8fr_0.9fr_1fr_1.3fr_1.45fr_1.15fr_0.75fr_1fr]">
+          {MODES.map((item) => (
+            <button
+              className={`min-h-11 shrink-0 snap-start rounded-xl px-3 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-100 sm:min-w-0 sm:whitespace-normal xl:px-2 xl:text-xs xl:whitespace-nowrap ${mode === item.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}
+              type="button"
+              key={item.id}
+              aria-current={mode === item.id ? "page" : undefined}
+              aria-label={item.label}
+              onClick={() => setMode(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        <span className="pointer-events-none absolute inset-y-1.5 right-1.5 flex items-center bg-gradient-to-l from-white/95 via-white/75 to-transparent pl-8 pr-2 text-xs font-bold text-slate-500 sm:hidden" aria-hidden="true">
+          Scroll →
+        </span>
       </nav>
 
       {mode === "sorting" ? <SortingVisualizer algorithms={algorithms?.sorting ?? []} isMetadataLoading={isMetadataLoading} metadataError={metadataError} /> : null}

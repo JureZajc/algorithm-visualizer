@@ -25,6 +25,7 @@ interface VisualizerControlsProps {
   onNextStep: () => void;
   onJumpToStart: () => void;
   onJumpToEnd: () => void;
+  onRestart: () => void;
   onSeek: (index: number) => void;
   onReset: () => void;
   onPresetChange: (presetId: string) => void;
@@ -121,7 +122,7 @@ export function VisualizerControls(props: VisualizerControlsProps) {
           {props.isLoading ? "Loading steps..." : "Start visualization"}
         </Button>
         <Button disabled={props.isLoading} onClick={props.onReset}>
-          Reset
+          Reset run
         </Button>
       </div>
 
@@ -136,6 +137,7 @@ export function VisualizerControls(props: VisualizerControlsProps) {
           onNext={props.onNextStep}
           onJumpToStart={props.onJumpToStart}
           onJumpToEnd={props.onJumpToEnd}
+          onRestart={props.onRestart}
           onSeek={props.onSeek}
         />
       </div>

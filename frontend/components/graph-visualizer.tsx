@@ -484,7 +484,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
             </span>
           )}
           <Button variant="primary" disabled={editingDisabled || validationMessage !== null} onClick={startVisualization}>{isLoading ? "Loading steps..." : "Start visualization"}</Button>
-          <Button disabled={isLoading} onClick={playback.reset}>Reset</Button>
+          <Button disabled={isLoading} onClick={playback.reset}>Reset run</Button>
         </div>
         {validationMessage ? (
           <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
@@ -502,6 +502,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
             onNext={playback.next}
             onJumpToStart={playback.jumpToStart}
             onJumpToEnd={playback.jumpToEnd}
+            onRestart={playback.restart}
             onSeek={playback.seek}
           />
         </div>
@@ -533,8 +534,6 @@ export function GraphVisualizer(props: MetadataSourceProps) {
           onLoadJson={loadJson}
         />
       ) : null}
-
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
@@ -581,6 +580,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
           </VisualizerStats>
         </div>
       </div>
+      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
     </div>
   );
 }

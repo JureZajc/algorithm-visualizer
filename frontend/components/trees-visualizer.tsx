@@ -128,7 +128,7 @@ export function TreesVisualizer(props: MetadataSourceProps) {
         </label>
         <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
           <Button variant="primary" disabled={editingDisabled || hasValidationError} onClick={startVisualization}>{isLoading ? "Loading steps..." : "Start visualization"}</Button>
-          <Button disabled={isLoading} onClick={playback.reset}>Reset</Button>
+          <Button disabled={isLoading} onClick={playback.reset}>Reset run</Button>
         </div>
         <div className="md:col-span-2 xl:col-span-6">
           <StepControls
@@ -141,12 +141,11 @@ export function TreesVisualizer(props: MetadataSourceProps) {
             onNext={playback.next}
             onJumpToStart={playback.jumpToStart}
             onJumpToEnd={playback.jumpToEnd}
+            onRestart={playback.restart}
             onSeek={playback.seek}
           />
         </div>
       </Panel>
-
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 
@@ -179,6 +178,7 @@ export function TreesVisualizer(props: MetadataSourceProps) {
           </VisualizerStats>
         </div>
       </div>
+      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
     </div>
   );
 }

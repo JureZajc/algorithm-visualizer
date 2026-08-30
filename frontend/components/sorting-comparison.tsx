@@ -137,7 +137,7 @@ export function SortingComparison(props: MetadataSourceProps) {
         <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <FormField label="Sample preset">
             <select
-              className={inputClassName()}
+              className={inputClassName(false, "h-11")}
               value={presetId}
               disabled={isLoading}
               onChange={(event) => loadPreset(event.target.value)}
@@ -158,7 +158,7 @@ export function SortingComparison(props: MetadataSourceProps) {
             <input
               aria-describedby="compare-count-validation"
               aria-invalid={hasCountError}
-              className={inputClassName(hasCountError)}
+              className={inputClassName(hasCountError, "h-11")}
               type="number"
               min={5}
               max={50}
@@ -169,7 +169,7 @@ export function SortingComparison(props: MetadataSourceProps) {
             />
           </FormField>
 
-          <div className="flex items-end gap-2 md:col-span-2">
+          <div className="flex items-start gap-2 md:col-span-2 md:self-start md:pt-[1.625rem]">
             <Button
               disabled={isLoading || hasCountError}
               onClick={() => handleGenerate(commitCount())}

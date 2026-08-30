@@ -35,6 +35,15 @@ export function useStepPlayback<T>(speed: number) {
     setElapsedMs(0);
   }, []);
 
+  const restart = useCallback(() => {
+    if (steps.length === 0) return;
+    accumulatedTimeRef.current = 0;
+    setElapsedMs(0);
+    setCurrentStepIndex(0);
+    playStartedAtRef.current = steps.length > 1 ? performance.now() : null;
+    setIsPlaying(steps.length > 1);
+  }, [steps.length]);
+
   const load = useCallback(
     (nextSteps: T[], autoplay = true) => {
       playStartedAtRef.current = null;
@@ -122,6 +131,7 @@ export function useStepPlayback<T>(speed: number) {
     elapsedMs,
     load,
     reset,
+    restart,
     toggle,
     seek,
     previous,

@@ -137,7 +137,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
         <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-5">
           <Button disabled={playback.isPlaying || isLoading || countValidation.error !== null} onClick={() => generate(commitCount())}>Generate numbers</Button>
           <Button variant="primary" disabled={playback.isPlaying || isLoading || hasValidationError} onClick={() => start(commitCount())}>{isLoading ? "Loading steps..." : "Start visualization"}</Button>
-          <Button disabled={isLoading} onClick={playback.reset}>Reset</Button>
+          <Button disabled={isLoading} onClick={playback.reset}>Reset run</Button>
         </div>
         <div className="md:col-span-2 xl:col-span-5">
           <StepControls
@@ -150,12 +150,11 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
             onNext={playback.next}
             onJumpToStart={playback.jumpToStart}
             onJumpToEnd={playback.jumpToEnd}
+            onRestart={playback.restart}
             onSeek={playback.seek}
           />
         </div>
       </Panel>
-
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
 
       {algorithm === "binary_search" ? <Alert title="Binary Search input" variant="info">Binary Search uses an ascending copy of the generated values.</Alert> : null}
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
@@ -182,6 +181,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
           <VisualizerStats algorithmName={SEARCHING_ALGORITHM_LABELS[algorithm]} currentStep={playback.currentStepIndex + 1} totalSteps={playback.steps.length} elapsedMs={playback.elapsedMs} resultLabel="Search result" result={result} />
         </div>
       </div>
+      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
     </div>
   );
 }
