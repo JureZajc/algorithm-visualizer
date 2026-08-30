@@ -563,48 +563,71 @@ the clipboard for sharing. To load a graph, paste JSON into the import box and
 click **Load JSON**. The saved JSON includes nodes, edges, node positions,
 directed mode, the selected start node, and the selected target node.
 
-## Local development on macOS
+## Local development
 
-Run the backend and frontend in separate Terminal tabs from the repository
-root. Install Python dependencies through `uv` and frontend dependencies with
-`npm install` before the first run.
+Local development requires Python 3.12 or newer, [uv](https://docs.astral.sh/uv/),
+and Node.js with npm. The repository includes lockfiles for both the backend
+and frontend dependencies.
 
-### Backend
-
-```bash
-cd backend
-uv run uvicorn app.main:app --reload
-```
-
-The API is available at `http://127.0.0.1:8000`. Interactive documentation is
-available at `http://127.0.0.1:8000/docs`.
-
-Run backend tests and lint checks with:
+From the repository root, install or synchronize both projects' dependencies:
 
 ```bash
-cd backend
-uv run ruff check .
-uv run pytest
+python scripts/dev.py setup
 ```
 
-### Frontend
+Start the backend and frontend separately so each development server remains
+easy to control. Use two terminal windows or tabs.
+
+Terminal 1:
 
 ```bash
-cd frontend
-npm install
-npm run dev
+python scripts/dev.py backend
 ```
 
-The frontend is available at `http://localhost:3000` and expects the backend
-on port 8000 by default.
+Terminal 2:
+
+```bash
+python scripts/dev.py frontend
+```
+
+The local services are available at:
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://127.0.0.1:8000`
+- FastAPI API documentation: `http://127.0.0.1:8000/docs`
+
+Run the recommended project validation with the dependencies already installed:
+
+```bash
+python scripts/dev.py check
+```
+
+This runs Ruff and pytest for the backend, followed by lint and a production
+build for the frontend. For a clean, reproducible validation using the
+committed lockfiles, synchronize dependencies before running the same checks:
+
+```bash
+python scripts/dev.py check-clean
+```
+
+The available developer commands are:
+
+- `setup` — installs or synchronizes backend and frontend dependencies.
+- `check` — validates the project using currently installed dependencies.
+- `check-clean` — synchronizes locked dependencies and performs full validation.
+- `backend` — starts the FastAPI development server.
+- `frontend` — starts the Next.js development server.
+
+On macOS and Linux, some environments expose Python as `python3`. The
+equivalent commands are:
+
+```bash
+python3 scripts/dev.py setup
+python3 scripts/dev.py backend
+python3 scripts/dev.py frontend
+python3 scripts/dev.py check
+```
 
 Open `http://localhost:3000`, choose a visualizer mode, select a preset or edit
 the inputs, and click **Start visualization**. Playback can be paused, resumed,
 reset, and slowed down while the side panel reports algorithm-specific state.
-
-Run the production frontend check with:
-
-```bash
-cd frontend
-npm run build
-```
