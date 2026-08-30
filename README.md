@@ -1,633 +1,205 @@
 # Algorithm Visualizer
 
-Algorithm Visualizer is an open-source learning project that generates
-step-by-step algorithm states in a FastAPI backend and animates them in a
-Next.js frontend. Each supported algorithm includes a learning-focused
-explanation and pseudocode panel whose active line follows the current
-visualization step.
+An interactive educational application for understanding algorithms through step-by-step visualization. Instead of only seeing the final answer, you can follow each comparison, traversal, table update, recursive choice, and data-structure change as it happens.
 
-## Supported algorithms
+![Algorithm Visualizer showing Bubble Sort in progress with playback controls and synchronized pseudocode](docs/images/algorithm-visualizer-overview.png)
 
-### Sorting
+## Overview
 
-- Bubble Sort
-- Selection Sort
-- Insertion Sort
-- Merge Sort
-- Quick Sort
-- Heap Sort
-- Shell Sort
-- Cocktail Shaker Sort
-- Gnome Sort
-- Comb Sort
-- Counting Sort
+Algorithm Visualizer pairs a FastAPI backend with a Next.js frontend. The backend turns an algorithm run into an ordered series of execution states; the frontend animates those states alongside the matching pseudocode, explanation, complexity information, and live run details.
 
-### Searching
+The project spans arrays, hash tables, trees, graphs, dynamic programming, and backtracking, making it both a learning tool and a full-stack portfolio project.
 
-- Linear Search
-- Binary Search
+## Features
 
-Binary search requires its input array to already be sorted in ascending
-order. The API returns HTTP 422 for unsorted input.
+- Follow an algorithm automatically or move one step at a time with play, pause, previous, next, first, last, restart, reset, seek, and speed controls.
+- See the active pseudocode line, current operation, progress, elapsed time, result, and algorithm-specific state together.
+- Review descriptions, best/average/worst time complexity, space complexity, and implementation notes for every algorithm.
+- Start quickly with curated examples, generate random arrays, or enter problem-specific values manually.
+- Compare two to four sorting algorithms on the same input using step, comparison, swap, overwrite, and average-complexity metrics.
+- Explore graph traversals, shortest paths, topological ordering, and minimum spanning trees on weighted presets or a custom graph.
+- Build custom directed or undirected graphs, edit edge weights, choose endpoints, and import, copy, or export graph JSON.
+- Watch dedicated array, table, grid, chessboard, tree, graph, hash-bucket, and probing visualizations rather than a one-size-fits-all animation.
 
-### Hash Tables
+## Supported Algorithms
 
-- Hash Insert with Separate Chaining
-- Hash Search with Separate Chaining
-- Hash Insert with Linear Probing
-- Hash Search with Linear Probing
+The metadata catalog and API currently expose 41 algorithms across seven categories.
 
-Hash table visualizations accept integer or string keys, a table size, and a
-search target for search operations. Integer keys hash with `key % table_size`;
-string keys hash by summing character codes modulo the table size. Separate
-chaining shows colliding keys inside bucket lists, while linear probing shows
-one key per slot and highlights the probe path.
+| Category | Algorithms |
+| --- | --- |
+| Sorting | Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, Heap Sort, Shell Sort, Cocktail Shaker Sort, Gnome Sort, Comb Sort, Counting Sort |
+| Searching | Linear Search, Binary Search |
+| Hash Tables | Insert — Separate Chaining, Search — Separate Chaining, Insert — Linear Probing, Search — Linear Probing |
+| Trees | BST Insert, AVL Tree Insert, BST Search, Inorder Traversal, Preorder Traversal, Postorder Traversal |
+| Graph / Pathfinding | Breadth-First Search, Depth-First Search, Dijkstra's Algorithm, A* Search, Topological Sort, Kruskal's Minimum Spanning Tree, Prim's Minimum Spanning Tree |
+| Dynamic Programming | Fibonacci DP, Coin Change, 0/1 Knapsack, Longest Common Subsequence, Edit Distance, Grid Unique Paths |
+| Backtracking | N-Queens, Maze Solver, Permutations, Subsets, Sudoku Solver |
 
-### Trees
+Binary Search uses an ascending array. Dijkstra and A* require non-negative weights, Topological Sort runs on a directed graph, and the minimum-spanning-tree algorithms run on an undirected graph. The interface applies or explains these constraints when you switch algorithms.
 
-- Binary Search Tree Insert
-- Binary Search Tree Search
-- Inorder Traversal
-- Preorder Traversal
-- Postorder Traversal
+## Showcase
 
-Tree visualizations build a Binary Search Tree from unique integer values.
-Duplicate values are rejected in this first version so each visual node can be
-identified clearly by its value. BST Search is a tree algorithm and is separate
-from the array-based Binary Search listed under Searching.
+### Compare sorting algorithms
 
-### Graph / Pathfinding
+Run multiple algorithms against one shared array and compare the work each one performs.
 
-- Breadth-First Search (BFS)
-- Depth-First Search (DFS)
-- Dijkstra's Algorithm
-- A* Search
-- Topological Sort
-- Kruskal's Minimum Spanning Tree
-- Prim's Minimum Spanning Tree
+![Sorting comparison showing Bubble Sort, Selection Sort, and Insertion Sort metrics with a step-count chart](docs/images/sorting-comparison.png)
 
-The frontend includes curated weighted graph presets, a custom graph editor,
-and dedicated SVG states for traversal, shortest-path, topological-order, and
-minimum-spanning-tree algorithms. Controls adapt to each algorithm: pathfinding
-uses start and target nodes, Topological Sort uses a directed graph, Prim uses a
-start node, and both MST algorithms use undirected edges. A* displays generated
-admissible heuristics, while Dijkstra and A* display live path costs.
-Topological results, candidate and accepted MST edges, and total forest weight
-are shown alongside the animation.
+### Explore weighted graphs
 
-### Dynamic Programming
+Follow Dijkstra's distance updates while the active frontier, edge weights, path costs, and pseudocode remain visible.
 
-- Fibonacci DP
-- Coin Change
-- 0/1 Knapsack
-- Longest Common Subsequence
-- Edit Distance
-- Grid Unique Paths
+![Dijkstra visualization on a weighted graph with an active frontier node and synchronized pseudocode](docs/images/graph-visualization.png)
 
-Dynamic programming visualizations use tables or grids with an active cell,
-related dependency cells, synchronized pseudocode, and the final computed
-result. Coin Change uses unlimited coins and displays impossible states as
-`inf`.
+### Build a custom graph
 
-### Backtracking
+Create nodes and edges, edit weights and run settings, then share the graph through JSON import and export.
 
-- N-Queens
-- Maze Solver
-- Permutations
-- Subsets
+![Custom graph editor populated with nodes, weighted edges, endpoints, and import-export controls](docs/images/graph-editor.png)
 
-Backtracking visualizations use semantic grids with an active cell, related
-cells, synchronized pseudocode, and a structured final result. N-Queens stops
-after the first valid placement. Maze Solver uses deterministic generated maze
-presets so the same inputs always replay the same search. Permutations and
-Subsets use comma-separated list input such as `1,2,3`, `A,B,C`, or
-`red,green,blue`.
+### Inspect dynamic programming tables
 
-## API
+See the active cell and its dependencies as a table is filled from smaller subproblems.
 
-The backend exposes these main routes:
+![Longest Common Subsequence table with active and related cells highlighted beside pseudocode](docs/images/dynamic-programming.png)
 
-- `GET /algorithms` lists supported sorting, searching, graph, dynamic
-  programming, backtracking, and tree algorithms with descriptions, complexity
-  bounds, notes or limitations, and ordered pseudocode.
-- `POST /numbers/random` generates an array of random integers.
-- `POST /sorting/steps` generates visualization steps for a sorting algorithm.
-- `POST /searching/steps` generates visualization steps for a search.
-- `POST /hash-tables/steps` generates hash table operation steps.
-- `POST /trees/steps` generates Binary Search Tree visualization steps.
-- `POST /graph/steps` generates graph algorithm visualization steps.
-- `POST /dynamic-programming/steps` generates dynamic programming table steps.
-- `POST /backtracking/steps` generates backtracking grid steps.
+### Follow backtracking decisions
 
-Each item returned by `GET /algorithms` has this shape:
+Watch recursive choices, conflicts, removals, and solutions on visual problem state such as an N-Queens board.
 
-```json
-{
-  "id": "bubble_sort",
-  "label": "Bubble Sort",
-  "name": "Bubble Sort",
-  "category": "sorting",
-  "description": "Repeatedly compares neighboring values and swaps pairs that are out of order.",
-  "time_complexity": {
-    "best": "O(n)",
-    "average": "O(n²)",
-    "worst": "O(n²)"
-  },
-  "space_complexity": "O(1)",
-  "notes": ["Stable and in-place."],
-  "pseudocode": [
-    "for each pass through the unsorted values",
-    "  compare each adjacent pair",
-    "  if the left value is larger, swap the pair",
-    "  stop early if the pass made no swaps",
-    "return the sorted array"
-  ]
-}
+![N-Queens visualization paused on a queen placement with the corresponding pseudocode line highlighted](docs/images/backtracking-visualization.png)
+
+## How It Works
+
+```text
+Algorithm + input selected in the browser
+                    ↓
+             Next.js frontend
+                    ↓ HTTP
+              FastAPI backend
+                    ↓
+        Ordered execution-state snapshots
+                    ↓
+Visualization + pseudocode + run details
 ```
 
-`label` is retained as a compatibility alias for `name`. Complexity values
-describe the algorithms themselves and do not include the extra snapshots kept
-for step-by-step animation.
+The frontend owns input controls, presets, playback, and the specialized visual components. The backend validates requests, executes the selected algorithm, and returns snapshots with descriptions and, where applicable, a 1-based pseudocode line. The frontend uses those snapshots as a timeline that can be played or inspected in either direction.
 
-Sorting request example:
+The sorting comparison mode requests the same input for each selected algorithm and summarizes their returned steps. Graph presets and custom-graph editing live in the frontend; graph execution and validation remain in the backend.
 
-```json
-{
-  "numbers": [5, 3, 8, 1],
-  "algorithm": "heap_sort"
-}
-```
+## Tech Stack
 
-## Comparison mode
+| Area | Technologies |
+| --- | --- |
+| Frontend | Next.js, React, TypeScript, Tailwind CSS |
+| Backend | Python, FastAPI, Pydantic, Uvicorn |
+| Quality | pytest, Ruff, ESLint, Next.js production builds |
+| Tooling | uv, npm, Python development script, GitHub Actions |
 
-The frontend includes a Compare tab for sorting algorithms. It lets you choose
-two to four sorting algorithms, runs each one against the same generated or
-preset array through `POST /sorting/steps`, and summarizes total steps,
-comparisons, swaps, overwrites, and average time complexity from the metadata
-catalog. A compact bar chart highlights the algorithm or algorithms with the
-fewest steps for that input.
+## Local Development
 
-Searching request example:
+### Prerequisites
 
-```json
-{
-  "numbers": [1, 3, 5, 7, 9],
-  "algorithm": "binary_search",
-  "target": 7
-}
-```
+- Python 3.12 or newer
+- [uv](https://docs.astral.sh/uv/)
+- Node.js with npm (CI currently uses Node.js 22)
 
-Hash table request examples:
-
-```json
-{
-  "algorithm": "hash_insert_chaining",
-  "values": [12, 22, 32, 5],
-  "table_size": 10
-}
-```
-
-```json
-{
-  "algorithm": "hash_search_linear_probing",
-  "values": [12, 22, 32, 5],
-  "table_size": 10,
-  "target": 32
-}
-```
-
-Hash table steps have this shape:
-
-```json
-{
-  "type": "probe",
-  "table": {
-    "strategy": "linear_probing",
-    "size": 10,
-    "buckets": [
-      { "index": 0, "items": [] },
-      { "index": 1, "items": [] },
-      { "index": 2, "items": [12] }
-    ]
-  },
-  "key": 32,
-  "hash_index": 2,
-  "active_bucket": 4,
-  "active_item": null,
-  "visited_buckets": [2, 3, 4],
-  "result": null,
-  "description": "Probe slot 4.",
-  "pseudocode_line": 5
-}
-```
-
-The final `done` step includes a result object. Insert results include the
-strategy, table size, inserted values, and load factor. Search results include
-`found`, `target`, `bucket`, and `visited_buckets`.
-
-Tree request examples:
-
-```json
-{
-  "algorithm": "bst_insert",
-  "values": [8, 3, 10, 1, 6, 14, 4, 7, 13]
-}
-```
-
-```json
-{
-  "algorithm": "bst_search",
-  "values": [8, 3, 10, 1, 6, 14, 4, 7, 13],
-  "target": 7
-}
-```
-
-```json
-{
-  "algorithm": "inorder_traversal",
-  "values": [8, 3, 10, 1, 6, 14, 4, 7, 13]
-}
-```
-
-Traversal algorithms also support `preorder_traversal` and
-`postorder_traversal`. Tree requests accept 1 to 31 unique integer values.
-`bst_search` requires `target`; other tree algorithms ignore it.
-
-Tree steps have this shape:
-
-```json
-{
-  "type": "compare",
-  "tree": {
-    "value": 8,
-    "left": { "value": 3, "left": null, "right": null },
-    "right": null
-  },
-  "current_node": 8,
-  "target": 7,
-  "visited": [],
-  "path": [8],
-  "result": null,
-  "description": "Compare 7 with 8 and move left.",
-  "pseudocode_line": 3
-}
-```
-
-Tree snapshots use recursive `{ "value", "left", "right" }` nodes. Insert
-results include the final root and inorder values, search results include
-`found`, `target`, and `path`, and traversal results include the final `order`.
-
-Graph request example:
-
-```json
-{
-  "nodes": ["A", "B", "C", "D"],
-  "edges": [
-    { "source": "A", "target": "B", "weight": 2 },
-    { "source": "B", "target": "D", "weight": 3 },
-    { "source": "A", "target": "C", "weight": 1 }
-  ],
-  "start": "A",
-  "target": "D",
-  "algorithm": "dijkstra",
-  "directed": false
-}
-```
-
-A* accepts optional heuristic values keyed by node. Missing heuristic values
-default to zero, which makes it behave like Dijkstra's algorithm:
-
-```json
-{
-  "nodes": ["A", "B", "C", "D"],
-  "edges": [
-    { "source": "A", "target": "B", "weight": 1 },
-    { "source": "B", "target": "D", "weight": 2 },
-    { "source": "A", "target": "C", "weight": 4 }
-  ],
-  "start": "A",
-  "target": "D",
-  "algorithm": "a_star",
-  "directed": false,
-  "heuristics": { "A": 2, "B": 1, "C": 3, "D": 0 }
-}
-```
-
-Topological sort requires a directed graph. A cycle produces a
-`cycle_detected` step followed by `done`:
-
-```json
-{
-  "nodes": ["A", "B", "C", "D"],
-  "edges": [
-    { "source": "A", "target": "B", "weight": 1 },
-    { "source": "A", "target": "C", "weight": 1 },
-    { "source": "B", "target": "D", "weight": 1 },
-    { "source": "C", "target": "D", "weight": 1 }
-  ],
-  "start": "A",
-  "target": "D",
-  "algorithm": "topological_sort",
-  "directed": true
-}
-```
-
-Kruskal treats edges as undirected and ignores `start`, `target`, and
-`directed` while preserving those fields in the shared API contract:
-
-```json
-{
-  "nodes": ["A", "B", "C", "D"],
-  "edges": [
-    { "source": "A", "target": "B", "weight": 1 },
-    { "source": "B", "target": "C", "weight": 2 },
-    { "source": "C", "target": "D", "weight": 3 },
-    { "source": "A", "target": "D", "weight": 8 }
-  ],
-  "start": "A",
-  "target": "D",
-  "algorithm": "kruskal",
-  "directed": false
-}
-```
-
-Prim also treats edges as undirected and uses `start` as its first node:
-
-```json
-{
-  "nodes": ["A", "B", "C", "D"],
-  "edges": [
-    { "source": "A", "target": "B", "weight": 1 },
-    { "source": "B", "target": "C", "weight": 2 },
-    { "source": "C", "target": "D", "weight": 3 },
-    { "source": "A", "target": "D", "weight": 8 }
-  ],
-  "start": "A",
-  "target": "D",
-  "algorithm": "prim",
-  "directed": false
-}
-```
-
-Graph steps share the original pathfinding fields and also include `result`
-for topological order, `frontier_edges` for Prim candidates, `mst_edges` for
-accepted spanning-forest edges, and `total_weight` for the current forest.
-
-Dynamic Programming request example:
-
-```json
-{
-  "algorithm": "coin_change",
-  "coins": [1, 3, 4],
-  "amount": 6
-}
-```
-
-The dynamic programming endpoint accepts algorithm-specific fields: `n` for
-Fibonacci, `coins` and `amount` for Coin Change, `weights`, `values`, and
-`capacity` for Knapsack, `text_a` and `text_b` for LCS and Edit Distance, and
-`rows` and `cols` for Grid Unique Paths.
-
-Dynamic programming steps have this shape:
-
-```json
-{
-  "type": "update",
-  "table": [[0, 1, 1, 2]],
-  "active_cell": [0, 3],
-  "related_cells": [[0, 2], [0, 1]],
-  "description": "Store F(3) = 2.",
-  "pseudocode_line": 4,
-  "result": null
-}
-```
-
-`active_cell` and `related_cells` use zero-based `[row, column]` coordinates.
-The final `done` step contains the canonical `result`.
-
-Backtracking request examples:
-
-```json
-{
-  "algorithm": "n_queens",
-  "size": 4
-}
-```
-
-```json
-{
-  "algorithm": "maze_solver",
-  "rows": 7,
-  "cols": 7,
-  "preset": "classic"
-}
-```
-
-The backtracking endpoint accepts algorithm-specific fields: `size` for
-N-Queens, `rows`, `cols`, and `preset` for Maze Solver, and `values` for
-Permutations and Subsets. Supported maze presets are `classic`, `open`, and
-`rooms`. Maze Solver also accepts optional custom maze fields while keeping
-preset requests valid:
-
-```json
-{
-  "algorithm": "maze_solver",
-  "rows": 3,
-  "cols": 4,
-  "grid": [
-    ["empty", "wall", "empty", "empty"],
-    ["start", "empty", "empty", "wall"],
-    ["wall", "empty", "end", "empty"]
-  ],
-  "start": [1, 0],
-  "end": [2, 2]
-}
-```
-
-When `grid`, `start`, and `end` are provided, the solver uses the submitted
-walls and endpoints instead of the default top-left to bottom-right route.
-
-Permutations and Subsets request example:
-
-```json
-{
-  "algorithm": "permutations",
-  "values": ["A", "B", "C"]
-}
-```
-
-The frontend parses comma-separated list input, trims whitespace, and rejects
-empty values. Permutations are limited to 6 input values, and Subsets are
-limited to 10 input values.
-
-Backtracking steps have this shape:
-
-```json
-{
-  "type": "try",
-  "grid": [
-    ["queen", "empty", "empty", "empty"],
-    ["empty", "conflict", "empty", "empty"]
-  ],
-  "active_cell": [1, 1],
-  "related_cells": [[0, 0]],
-  "description": "Try row 2, column 2.",
-  "pseudocode_line": 3,
-  "result": null
-}
-```
-
-Backtracking grids use semantic cell tokens such as `empty`, `wall`, `start`,
-`end`, `queen`, `attempt`, `conflict`, `visited`, `path`, `backtracked`, and
-`solution`. N-Queens `done` results have this shape:
-
-```json
-{
-  "solved": true,
-  "size": 4,
-  "solution": [[0, 1], [1, 3], [2, 0], [3, 2]]
-}
-```
-
-Maze Solver `done` results have this shape:
-
-```json
-{
-  "solved": true,
-  "rows": 7,
-  "cols": 7,
-  "preset": "classic",
-  "path": [[0, 0], [0, 1], [0, 2]]
-}
-```
-
-Permutations and Subsets return their generated results and counts in the final
-`done` result:
-
-```json
-{
-  "values": ["A", "B", "C"],
-  "permutations": [["A", "B", "C"], ["A", "C", "B"]],
-  "count": 6
-}
-```
-
-Every visualization step contains its existing state fields and may also
-include a 1-based `pseudocode_line`. The frontend uses that number to highlight
-the matching line while the animation plays. Older clients can ignore the
-additive field, and steps without it remain valid. Responses also include the
-initial input and total step count.
-
-The pseudocode panel stays synchronized across sorting, searching, trees,
-graph, dynamic programming, and backtracking visualizers, pairing highlighted
-algorithm steps with the existing descriptions, complexity details, notes, and
-live data-structure state.
-
-## Sample presets
-
-Each visualizer includes frontend-only sample presets for quickly loading useful
-inputs. Sorting examples cover common data shapes and array sizes, searching
-examples cover successful and unsuccessful target positions plus binary search,
-tree examples cover BST insertion, search paths, and traversal orders, graph examples cover paths, weights, disconnected components, cycles,
-topological sorting, minimum spanning trees, and A* search, and dynamic
-programming examples cover one-dimensional, string, item, coin, and grid
-tables. Selecting a preset updates the current input while leaving the existing
-manual controls available.
-
-## Custom graph editor
-
-Choose **Custom graph** from the Graph menu to build a graph for the current
-browser session:
-
-1. Enter a unique node ID, click **Add node**, then click the SVG canvas to
-   place it.
-2. Choose two existing nodes, enter a numeric weight, and click **Add edge**.
-3. Edit weights directly in the edge list, or remove edges and nodes with their
-   remove buttons. Removing a node also removes its connected edges.
-4. Choose directed or undirected mode and select the start and target nodes.
-5. Select an algorithm and click **Start visualization**.
-
-Node IDs cannot be empty or duplicated. Edges must connect two different
-existing nodes, and weights must be finite numbers. Negative weights can be
-stored for algorithms that support them, but Dijkstra and A* clearly block the
-run because they require non-negative weights. Topological Sort temporarily
-runs the graph as directed, while Kruskal and Prim temporarily run it as
-undirected; the editor preserves the user's graph type choice for other
-algorithms. Switching to a preset does not discard the custom draft.
-
-### Importing and exporting custom graphs
-
-The custom graph editor can save and load graphs as JSON. Use **Export JSON**
-to download the current custom graph, or **Copy JSON** to place the same JSON on
-the clipboard for sharing. To load a graph, paste JSON into the import box and
-click **Load JSON**. The saved JSON includes nodes, edges, node positions,
-directed mode, the selected start node, and the selected target node.
-
-## Local development
-
-Local development requires Python 3.12 or newer, [uv](https://docs.astral.sh/uv/),
-and Node.js with npm. The repository includes lockfiles for both the backend
-and frontend dependencies.
-
-From the repository root, install or synchronize both projects' dependencies:
+From the repository root, install the locked backend and frontend dependencies:
 
 ```bash
 python scripts/dev.py setup
 ```
 
-Start the backend and frontend separately so each development server remains
-easy to control. Use two terminal windows or tabs.
-
-Terminal 1:
+Run the two development servers in separate terminals:
 
 ```bash
+# Terminal 1 — FastAPI
 python scripts/dev.py backend
 ```
 
-Terminal 2:
-
 ```bash
+# Terminal 2 — Next.js
 python scripts/dev.py frontend
 ```
 
-The local services are available at:
+Open the services at:
 
-- Frontend: `http://localhost:3000`
+- Application: `http://localhost:3000`
 - Backend: `http://127.0.0.1:8000`
-- FastAPI API documentation: `http://127.0.0.1:8000/docs`
+- Interactive API docs: `http://127.0.0.1:8000/docs`
 
-Run the recommended project validation with the dependencies already installed:
-
-```bash
-python scripts/dev.py check
-```
-
-This runs Ruff and pytest for the backend, followed by lint and a production
-build for the frontend. For a clean, reproducible validation using the
-committed lockfiles, synchronize dependencies before running the same checks:
-
-```bash
-python scripts/dev.py check-clean
-```
-
-The available developer commands are:
-
-- `setup` — installs or synchronizes backend and frontend dependencies.
-- `check` — validates the project using currently installed dependencies.
-- `check-clean` — synchronizes locked dependencies and performs full validation.
-- `backend` — starts the FastAPI development server.
-- `frontend` — starts the Next.js development server.
-
-On macOS and Linux, some environments expose Python as `python3`. The
-equivalent commands are:
+If your system exposes Python as `python3`, replace `python` in the commands above:
 
 ```bash
 python3 scripts/dev.py setup
 python3 scripts/dev.py backend
 python3 scripts/dev.py frontend
-python3 scripts/dev.py check
 ```
 
-Open `http://localhost:3000`, choose a visualizer mode, select a preset or edit
-the inputs, and click **Start visualization**. Playback can be paused, resumed,
-reset, and slowed down while the side panel reports algorithm-specific state.
+<details>
+<summary>Run each project manually</summary>
+
+```bash
+cd backend
+uv run uvicorn app.main:app --reload
+```
+
+```bash
+cd frontend
+npm run dev
+```
+
+</details>
+
+## Validation
+
+Validate with the dependencies already installed:
+
+```bash
+python scripts/dev.py check
+```
+
+This runs Ruff and pytest for the backend, then ESLint and a production build for the frontend. To synchronize both projects from their lockfiles before running the same checks, use:
+
+```bash
+python scripts/dev.py check-clean
+```
+
+CI runs Ruff and pytest for the backend plus a production frontend build on pushes and pull requests to `master`; the local `check` command additionally runs ESLint.
+
+## API
+
+The FastAPI service exposes the algorithm metadata catalog, random-number generation, and one step-generation endpoint for each visualization family:
+
+- `GET /algorithms`
+- `POST /numbers/random`
+- `POST /sorting/steps`
+- `POST /searching/steps`
+- `POST /hash-tables/steps`
+- `POST /trees/steps`
+- `POST /graph/steps`
+- `POST /dynamic-programming/steps`
+- `POST /backtracking/steps`
+
+Use the interactive OpenAPI interface at `http://127.0.0.1:8000/docs` while the backend is running. Request examples and response conventions are documented in [docs/api.md](docs/api.md).
+
+## Project Structure
+
+```text
+algorithm-visualizer/
+├── backend/          # FastAPI app, algorithm implementations, and tests
+├── frontend/         # Next.js interface and visualization components
+├── docs/             # Supporting documentation and showcase images
+├── scripts/          # Cross-project development workflow
+├── .github/          # Continuous integration configuration
+└── README.md
+```
+
+## Documentation
+
+- [API guide and request examples](docs/api.md)
+- [UX/UI audit](docs/ux-ui-audit.md)
+
+## About
+
+Algorithm Visualizer is an open-source learning and portfolio project focused on making algorithm execution observable, explorable, and easier to reason about. Contributions and issue reports are welcome through the GitHub repository.
