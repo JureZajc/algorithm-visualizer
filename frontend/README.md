@@ -28,23 +28,28 @@ backend.
 
 ## Local development
 
-Start the backend from `backend/`:
+From the repository root, install dependencies and start both servers:
 
 ```bash
-uv run uvicorn app.main:app --reload
+python scripts/dev.py setup
+python scripts/dev.py dev
 ```
 
-Then start the frontend from `frontend/`:
+The helper prefers frontend port `3000` and backend port `8000`, selects the next
+available port when needed, and prints the actual URLs. It sets
+`NEXT_PUBLIC_API_URL` and backend CORS to match the selected ports. Press `Ctrl+C`
+to stop both servers.
+
+To start just the frontend from the repository root:
 
 ```bash
-npm install
-npm run dev
+python scripts/dev.py frontend
 ```
 
 The frontend uses `http://127.0.0.1:8000` by default. To use another backend URL,
 set `NEXT_PUBLIC_API_URL` before starting or building the app.
 
-On macOS, open `http://localhost:3000`. The available controls change with the
+Open the frontend URL printed by the helper. The available controls change with the
 selected algorithm. Graph algorithms adapt start, target, directed, and MST
 controls. Dynamic Programming algorithms adapt numeric, list, string, and grid
 inputs for the selected table. Hash Table algorithms adapt target input for

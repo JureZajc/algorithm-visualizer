@@ -1,3 +1,4 @@
+import os
 from random import randint
 
 from fastapi import FastAPI, HTTPException
@@ -51,7 +52,19 @@ from app.algorithms.types import (
 app = FastAPI(title="Algorithm Visualizer API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        origin.strip()
+        for origin in os.environ.get(
+            "CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+        ).split(",")
+        if origin.strip()
+    ],
+    # Only the standalone development helper opts into other loopback ports.
+    allow_origin_regex=(
+        r"http://(localhost|127\.0\.0\.1):[0-9]{1,5}"
+        if os.environ.get("ALGORITHM_VISUALIZER_DEV_CORS") == "1"
+        else None
+    ),
     allow_methods=["*"],
     allow_headers=["*"],
 )
