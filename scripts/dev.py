@@ -113,6 +113,11 @@ def steps_for(command: str) -> tuple[Step, ...]:
         ("npm", "run", "build"),
         FRONTEND_DIRECTORY,
     )
+    frontend_tests = Step(
+        "Frontend: running tests",
+        ("npm", "test"),
+        FRONTEND_DIRECTORY,
+    )
 
     if command == "setup":
         return (
@@ -128,7 +133,7 @@ def steps_for(command: str) -> tuple[Step, ...]:
             ),
         )
     if command == "check":
-        return (backend_ruff, backend_tests, frontend_lint, frontend_build)
+        return (backend_ruff, backend_tests, frontend_lint, frontend_tests, frontend_build)
     if command == "check-clean":
         return (
             Step(
@@ -144,6 +149,7 @@ def steps_for(command: str) -> tuple[Step, ...]:
                 FRONTEND_DIRECTORY,
             ),
             frontend_lint,
+            frontend_tests,
             frontend_build,
         )
     raise ValueError(f"Unknown task: {command}")

@@ -17,6 +17,8 @@ backend.
 - Weighted, directed, and undirected graph rendering with curated presets,
   including a directed acyclic graph
 - Start, pause, resume, reset, animation speed, elapsed time, and step progress
+- Optional Learning mode for Bubble Sort, Binary Search, BST Insert/Search,
+  BFS, Fibonacci DP, and N-Queens, with prediction checkpoints and session scores
 - Algorithm-aware controls for pathfinding, topological ordering, and MSTs
 - Algorithm-aware controls for hash table values, table size, and search target
 - Algorithm-aware controls for one-dimensional tables, string tables, item
@@ -61,3 +63,14 @@ Run a production build with:
 ```bash
 npm run build
 ```
+
+Run the deterministic question-generation, session, playback, and component tests:
+
+```bash
+npm test
+```
+
+Learning strategies and checkpoint selection live in `learning/`. The shared
+learning playback hook adds checkpoint gating to the existing timeline while
+keeping session state separate. Extend the strategy registry to support another
+algorithm using its existing backend snapshots.

@@ -9,7 +9,8 @@ import { TreeCanvas } from "@/components/tree-canvas";
 import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
-import { useStepPlayback } from "@/hooks/use-step-playback";
+import { useLearningPlayback } from "@/hooks/use-learning-playback";
+import { LearningPanel } from "@/components/learning-panel";
 import { fetchTreeSteps } from "@/lib/api";
 import type { MetadataSourceProps } from "@/types/algorithm";
 import {
@@ -35,7 +36,7 @@ export function TreesVisualizer(props: MetadataSourceProps) {
   const [speed, setSpeed] = useState(520);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const playback = useStepPlayback<TreeStep>(speed);
+  const playback = useLearningPlayback<TreeStep>(speed, algorithm);
   const currentStep = playback.currentStep;
   const isSearch = algorithm === "bst_search";
   const isInsert = algorithm === "bst_insert" || algorithm === "avl_insert";
@@ -136,6 +137,7 @@ export function TreesVisualizer(props: MetadataSourceProps) {
             totalSteps={playback.steps.length}
             isLoading={isLoading}
             isPlaying={playback.isPlaying}
+            learningBlocked={playback.learning.blocked}
             onTogglePlayback={playback.toggle}
             onPrevious={playback.previous}
             onNext={playback.next}
@@ -146,6 +148,8 @@ export function TreesVisualizer(props: MetadataSourceProps) {
           />
         </div>
       </Panel>
+
+      <LearningPanel learning={playback.learning} isLoading={isLoading} />
 
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 

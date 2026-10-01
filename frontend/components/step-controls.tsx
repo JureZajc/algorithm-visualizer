@@ -5,6 +5,7 @@ interface StepControlsProps {
   totalSteps: number;
   isLoading: boolean;
   isPlaying: boolean;
+  learningBlocked?: boolean;
   onTogglePlayback: () => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -69,7 +70,7 @@ export function StepControls(props: StepControlsProps) {
           variant="soft"
           type="button"
           aria-label={playLabel === "Replay" ? "Replay loaded steps" : playLabel === "Resume" ? "Resume playback" : `${playLabel} playback`}
-          disabled={controlsDisabled}
+          disabled={controlsDisabled || props.learningBlocked}
           onClick={isAtEnd && !props.isPlaying ? props.onRestart : props.onTogglePlayback}
         >
           {playLabel}
@@ -79,7 +80,7 @@ export function StepControls(props: StepControlsProps) {
           className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
           aria-label="Next step"
-          disabled={controlsDisabled || isAtEnd}
+          disabled={controlsDisabled || isAtEnd || props.learningBlocked}
           onClick={props.onNext}
         >
           Next
@@ -89,7 +90,7 @@ export function StepControls(props: StepControlsProps) {
           className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
           aria-label="Jump to last step"
-          disabled={controlsDisabled || isAtEnd}
+          disabled={controlsDisabled || isAtEnd || props.learningBlocked}
           onClick={props.onJumpToEnd}
         >
           Last
@@ -110,7 +111,7 @@ export function StepControls(props: StepControlsProps) {
           className="w-full accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-45"
           type="range"
           min={0}
-          max={Math.max(0, props.totalSteps - 1)}
+          max={Math.max(0, props.learningBlocked ? props.currentStepIndex : props.totalSteps - 1)}
           step={1}
           value={hasSteps ? props.currentStepIndex : 0}
           disabled={controlsDisabled}
