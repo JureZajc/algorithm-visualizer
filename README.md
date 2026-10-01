@@ -110,7 +110,20 @@ From the repository root, install the locked backend and frontend dependencies:
 python scripts/dev.py setup
 ```
 
-Run the two development servers in separate terminals:
+Start the complete application with the recommended development command:
+
+```bash
+python scripts/dev.py dev
+```
+
+This starts both the Next.js frontend and FastAPI backend. Ports `3000` and
+`8000` are preferred; if either is occupied, the helper selects the next available
+port and prints the actual frontend, backend, and API docs URLs. It also sets
+`NEXT_PUBLIC_API_URL` to the selected backend URL and configures CORS for the
+selected frontend origin. Press `Ctrl+C` to stop both servers. If either server
+exits unexpectedly, the helper stops the other server as well.
+
+To run the servers individually, use separate terminals:
 
 ```bash
 # Terminal 1 — FastAPI
@@ -122,18 +135,18 @@ python scripts/dev.py backend
 python scripts/dev.py frontend
 ```
 
-Open the services at:
-
-- Application: `http://localhost:3000`
-- Backend: `http://127.0.0.1:8000`
-- Interactive API docs: `http://127.0.0.1:8000/docs`
+Each command also selects an available port and prints its URL. When running
+them individually, the frontend defaults to `http://127.0.0.1:8000`; if the
+backend selects a different port, set `NEXT_PUBLIC_API_URL` in the frontend's
+environment to the printed backend URL before starting it. The standalone
+backend helper allows HTTP frontend origins on `localhost` and `127.0.0.1` at
+other ports.
 
 If your system exposes Python as `python3`, replace `python` in the commands above:
 
 ```bash
 python3 scripts/dev.py setup
-python3 scripts/dev.py backend
-python3 scripts/dev.py frontend
+python3 scripts/dev.py dev
 ```
 
 <details>
@@ -149,6 +162,12 @@ cd frontend
 npm run dev
 ```
 
+Manual commands do not use the helper's port selection or coordinated URL/CORS
+configuration. Set `NEXT_PUBLIC_API_URL` for a custom backend URL and
+`CORS_ORIGINS` (comma-separated exact origins) for a custom frontend origin.
+Without development overrides, backend CORS retains the two port-3000 loopback
+origins; deployments can set `CORS_ORIGINS` to their frontend origin.
+
 </details>
 
 ## Validation
@@ -159,7 +178,7 @@ Validate with the dependencies already installed:
 python scripts/dev.py check
 ```
 
-This runs Ruff and pytest for the backend, then ESLint and a production build for the frontend. To synchronize both projects from their lockfiles before running the same checks, use:
+This runs Ruff for the backend and development helper, pytest (including development workflow tests), then ESLint and a production build for the frontend. To synchronize both projects from their lockfiles before running the same checks, use:
 
 ```bash
 python scripts/dev.py check-clean
@@ -181,7 +200,7 @@ The FastAPI service exposes the algorithm metadata catalog, random-number genera
 - `POST /dynamic-programming/steps`
 - `POST /backtracking/steps`
 
-Use the interactive OpenAPI interface at `http://127.0.0.1:8000/docs` while the backend is running. Request examples and response conventions are documented in [docs/api.md](docs/api.md).
+Use the interactive OpenAPI interface at the API docs URL printed by the development helper (`http://127.0.0.1:8000/docs` when the preferred port is available). Request examples and response conventions are documented in [docs/api.md](docs/api.md).
 
 ## Project Structure
 

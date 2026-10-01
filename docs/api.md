@@ -6,7 +6,11 @@ The FastAPI backend validates visualization inputs and returns ordered execution
 python scripts/dev.py backend
 ```
 
-The API is served at `http://127.0.0.1:8000`, with interactive OpenAPI documentation at `http://127.0.0.1:8000/docs`.
+The helper prefers `http://127.0.0.1:8000`, selecting the next available port if
+`8000` is occupied. Use the backend and API docs URLs it prints. To start both
+the frontend and backend with matching URL and CORS configuration, run
+`python scripts/dev.py dev` instead. The examples below use the preferred port;
+substitute the printed backend URL when a fallback is selected.
 
 ## Endpoints
 
@@ -210,4 +214,4 @@ Backtracking also supports `maze_solver`, `subsets`, and `sudoku_solver`. Maze r
 
 Invalid input is returned through FastAPI's standard HTTP 422 validation response. Algorithm-specific checks include array bounds and ordering, unique tree values, graph references and weight constraints, bounded dynamic-programming inputs, and well-formed backtracking boards or grids.
 
-For the exact current schema, use the generated OpenAPI interface at `http://127.0.0.1:8000/docs`.
+For the exact current schema, use the generated OpenAPI interface at the API docs URL printed by the helper (`http://127.0.0.1:8000/docs` when the preferred port is available).
