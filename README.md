@@ -13,6 +13,7 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 ## Features
 
 - Follow an algorithm automatically or move one step at a time with play, pause, previous, next, first, last, restart, reset, seek, and speed controls.
+- Enable Learning mode to predict algorithm behavior before selected execution steps, receive feedback, and track your score and streak.
 - See the active pseudocode line, current operation, progress, elapsed time, result, and algorithm-specific state together.
 - Review descriptions, best/average/worst time complexity, space complexity, and implementation notes for every algorithm.
 - Start quickly with curated examples, generate random arrays, or enter problem-specific values manually.
@@ -20,6 +21,27 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 - Explore graph traversals, shortest paths, topological ordering, and minimum spanning trees on weighted presets or a custom graph.
 - Build custom directed or undirected graphs, edit edge weights, choose endpoints, and import, copy, or export graph JSON.
 - Watch dedicated array, table, grid, chessboard, tree, graph, hash-bucket, and probing visualizations rather than a one-size-fits-all animation.
+
+### Interactive learning
+
+Learning mode supports Bubble Sort, Binary Search, BST Insert, BST Search, BFS,
+Fibonacci DP, and N-Queens. Enable it within the visualizer before starting a run:
+
+```text
+Run visualization → pause at a learning checkpoint → predict the next step
+                 → receive feedback → Continue to reveal the step
+```
+
+Runs include up to eight checkpoints. Play, Next, Last, and forward seeking stop
+before unanswered checkpoints. Submit an answer or skip, then press Continue;
+autoplay resumes only if it was playing before the question. Previous and First
+let you revisit earlier steps without earning points again.
+
+Accuracy counts submitted answers only. Skipping awards no points and resets the
+current streak. Restart/Replay starts a fresh learning session; pausing preserves
+it. Turning Learning mode off keeps your score, but checkpoints passed with the
+mode off cannot subsequently earn points. All progress stays in memory for the
+current run. Other algorithms continue to support normal visualization.
 
 ## Supported Algorithms
 
@@ -93,7 +115,7 @@ The sorting comparison mode requests the same input for each selected algorithm 
 | --- | --- |
 | Frontend | Next.js, React, TypeScript, Tailwind CSS |
 | Backend | Python, FastAPI, Pydantic, Uvicorn |
-| Quality | pytest, Ruff, ESLint, Next.js production builds |
+| Quality | pytest, Ruff, ESLint, Vitest, Next.js production builds |
 | Tooling | uv, npm, Python development script, GitHub Actions |
 
 ## Local Development
@@ -178,13 +200,13 @@ Validate with the dependencies already installed:
 python scripts/dev.py check
 ```
 
-This runs Ruff for the backend and development helper, pytest (including development workflow tests), then ESLint and a production build for the frontend. To synchronize both projects from their lockfiles before running the same checks, use:
+This runs Ruff for the backend and development helper, pytest (including development workflow tests), then ESLint, frontend tests, and a production build. To synchronize both projects from their lockfiles before running the same checks, use:
 
 ```bash
 python scripts/dev.py check-clean
 ```
 
-CI runs Ruff and pytest for the backend plus a production frontend build on pushes and pull requests to `master`; the local `check` command additionally runs ESLint.
+CI runs Ruff and pytest for the backend plus frontend tests and a production build on pushes and pull requests to `master`; the local `check` command additionally runs ESLint.
 
 ## API
 

@@ -9,7 +9,8 @@ import { StepControls } from "@/components/step-controls";
 import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
-import { useStepPlayback } from "@/hooks/use-step-playback";
+import { useLearningPlayback } from "@/hooks/use-learning-playback";
+import { LearningPanel } from "@/components/learning-panel";
 import { fetchSearchingSteps, generateRandomNumbers } from "@/lib/api";
 import { SEARCHING_PRESETS } from "@/lib/array-presets";
 import type { ArrayAlgorithmStep, MetadataSourceProps } from "@/types/algorithm";
@@ -27,7 +28,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
   const [speed, setSpeed] = useState(420);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const playback = useStepPlayback<ArrayAlgorithmStep>(speed);
+  const playback = useLearningPlayback<ArrayAlgorithmStep>(speed, algorithm);
   const currentStep = playback.currentStep;
   const outcomeStep = currentStep?.type === "done" && playback.currentStepIndex > 0
     ? playback.steps[playback.currentStepIndex - 1]
@@ -76,7 +77,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
       }
       if (algorithm === "binary_search") next = [...next].sort((a, b) => a - b);
       setNumbers(next);
-      playback.load((await fetchSearchingSteps(next, algorithm, targetValidation.target)).steps);
+      playback.load((await fetchSearchingSteps(next, algorithm, targetValidation.target)).steps, true, { target: targetValidation.target });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Could not load searching steps.");
     } finally {
@@ -145,6 +146,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
             totalSteps={playback.steps.length}
             isLoading={isLoading}
             isPlaying={playback.isPlaying}
+            learningBlocked={playback.learning.blocked}
             onTogglePlayback={playback.toggle}
             onPrevious={playback.previous}
             onNext={playback.next}
@@ -155,6 +157,8 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
           />
         </div>
       </Panel>
+
+      <LearningPanel learning={playback.learning} isLoading={isLoading} />
 
       {algorithm === "binary_search" ? <Alert title="Binary Search input" variant="info">Binary Search uses an ascending copy of the generated values.</Alert> : null}
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}

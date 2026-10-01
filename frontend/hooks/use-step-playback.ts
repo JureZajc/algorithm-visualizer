@@ -2,15 +2,28 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useStepPlayback<T>(speed: number) {
+export interface PlaybackTransition {
+  fromIndex: number;
+  toIndex: number;
+  source: "autoplay" | "seek";
+}
+
+export type PlaybackGuard = (transition: PlaybackTransition) => { index: number; blocked: boolean };
+
+export function useStepPlayback<T>(speed: number, guard?: PlaybackGuard) {
   const [steps, setSteps] = useState<T[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const accumulatedTimeRef = useRef(0);
   const playStartedAtRef = useRef<number | null>(null);
+  const advanceTimerRef = useRef<number | null>(null);
 
   const pause = useCallback(() => {
+    if (advanceTimerRef.current !== null) {
+      window.clearTimeout(advanceTimerRef.current);
+      advanceTimerRef.current = null;
+    }
     if (playStartedAtRef.current !== null) {
       accumulatedTimeRef.current += performance.now() - playStartedAtRef.current;
       playStartedAtRef.current = null;
@@ -27,25 +40,28 @@ export function useStepPlayback<T>(speed: number) {
   }, []);
 
   const reset = useCallback(() => {
+    pause();
     playStartedAtRef.current = null;
     accumulatedTimeRef.current = 0;
     setSteps([]);
     setCurrentStepIndex(-1);
     setIsPlaying(false);
     setElapsedMs(0);
-  }, []);
+  }, [pause]);
 
   const restart = useCallback(() => {
     if (steps.length === 0) return;
+    pause();
     accumulatedTimeRef.current = 0;
     setElapsedMs(0);
     setCurrentStepIndex(0);
     playStartedAtRef.current = steps.length > 1 ? performance.now() : null;
     setIsPlaying(steps.length > 1);
-  }, [steps.length]);
+  }, [pause, steps.length]);
 
   const load = useCallback(
     (nextSteps: T[], autoplay = true) => {
+      pause();
       playStartedAtRef.current = null;
       accumulatedTimeRef.current = 0;
       setElapsedMs(0);
@@ -58,8 +74,14 @@ export function useStepPlayback<T>(speed: number) {
         setIsPlaying(true);
       }
     },
-    [],
+    [pause],
   );
+
+  const transition = useCallback((toIndex: number, source: PlaybackTransition["source"]) => {
+    const result = guard?.({ fromIndex: currentStepIndex, toIndex, source });
+    if (result?.blocked) pause();
+    setCurrentStepIndex(result?.index ?? toIndex);
+  }, [currentStepIndex, guard, pause]);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -86,11 +108,16 @@ export function useStepPlayback<T>(speed: number) {
     }
 
     const timer = window.setTimeout(() => {
-      setCurrentStepIndex((index) => index + 1);
+      advanceTimerRef.current = null;
+      transition(currentStepIndex + 1, "autoplay");
     }, speed);
+    advanceTimerRef.current = timer;
 
-    return () => window.clearTimeout(timer);
-  }, [currentStepIndex, isPlaying, pause, speed, steps.length]);
+    return () => {
+      window.clearTimeout(timer);
+      if (advanceTimerRef.current === timer) advanceTimerRef.current = null;
+    };
+  }, [currentStepIndex, isPlaying, pause, speed, steps.length, transition]);
 
   const toggle = useCallback(() => {
     if (isPlaying) pause();
@@ -101,9 +128,9 @@ export function useStepPlayback<T>(speed: number) {
     (index: number) => {
       if (steps.length === 0) return;
       pause();
-      setCurrentStepIndex(Math.min(steps.length - 1, Math.max(0, index)));
+      transition(Math.min(steps.length - 1, Math.max(0, index)), "seek");
     },
-    [pause, steps.length],
+    [pause, steps.length, transition],
   );
 
   const previous = useCallback(() => {
@@ -129,6 +156,8 @@ export function useStepPlayback<T>(speed: number) {
     isPlaying,
     isComplete: steps.length > 0 && currentStepIndex === steps.length - 1,
     elapsedMs,
+    pause,
+    play,
     load,
     reset,
     restart,

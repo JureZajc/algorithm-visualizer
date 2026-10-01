@@ -10,7 +10,8 @@ import { StepControls } from "@/components/step-controls";
 import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
-import { useStepPlayback } from "@/hooks/use-step-playback";
+import { useLearningPlayback } from "@/hooks/use-learning-playback";
+import { LearningPanel } from "@/components/learning-panel";
 import { fetchGraphSteps } from "@/lib/api";
 import { createAdmissibleHeuristics, GRAPH_PRESETS } from "@/lib/graph-presets";
 import type { MetadataSourceProps } from "@/types/algorithm";
@@ -231,7 +232,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
   const [error, setError] = useState<string | null>(null);
   const [editorError, setEditorError] = useState<string | null>(null);
   const [pendingNodeId, setPendingNodeId] = useState<string | null>(null);
-  const playback = useStepPlayback<GraphStep>(speed);
+  const playback = useLearningPlayback<GraphStep>(speed, algorithm);
 
   const isCustom = graphId === CUSTOM_GRAPH_ID;
   const isPathAlgorithm = PATH_ALGORITHMS.has(algorithm);
@@ -417,7 +418,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
         directed: effectiveDirected,
         ...(algorithm === "a_star" ? { heuristics } : {}),
       });
-      playback.load(response.steps);
+      playback.load(response.steps, true, { nodes: response.nodes });
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Could not load graph steps.");
     } finally {
@@ -497,6 +498,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
             totalSteps={playback.steps.length}
             isLoading={isLoading}
             isPlaying={playback.isPlaying}
+            learningBlocked={playback.learning.blocked}
             onTogglePlayback={playback.toggle}
             onPrevious={playback.previous}
             onNext={playback.next}
@@ -507,6 +509,8 @@ export function GraphVisualizer(props: MetadataSourceProps) {
           />
         </div>
       </Panel>
+
+      <LearningPanel learning={playback.learning} isLoading={isLoading} />
 
       {isCustom ? (
         <GraphEditor

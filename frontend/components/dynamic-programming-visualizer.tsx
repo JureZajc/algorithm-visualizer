@@ -9,7 +9,8 @@ import { StepControls } from "@/components/step-controls";
 import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
-import { useStepPlayback } from "@/hooks/use-step-playback";
+import { useLearningPlayback } from "@/hooks/use-learning-playback";
+import { LearningPanel } from "@/components/learning-panel";
 import { fetchDynamicProgrammingSteps } from "@/lib/api";
 import {
   DYNAMIC_PROGRAMMING_PRESETS,
@@ -397,7 +398,7 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
   const [speed, setSpeed] = useState(520);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const playback = useStepPlayback<DynamicProgrammingStep>(speed);
+  const playback = useLearningPlayback<DynamicProgrammingStep>(speed, algorithm);
   const currentStep = playback.currentStep;
   const availablePresets = DYNAMIC_PROGRAMMING_PRESETS.filter(
     (preset) => preset.algorithm === algorithm,
@@ -547,6 +548,7 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
             totalSteps={playback.steps.length}
             isLoading={isLoading}
             isPlaying={playback.isPlaying}
+            learningBlocked={playback.learning.blocked}
             onTogglePlayback={playback.toggle}
             onPrevious={playback.previous}
             onNext={playback.next}
@@ -557,6 +559,8 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
           />
         </div>
       </Panel>
+
+      <LearningPanel learning={playback.learning} isLoading={isLoading} />
 
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 

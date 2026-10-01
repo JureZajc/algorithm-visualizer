@@ -11,6 +11,7 @@ interface VisualizerControlsProps {
   speed: number;
   isLoading: boolean;
   isPlaying: boolean;
+  learningBlocked?: boolean;
   currentStepIndex: number;
   totalSteps: number;
   presetId: string;
@@ -132,6 +133,7 @@ export function VisualizerControls(props: VisualizerControlsProps) {
           totalSteps={props.totalSteps}
           isLoading={props.isLoading}
           isPlaying={props.isPlaying}
+          learningBlocked={props.learningBlocked}
           onTogglePlayback={props.onTogglePlayback}
           onPrevious={props.onPreviousStep}
           onNext={props.onNextStep}

@@ -1,0 +1,6579 @@
+{
+  "bubble": {
+    "algorithm": "bubble_sort",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          3,
+          2,
+          2,
+          1
+        ],
+        "description": "Compare 3 and 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "swap",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          2,
+          3,
+          2,
+          1
+        ],
+        "description": "Swap indices 0 and 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          2,
+          3,
+          2,
+          1
+        ],
+        "description": "Compare 3 and 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "swap",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          2,
+          2,
+          3,
+          1
+        ],
+        "description": "Swap indices 1 and 2.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2,
+          3
+        ],
+        "array": [
+          2,
+          2,
+          3,
+          1
+        ],
+        "description": "Compare 3 and 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "swap",
+        "indices": [
+          2,
+          3
+        ],
+        "array": [
+          2,
+          2,
+          1,
+          3
+        ],
+        "description": "Swap indices 2 and 3.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          2,
+          2,
+          1,
+          3
+        ],
+        "description": "Compare 2 and 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          2,
+          2,
+          1,
+          3
+        ],
+        "description": "Compare 2 and 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "swap",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          2,
+          1,
+          2,
+          3
+        ],
+        "description": "Swap indices 1 and 2.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          2,
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 2 and 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "swap",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          1,
+          2,
+          2,
+          3
+        ],
+        "description": "Swap indices 0 and 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          2,
+          2,
+          3
+        ],
+        "description": "Bubble sort is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {}
+  },
+  "bubble_sorted": {
+    "algorithm": "bubble_sort",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 1 and 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 2 and 3.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Bubble sort is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {}
+  },
+  "binary_right": {
+    "algorithm": "binary_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          3
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 7 with target 11.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          5
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 11 with target 11.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "found",
+        "indices": [
+          5
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Found 11 at index 5.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Binary search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "target": 11
+    }
+  },
+  "binary_left": {
+    "algorithm": "binary_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          3
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 7 with target 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 3 with target 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          0
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 1 with target 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "found",
+        "indices": [
+          0
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Found 1 at index 0.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Binary search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "target": 1
+    }
+  },
+  "binary_found": {
+    "algorithm": "binary_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          3
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 7 with target 7.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "found",
+        "indices": [
+          3
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Found 7 at index 3.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Binary search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "target": 7
+    }
+  },
+  "binary_absent": {
+    "algorithm": "binary_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          3
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 7 with target 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 3 with target 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Compare 5 with target 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "not_found",
+        "indices": [],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Target 4 is not in the array.",
+        "pseudocode_line": 7
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13
+        ],
+        "description": "Binary search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "target": 4
+    }
+  },
+  "binary_empty": {
+    "algorithm": "binary_search",
+    "steps": [
+      {
+        "type": "not_found",
+        "indices": [],
+        "array": [],
+        "description": "Target 4 is not in the array.",
+        "pseudocode_line": 7
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [],
+        "description": "Binary search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "target": 4
+    }
+  },
+  "binary_single": {
+    "algorithm": "binary_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0
+        ],
+        "array": [
+          4
+        ],
+        "description": "Compare 4 with target 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "found",
+        "indices": [
+          0
+        ],
+        "array": [
+          4
+        ],
+        "description": "Found 4 at index 0.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          4
+        ],
+        "description": "Binary search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "target": 4
+    }
+  },
+  "bst_insert": {
+    "algorithm": "bst_insert",
+    "steps": [
+      {
+        "type": "insert",
+        "tree": {
+          "value": 8,
+          "left": null,
+          "right": null
+        },
+        "current_node": 8,
+        "target": null,
+        "visited": [],
+        "path": [
+          8
+        ],
+        "result": null,
+        "description": "Insert 8 as the root node.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": null,
+          "right": null
+        },
+        "current_node": 8,
+        "target": 3,
+        "visited": [],
+        "path": [
+          8
+        ],
+        "result": null,
+        "description": "Compare 3 with 8 and move left.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "insert",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": null,
+            "right": null
+          },
+          "right": null
+        },
+        "current_node": 3,
+        "target": 3,
+        "visited": [],
+        "path": [
+          8,
+          3
+        ],
+        "result": null,
+        "description": "Insert 3 as the left child of 8.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": null,
+            "right": null
+          },
+          "right": null
+        },
+        "current_node": 8,
+        "target": 10,
+        "visited": [],
+        "path": [
+          8
+        ],
+        "result": null,
+        "description": "Compare 10 with 8 and move right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "insert",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 10,
+        "target": 10,
+        "visited": [],
+        "path": [
+          8,
+          10
+        ],
+        "result": null,
+        "description": "Insert 10 as the right child of 8.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 8,
+        "target": 3,
+        "visited": [],
+        "path": [
+          8
+        ],
+        "result": null,
+        "description": "Compare 3 with 8 and move left.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 3,
+        "target": 3,
+        "visited": [],
+        "path": [
+          8,
+          3
+        ],
+        "result": null,
+        "description": "Compare 3 with 3 and move right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "insert",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": null,
+            "right": {
+              "value": 3,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 3,
+        "target": 3,
+        "visited": [],
+        "path": [
+          8,
+          3,
+          3
+        ],
+        "result": null,
+        "description": "Insert 3 as the right child of 3.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "done",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": null,
+            "right": {
+              "value": 3,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": null,
+        "target": null,
+        "visited": [
+          3,
+          3,
+          8,
+          10
+        ],
+        "path": [],
+        "result": {
+          "root": {
+            "value": 8,
+            "left": {
+              "value": 3,
+              "left": null,
+              "right": {
+                "value": 3,
+                "left": null,
+                "right": null
+              }
+            },
+            "right": {
+              "value": 10,
+              "left": null,
+              "right": null
+            }
+          },
+          "values": [
+            8,
+            3,
+            10,
+            3
+          ],
+          "inorder": [
+            3,
+            3,
+            8,
+            10
+          ]
+        },
+        "description": "BST insertion is complete.",
+        "pseudocode_line": 6
+      }
+    ],
+    "context": {}
+  },
+  "bst_search": {
+    "algorithm": "bst_search",
+    "steps": [
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 8,
+        "target": 6,
+        "visited": [],
+        "path": [
+          8
+        ],
+        "result": null,
+        "description": "Compare target 6 with node 8.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 3,
+        "target": 6,
+        "visited": [],
+        "path": [
+          8,
+          3
+        ],
+        "result": null,
+        "description": "Compare target 6 with node 3.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 6,
+        "target": 6,
+        "visited": [],
+        "path": [
+          8,
+          3,
+          6
+        ],
+        "result": null,
+        "description": "Compare target 6 with node 6.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "found",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 6,
+        "target": 6,
+        "visited": [],
+        "path": [
+          8,
+          3,
+          6
+        ],
+        "result": {
+          "found": true,
+          "target": 6,
+          "path": [
+            8,
+            3,
+            6
+          ]
+        },
+        "description": "Found 6 in the tree.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "done",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": null,
+        "target": 6,
+        "visited": [],
+        "path": [
+          8,
+          3,
+          6
+        ],
+        "result": {
+          "found": true,
+          "target": 6,
+          "path": [
+            8,
+            3,
+            6
+          ]
+        },
+        "description": "BST search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {}
+  },
+  "bst_absent": {
+    "algorithm": "bst_search",
+    "steps": [
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 8,
+        "target": 0,
+        "visited": [],
+        "path": [
+          8
+        ],
+        "result": null,
+        "description": "Compare target 0 with node 8.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 3,
+        "target": 0,
+        "visited": [],
+        "path": [
+          8,
+          3
+        ],
+        "result": null,
+        "description": "Compare target 0 with node 3.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": 1,
+        "target": 0,
+        "visited": [],
+        "path": [
+          8,
+          3,
+          1
+        ],
+        "result": null,
+        "description": "Compare target 0 with node 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "not_found",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": null,
+        "target": 0,
+        "visited": [],
+        "path": [
+          8,
+          3,
+          1
+        ],
+        "result": {
+          "found": false,
+          "target": 0,
+          "path": [
+            8,
+            3,
+            1
+          ]
+        },
+        "description": "Target 0 is not in the tree.",
+        "pseudocode_line": 7
+      },
+      {
+        "type": "done",
+        "tree": {
+          "value": 8,
+          "left": {
+            "value": 3,
+            "left": {
+              "value": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "value": 6,
+              "left": null,
+              "right": null
+            }
+          },
+          "right": {
+            "value": 10,
+            "left": null,
+            "right": null
+          }
+        },
+        "current_node": null,
+        "target": 0,
+        "visited": [],
+        "path": [
+          8,
+          3,
+          1
+        ],
+        "result": {
+          "found": false,
+          "target": 0,
+          "path": [
+            8,
+            3,
+            1
+          ]
+        },
+        "description": "BST search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {}
+  },
+  "bfs": {
+    "algorithm": "bfs",
+    "steps": [
+      {
+        "type": "enqueue",
+        "current": "A",
+        "neighbor": null,
+        "edge": null,
+        "visited": [],
+        "frontier": [
+          "A"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Add start node A to the queue.",
+        "pseudocode_line": 1
+      },
+      {
+        "type": "dequeue",
+        "current": "A",
+        "neighbor": null,
+        "edge": null,
+        "visited": [],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Remove A from the queue.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "A",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node A.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "inspect_edge",
+        "current": "A",
+        "neighbor": "B",
+        "edge": {
+          "source": "A",
+          "target": "B",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from A to B.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "enqueue",
+        "current": "A",
+        "neighbor": "B",
+        "edge": {
+          "source": "A",
+          "target": "B",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "B"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": null,
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Add B to the queue.",
+        "pseudocode_line": 6
+      },
+      {
+        "type": "inspect_edge",
+        "current": "A",
+        "neighbor": "C",
+        "edge": {
+          "source": "A",
+          "target": "C",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "B"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": null,
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from A to C.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "enqueue",
+        "current": "A",
+        "neighbor": "C",
+        "edge": {
+          "source": "A",
+          "target": "C",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "B",
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Add C to the queue.",
+        "pseudocode_line": 6
+      },
+      {
+        "type": "dequeue",
+        "current": "B",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Remove B from the queue.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "B",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node B.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "inspect_edge",
+        "current": "B",
+        "neighbor": "A",
+        "edge": {
+          "source": "B",
+          "target": "A",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from B to A.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "inspect_edge",
+        "current": "B",
+        "neighbor": "D",
+        "edge": {
+          "source": "B",
+          "target": "D",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from B to D.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "enqueue",
+        "current": "B",
+        "neighbor": "D",
+        "edge": {
+          "source": "B",
+          "target": "D",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C",
+          "D"
+        ],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Add D to the queue.",
+        "pseudocode_line": 6
+      },
+      {
+        "type": "dequeue",
+        "current": "C",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "D"
+        ],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Remove C from the queue.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "C",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "C"
+        ],
+        "frontier": [
+          "D"
+        ],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node C.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "inspect_edge",
+        "current": "C",
+        "neighbor": "A",
+        "edge": {
+          "source": "C",
+          "target": "A",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B",
+          "C"
+        ],
+        "frontier": [
+          "D"
+        ],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from C to A.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "inspect_edge",
+        "current": "C",
+        "neighbor": "D",
+        "edge": {
+          "source": "C",
+          "target": "D",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B",
+          "C"
+        ],
+        "frontier": [
+          "D"
+        ],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from C to D.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "dequeue",
+        "current": "D",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "C"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Remove D from the queue.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "D",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node D.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "path_found",
+        "current": "D",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [
+          "A",
+          "B",
+          "D"
+        ],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Found path: A -> B -> D.",
+        "pseudocode_line": 7
+      },
+      {
+        "type": "done",
+        "current": "D",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [
+          "A",
+          "B",
+          "D"
+        ],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Breadth-first search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "nodes": [
+        "D",
+        "C",
+        "B",
+        "A"
+      ]
+    }
+  },
+  "fibonacci_0": {
+    "algorithm": "fibonacci",
+    "steps": [
+      {
+        "type": "initialize",
+        "table": [
+          [
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Create a table for Fibonacci values from 0 through n.",
+        "pseudocode_line": 1,
+        "result": null
+      },
+      {
+        "type": "done",
+        "table": [
+          [
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Fibonacci number F(0) is 0.",
+        "pseudocode_line": 5,
+        "result": 0
+      }
+    ],
+    "context": {}
+  },
+  "fibonacci_1": {
+    "algorithm": "fibonacci",
+    "steps": [
+      {
+        "type": "initialize",
+        "table": [
+          [
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Create a table for Fibonacci values from 0 through n.",
+        "pseudocode_line": 1,
+        "result": null
+      },
+      {
+        "type": "initialize",
+        "table": [
+          [
+            0,
+            1
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Set the base value F(1) to 1.",
+        "pseudocode_line": 2,
+        "result": null
+      },
+      {
+        "type": "done",
+        "table": [
+          [
+            0,
+            1
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [],
+        "description": "Fibonacci number F(1) is 1.",
+        "pseudocode_line": 5,
+        "result": 1
+      }
+    ],
+    "context": {}
+  },
+  "fibonacci_8": {
+    "algorithm": "fibonacci",
+    "steps": [
+      {
+        "type": "initialize",
+        "table": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Create a table for Fibonacci values from 0 through n.",
+        "pseudocode_line": 1,
+        "result": null
+      },
+      {
+        "type": "initialize",
+        "table": [
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Set the base value F(1) to 1.",
+        "pseudocode_line": 2,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Read F(1) and F(0) before computing F(2).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Store F(2) = 1.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          3
+        ],
+        "related_cells": [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Read F(2) and F(1) before computing F(3).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          3
+        ],
+        "related_cells": [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Store F(3) = 2.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          4
+        ],
+        "related_cells": [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "description": "Read F(3) and F(2) before computing F(4).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          4
+        ],
+        "related_cells": [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "description": "Store F(4) = 3.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          5
+        ],
+        "related_cells": [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "description": "Read F(4) and F(3) before computing F(5).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          5
+        ],
+        "related_cells": [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "description": "Store F(5) = 5.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          6
+        ],
+        "related_cells": [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        "description": "Read F(5) and F(4) before computing F(6).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          6
+        ],
+        "related_cells": [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        "description": "Store F(6) = 8.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          7
+        ],
+        "related_cells": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "description": "Read F(6) and F(5) before computing F(7).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          7
+        ],
+        "related_cells": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "description": "Store F(7) = 13.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          8
+        ],
+        "related_cells": [
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        "description": "Read F(7) and F(6) before computing F(8).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21
+          ]
+        ],
+        "active_cell": [
+          0,
+          8
+        ],
+        "related_cells": [
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        "description": "Store F(8) = 21.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "done",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21
+          ]
+        ],
+        "active_cell": [
+          0,
+          8
+        ],
+        "related_cells": [],
+        "description": "Fibonacci number F(8) is 21.",
+        "pseudocode_line": 5,
+        "result": 21
+      }
+    ],
+    "context": {}
+  },
+  "fibonacci_15": {
+    "algorithm": "fibonacci",
+    "steps": [
+      {
+        "type": "initialize",
+        "table": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Create a table for Fibonacci values from 0 through n.",
+        "pseudocode_line": 1,
+        "result": null
+      },
+      {
+        "type": "initialize",
+        "table": [
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Set the base value F(1) to 1.",
+        "pseudocode_line": 2,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Read F(1) and F(0) before computing F(2).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Store F(2) = 1.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          3
+        ],
+        "related_cells": [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Read F(2) and F(1) before computing F(3).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          3
+        ],
+        "related_cells": [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Store F(3) = 2.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          4
+        ],
+        "related_cells": [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "description": "Read F(3) and F(2) before computing F(4).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          4
+        ],
+        "related_cells": [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "description": "Store F(4) = 3.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          5
+        ],
+        "related_cells": [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "description": "Read F(4) and F(3) before computing F(5).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          5
+        ],
+        "related_cells": [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "description": "Store F(5) = 5.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          6
+        ],
+        "related_cells": [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        "description": "Read F(5) and F(4) before computing F(6).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          6
+        ],
+        "related_cells": [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        "description": "Store F(6) = 8.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          7
+        ],
+        "related_cells": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "description": "Read F(6) and F(5) before computing F(7).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          7
+        ],
+        "related_cells": [
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "description": "Store F(7) = 13.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          8
+        ],
+        "related_cells": [
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        "description": "Read F(7) and F(6) before computing F(8).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          8
+        ],
+        "related_cells": [
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        "description": "Store F(8) = 21.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          9
+        ],
+        "related_cells": [
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            7
+          ]
+        ],
+        "description": "Read F(8) and F(7) before computing F(9).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          9
+        ],
+        "related_cells": [
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            7
+          ]
+        ],
+        "description": "Store F(9) = 34.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          10
+        ],
+        "related_cells": [
+          [
+            0,
+            9
+          ],
+          [
+            0,
+            8
+          ]
+        ],
+        "description": "Read F(9) and F(8) before computing F(10).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          10
+        ],
+        "related_cells": [
+          [
+            0,
+            9
+          ],
+          [
+            0,
+            8
+          ]
+        ],
+        "description": "Store F(10) = 55.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          11
+        ],
+        "related_cells": [
+          [
+            0,
+            10
+          ],
+          [
+            0,
+            9
+          ]
+        ],
+        "description": "Read F(10) and F(9) before computing F(11).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          11
+        ],
+        "related_cells": [
+          [
+            0,
+            10
+          ],
+          [
+            0,
+            9
+          ]
+        ],
+        "description": "Store F(11) = 89.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          12
+        ],
+        "related_cells": [
+          [
+            0,
+            11
+          ],
+          [
+            0,
+            10
+          ]
+        ],
+        "description": "Read F(11) and F(10) before computing F(12).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          12
+        ],
+        "related_cells": [
+          [
+            0,
+            11
+          ],
+          [
+            0,
+            10
+          ]
+        ],
+        "description": "Store F(12) = 144.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            0,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          13
+        ],
+        "related_cells": [
+          [
+            0,
+            12
+          ],
+          [
+            0,
+            11
+          ]
+        ],
+        "description": "Read F(12) and F(11) before computing F(13).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            233,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          13
+        ],
+        "related_cells": [
+          [
+            0,
+            12
+          ],
+          [
+            0,
+            11
+          ]
+        ],
+        "description": "Store F(13) = 233.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            233,
+            0,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          14
+        ],
+        "related_cells": [
+          [
+            0,
+            13
+          ],
+          [
+            0,
+            12
+          ]
+        ],
+        "description": "Read F(13) and F(12) before computing F(14).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            233,
+            377,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          14
+        ],
+        "related_cells": [
+          [
+            0,
+            13
+          ],
+          [
+            0,
+            12
+          ]
+        ],
+        "description": "Store F(14) = 377.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "compare",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            233,
+            377,
+            0
+          ]
+        ],
+        "active_cell": [
+          0,
+          15
+        ],
+        "related_cells": [
+          [
+            0,
+            14
+          ],
+          [
+            0,
+            13
+          ]
+        ],
+        "description": "Read F(14) and F(13) before computing F(15).",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "update",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            233,
+            377,
+            610
+          ]
+        ],
+        "active_cell": [
+          0,
+          15
+        ],
+        "related_cells": [
+          [
+            0,
+            14
+          ],
+          [
+            0,
+            13
+          ]
+        ],
+        "description": "Store F(15) = 610.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "done",
+        "table": [
+          [
+            0,
+            1,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            233,
+            377,
+            610
+          ]
+        ],
+        "active_cell": [
+          0,
+          15
+        ],
+        "related_cells": [],
+        "description": "Fibonacci number F(15) is 610.",
+        "pseudocode_line": 5,
+        "result": 610
+      }
+    ],
+    "context": {}
+  },
+  "n_queens": {
+    "algorithm": "n_queens",
+    "steps": [
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Start with an empty 4 by 4 board.",
+        "pseudocode_line": 1,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "attempt",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Try row 1, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 1, column 1.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Try row 2, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Try row 2, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "attempt",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          2
+        ],
+        "related_cells": [],
+        "description": "Try row 2, column 3.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "queen",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          2
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 2, column 3.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "queen",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Try row 3, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "queen",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          1
+        ],
+        "related_cells": [
+          [
+            1,
+            2
+          ]
+        ],
+        "description": "Try row 3, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          1
+        ],
+        "related_cells": [
+          [
+            1,
+            2
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        "description": "Try row 3, column 3.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          3
+        ],
+        "related_cells": [
+          [
+            1,
+            2
+          ]
+        ],
+        "description": "Try row 3, column 4.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          3
+        ],
+        "related_cells": [
+          [
+            1,
+            2
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "remove",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "backtracked",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          2
+        ],
+        "related_cells": [],
+        "description": "Remove the queen from row 2, column 3.",
+        "pseudocode_line": 6,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "attempt"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          3
+        ],
+        "related_cells": [],
+        "description": "Try row 2, column 4.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          3
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 2, column 4.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Try row 3, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "attempt",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          1
+        ],
+        "related_cells": [],
+        "description": "Try row 3, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          1
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 3, column 2.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "description": "Try row 4, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          1
+        ],
+        "related_cells": [
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "description": "Try row 4, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          1
+        ],
+        "related_cells": [
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          2
+        ],
+        "related_cells": [
+          [
+            2,
+            1
+          ]
+        ],
+        "description": "Try row 4, column 3.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          2
+        ],
+        "related_cells": [
+          [
+            2,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ]
+        ],
+        "active_cell": [
+          3,
+          3
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "description": "Try row 4, column 4.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ]
+        ],
+        "active_cell": [
+          3,
+          3
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "remove",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "backtracked",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          1
+        ],
+        "related_cells": [],
+        "description": "Remove the queen from row 3, column 2.",
+        "pseudocode_line": 6,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "description": "Try row 3, column 3.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          3
+        ],
+        "related_cells": [
+          [
+            1,
+            3
+          ]
+        ],
+        "description": "Try row 3, column 4.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          3
+        ],
+        "related_cells": [
+          [
+            1,
+            3
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "remove",
+        "grid": [
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "backtracked"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          3
+        ],
+        "related_cells": [],
+        "description": "Remove the queen from row 2, column 4.",
+        "pseudocode_line": 6,
+        "result": null
+      },
+      {
+        "type": "remove",
+        "grid": [
+          [
+            "backtracked",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Remove the queen from row 1, column 1.",
+        "pseudocode_line": 6,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "attempt",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [],
+        "description": "Try row 1, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 1, column 2.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Try row 2, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Try row 2, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Try row 2, column 3.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "attempt"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          3
+        ],
+        "related_cells": [],
+        "description": "Try row 2, column 4.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          3
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 2, column 4.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "attempt",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          0
+        ],
+        "related_cells": [],
+        "description": "Try row 3, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          2,
+          0
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 3, column 1.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          0
+        ],
+        "related_cells": [
+          [
+            2,
+            0
+          ]
+        ],
+        "description": "Try row 4, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          0
+        ],
+        "related_cells": [
+          [
+            2,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        "description": "Try row 4, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "conflict"
+          ],
+          [
+            "conflict",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict",
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "attempt",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          2
+        ],
+        "related_cells": [],
+        "description": "Try row 4, column 3.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "empty",
+            "queen",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "queen"
+          ],
+          [
+            "queen",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "queen",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          2
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 4, column 3.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "solution_found",
+        "grid": [
+          [
+            "empty",
+            "solution",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "solution"
+          ],
+          [
+            "solution",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "solution",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            2
+          ]
+        ],
+        "description": "Every row has a safe queen placement.",
+        "pseudocode_line": 7,
+        "result": {
+          "solved": true,
+          "size": 4,
+          "solution": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              2
+            ]
+          ]
+        }
+      },
+      {
+        "type": "done",
+        "grid": [
+          [
+            "empty",
+            "solution",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "empty",
+            "solution"
+          ],
+          [
+            "solution",
+            "empty",
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty",
+            "solution",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          3,
+          2
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            2
+          ]
+        ],
+        "description": "N-Queens search is complete.",
+        "pseudocode_line": 7,
+        "result": {
+          "solved": true,
+          "size": 4,
+          "solution": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              2
+            ]
+          ]
+        }
+      }
+    ],
+    "context": {}
+  },
+  "n_queens_unsolved": {
+    "algorithm": "n_queens",
+    "steps": [
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Start with an empty 2 by 2 board.",
+        "pseudocode_line": 1,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "attempt",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Try row 1, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "queen",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 1, column 1.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Try row 2, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty"
+          ],
+          [
+            "conflict",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "Try row 2, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "conflict",
+            "empty"
+          ],
+          [
+            "empty",
+            "conflict"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            0
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "remove",
+        "grid": [
+          [
+            "backtracked",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          0
+        ],
+        "related_cells": [],
+        "description": "Remove the queen from row 1, column 1.",
+        "pseudocode_line": 6,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "attempt"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [],
+        "description": "Try row 1, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "place",
+        "grid": [
+          [
+            "empty",
+            "queen"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [],
+        "description": "Place a queen at row 1, column 2.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "conflict"
+          ],
+          [
+            "conflict",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Try row 2, column 1.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "empty",
+            "conflict"
+          ],
+          [
+            "conflict",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          1,
+          0
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "try",
+        "grid": [
+          [
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "conflict"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "Try row 2, column 2.",
+        "pseudocode_line": 3,
+        "result": null
+      },
+      {
+        "type": "dead_end",
+        "grid": [
+          [
+            "empty",
+            "conflict"
+          ],
+          [
+            "empty",
+            "conflict"
+          ]
+        ],
+        "active_cell": [
+          1,
+          1
+        ],
+        "related_cells": [
+          [
+            0,
+            1
+          ]
+        ],
+        "description": "This square is attacked by an existing queen.",
+        "pseudocode_line": 4,
+        "result": null
+      },
+      {
+        "type": "remove",
+        "grid": [
+          [
+            "empty",
+            "backtracked"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": [
+          0,
+          1
+        ],
+        "related_cells": [],
+        "description": "Remove the queen from row 1, column 2.",
+        "pseudocode_line": 6,
+        "result": null
+      },
+      {
+        "type": "done",
+        "grid": [
+          [
+            "empty",
+            "empty"
+          ],
+          [
+            "empty",
+            "empty"
+          ]
+        ],
+        "active_cell": null,
+        "related_cells": [],
+        "description": "No solution exists for a 2 by 2 board.",
+        "pseudocode_line": 7,
+        "result": {
+          "solved": false,
+          "size": 2,
+          "solution": []
+        }
+      }
+    ],
+    "context": {}
+  }
+}

@@ -9,7 +9,8 @@ import { Alert } from "@/components/ui-primitives";
 import { VisualizerControls } from "@/components/visualizer-controls";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
-import { useStepPlayback } from "@/hooks/use-step-playback";
+import { useLearningPlayback } from "@/hooks/use-learning-playback";
+import { LearningPanel } from "@/components/learning-panel";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
 import { SORTING_PRESETS } from "@/lib/array-presets";
 import type { MetadataSourceProps } from "@/types/algorithm";
@@ -25,7 +26,7 @@ export function SortingVisualizer(props: MetadataSourceProps) {
   const [initialNumbers, setInitialNumbers] = useState(DEFAULT_NUMBERS);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const playback = useStepPlayback<AlgorithmStep>(speed);
+  const playback = useLearningPlayback<AlgorithmStep>(speed, algorithm);
   const displayedNumbers = playback.currentStep?.array ?? initialNumbers;
   const finalArray = playback.isComplete ? playback.currentStep?.array : null;
 
@@ -88,6 +89,7 @@ export function SortingVisualizer(props: MetadataSourceProps) {
         speed={speed}
         isLoading={isLoading}
         isPlaying={playback.isPlaying}
+            learningBlocked={playback.learning.blocked}
         currentStepIndex={playback.currentStepIndex}
         totalSteps={playback.steps.length}
         presetId={presetId}
@@ -110,6 +112,8 @@ export function SortingVisualizer(props: MetadataSourceProps) {
         onReset={playback.reset}
         onPresetChange={loadPreset}
       />
+
+      <LearningPanel learning={playback.learning} isLoading={isLoading} />
 
       {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
 

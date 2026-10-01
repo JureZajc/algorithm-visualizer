@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
+import type { ComponentPropsWithRef, HTMLAttributes, ReactNode } from "react";
 
 type PanelVariant = "default" | "control" | "visualization" | "subtle" | "warning" | "accent";
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "soft";
@@ -121,7 +121,7 @@ export function Button({
   size = "md",
   variant = "secondary",
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
+}: ComponentPropsWithRef<"button"> & {
   children: ReactNode;
   size?: ButtonSize;
   variant?: ButtonVariant;
