@@ -224,6 +224,21 @@ def test_cleanup_reaches_posix_group_even_after_leader_exits(monkeypatch):
     ]
 
 
+def test_cleanup_tolerates_posix_group_with_only_unreaped_members(monkeypatch):
+    # macOS raises EPERM instead of ESRCH once every group member has exited.
+    killpg = MagicMock(
+        side_effect=[None, PermissionError(1, "Operation not permitted")]
+    )
+    monkeypatch.setattr(dev, "os", SimpleNamespace(name="posix", killpg=killpg))
+    monkeypatch.setattr(dev.signal, "SIGKILL", 9, raising=False)
+    process = MagicMock(pid=12345)
+    process.poll.return_value = 1
+
+    dev.stop_servers([process], None)
+    assert killpg.call_count == 2
+    process.kill.assert_not_called()
+
+
 def test_real_descendant_cleanup_after_leader_exit(tmp_path):
     marker = tmp_path / "child-port"
     child_code = (

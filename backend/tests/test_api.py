@@ -788,6 +788,7 @@ def test_backtracking_steps_endpoint_rejects_overlapping_custom_maze_points() ->
     [
         {"algorithm": "permutations", "values": []},
         {"algorithm": "permutations", "values": ["A", ""]},
+        {"algorithm": "permutations", "values": ["A", "B" * 13]},
         {"algorithm": "permutations", "values": ["1", "2", "3", "4", "5", "6", "7"]},
         {
             "algorithm": "subsets",
@@ -1003,3 +1004,163 @@ def test_mst_steps_endpoint(algorithm: str) -> None:
     assert body["steps"][-1]["type"] == "done"
     assert body["steps"][-1]["total_weight"] == 6
     assert len(body["steps"][-1]["mst_edges"]) == 3
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"size": 51},
+        {"size": -1},
+        {"size": 5, "min_value": -1_000_001},
+        {"size": 5, "max_value": 1_000_001},
+    ],
+)
+def test_random_numbers_endpoint_rejects_out_of_bounds_input(
+    payload: dict[str, object],
+) -> None:
+    response = client.post("/numbers/random", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_random_numbers_endpoint_accepts_maximum_size() -> None:
+    response = client.post("/numbers/random", json={"size": 50})
+
+    assert response.status_code == 200
+    assert len(response.json()["numbers"]) == 50
+
+
+@pytest.mark.parametrize(
+    "numbers",
+    [
+        list(range(51)),
+        [0, 1_000_001],
+        [-1_000_001, 0],
+    ],
+)
+def test_sorting_steps_endpoint_rejects_out_of_bounds_numbers(
+    numbers: list[int],
+) -> None:
+    response = client.post(
+        "/sorting/steps",
+        json={"numbers": numbers, "algorithm": "counting_sort"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_sorting_steps_endpoint_accepts_maximum_length() -> None:
+    response = client.post(
+        "/sorting/steps",
+        json={"numbers": list(range(50, 0, -1)), "algorithm": "bubble_sort"},
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"numbers": list(range(51)), "target": 3},
+        {"numbers": [1, 2, 3], "target": 1_000_001},
+    ],
+)
+def test_searching_steps_endpoint_rejects_out_of_bounds_input(
+    payload: dict[str, object],
+) -> None:
+    response = client.post(
+        "/searching/steps",
+        json={**payload, "algorithm": "linear_search"},
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {
+            "nodes": [str(index) for index in range(31)],
+            "edges": [],
+            "start": "0",
+            "target": "1",
+        },
+        {
+            "nodes": ["A", "B"],
+            "edges": [{"source": "A", "target": "B"}] * 201,
+            "start": "A",
+            "target": "B",
+        },
+        {
+            "nodes": ["A", "B" * 21],
+            "edges": [],
+            "start": "A",
+            "target": "A",
+        },
+    ],
+)
+def test_graph_steps_endpoint_rejects_oversized_graph(
+    payload: dict[str, object],
+) -> None:
+    response = client.post("/graph/steps", json={**payload, "algorithm": "bfs"})
+
+    assert response.status_code == 422
+
+
+def test_graph_steps_endpoint_accepts_maximum_graph_size() -> None:
+    nodes = [str(index) for index in range(30)]
+    edges = [
+        {"source": source, "target": target}
+        for index, source in enumerate(nodes)
+        for target in nodes[index + 1 :]
+    ][:200]
+
+    response = client.post(
+        "/graph/steps",
+        json={
+            "nodes": nodes,
+            "edges": edges,
+            "start": "0",
+            "target": "29",
+            "algorithm": "bfs",
+        },
+    )
+
+    assert response.status_code == 200
+
+
+def test_hash_table_steps_endpoint_rejects_oversized_string_key() -> None:
+    response = client.post(
+        "/hash-tables/steps",
+        json={
+            "algorithm": "hash_insert_chaining",
+            "values": ["k" * 33],
+            "table_size": 10,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_backtracking_steps_endpoint_limits_sudoku_search() -> None:
+    # Row-major brute force needs millions of steps for this valid puzzle.
+    response = client.post(
+        "/backtracking/steps",
+        json={
+            "algorithm": "sudoku_solver",
+            "board": [
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 3, 0, 8, 5],
+                [0, 0, 1, 0, 2, 0, 0, 0, 0],
+                [0, 0, 0, 5, 0, 7, 0, 0, 0],
+                [0, 0, 4, 0, 0, 0, 1, 0, 0],
+                [0, 9, 0, 0, 0, 0, 0, 0, 0],
+                [5, 0, 0, 0, 0, 0, 0, 7, 3],
+                [0, 0, 2, 0, 1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 4, 0, 0, 0, 9],
+            ],
+        },
+    )
+
+    assert response.status_code == 422
+    assert "step limit" in response.json()["detail"]

@@ -300,6 +300,9 @@ def stop_servers(processes: list[subprocess.Popen], job: WindowsJob | None) -> N
                 os.killpg(process.pid, signal.SIGKILL)
             except ProcessLookupError:
                 pass
+            except PermissionError:
+                # macOS reports EPERM when only unreaped members remain.
+                pass
     for process in processes:
         if process.poll() is None:
             # Also covers failure to assign a newly launched Windows process.

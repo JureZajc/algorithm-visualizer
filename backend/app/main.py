@@ -1,9 +1,10 @@
 import os
 from random import randint
+from typing import Annotated
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from app.algorithms.backtracking import BACKTRACKING_ALGORITHMS
 from app.algorithms.backtracking.sudoku_solver import DEFAULT_SUDOKU_BOARD
@@ -70,14 +71,28 @@ app.add_middleware(
 )
 
 
+# Step responses snapshot the full state per step, so inputs stay small.
+MAX_ARRAY_LENGTH = 50
+MAX_ARRAY_VALUE = 1_000_000
+MAX_GRAPH_NODES = 30
+MAX_GRAPH_EDGES = 200
+MAX_GRAPH_NODE_LENGTH = 20
+MAX_LIST_VALUE_LENGTH = 12
+MAX_HASH_KEY_LENGTH = 32
+
+ArrayValue = Annotated[int, Field(ge=-MAX_ARRAY_VALUE, le=MAX_ARRAY_VALUE)]
+ArrayValues = Annotated[list[ArrayValue], Field(max_length=MAX_ARRAY_LENGTH)]
+GraphNode = Annotated[str, Field(max_length=MAX_GRAPH_NODE_LENGTH)]
+
+
 class GenerateRequest(BaseModel):
-    size: int = 20
-    min_value: int = 1
-    max_value: int = 100
+    size: int = Field(default=20, ge=0, le=MAX_ARRAY_LENGTH)
+    min_value: ArrayValue = 1
+    max_value: ArrayValue = 100
 
 
 class SortRequest(BaseModel):
-    numbers: list[int]
+    numbers: ArrayValues
     algorithm: SortingAlgorithm
 
 
@@ -89,9 +104,9 @@ class SortResponse(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    numbers: list[int]
+    numbers: ArrayValues
     algorithm: SearchingAlgorithm
-    target: int
+    target: ArrayValue
 
 
 class SearchResponse(BaseModel):
@@ -109,8 +124,8 @@ class GraphEdgeModel(BaseModel):
 
 
 class GraphRequest(BaseModel):
-    nodes: list[str]
-    edges: list[GraphEdgeModel]
+    nodes: list[GraphNode] = Field(max_length=MAX_GRAPH_NODES)
+    edges: list[GraphEdgeModel] = Field(max_length=MAX_GRAPH_EDGES)
     start: str
     target: str
     algorithm: GraphAlgorithm
@@ -482,6 +497,10 @@ def _validate_text_list(
     normalized = [value.strip() for value in values]
     if any(not value for value in normalized):
         raise ValueError(f"{name} must not contain empty values.")
+    if any(len(value) > MAX_LIST_VALUE_LENGTH for value in normalized):
+        raise ValueError(
+            f"{name} entries must be {MAX_LIST_VALUE_LENGTH} characters or fewer."
+        )
     return normalized
 
 
@@ -494,6 +513,10 @@ def _validate_hash_key(value: HashKey, name: str) -> HashKey:
     normalized = value.strip()
     if not normalized:
         raise ValueError(f"{name} must be an integer or non-empty string key.")
+    if len(normalized) > MAX_HASH_KEY_LENGTH:
+        raise ValueError(
+            f"{name} string keys must be {MAX_HASH_KEY_LENGTH} characters or fewer."
+        )
     return normalized
 
 
