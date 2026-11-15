@@ -96,7 +96,7 @@ Generate searching steps:
 }
 ```
 
-Binary Search requires an ascending input array; an unsorted request is rejected with HTTP 422.
+Array requests accept at most 50 values, each between -1,000,000 and 1,000,000; random generation accepts a `size` from 0 to 50. Binary Search requires an ascending input array; an unsorted request is rejected with HTTP 422.
 
 ## Hash Tables
 
@@ -117,7 +117,7 @@ Binary Search requires an ascending input array; an unsorted request is rejected
 }
 ```
 
-Keys may be integers or strings. Integers hash with `key % table_size`; strings hash by summing character codes modulo the table size. Search results report whether the target was found and which buckets were visited.
+Keys may be integers or strings of up to 32 characters. Integers hash with `key % table_size`; strings hash by summing character codes modulo the table size. Search results report whether the target was found and which buckets were visited.
 
 ## Trees
 
@@ -165,7 +165,7 @@ A* additionally accepts optional non-negative heuristic values keyed by node:
 }
 ```
 
-Missing A* heuristic values default to zero. Topological Sort requires a directed graph. Dijkstra and A* require non-negative weights. Kruskal and Prim operate on undirected graphs.
+Graph requests accept at most 30 nodes and 200 edges, with node names of up to 20 characters. Missing A* heuristic values default to zero. Topological Sort requires a directed graph. Dijkstra and A* require non-negative weights. Kruskal and Prim operate on undirected graphs.
 
 ## Dynamic Programming
 
@@ -208,7 +208,7 @@ Other algorithms use `n` for Fibonacci, `coins` and `amount` for Coin Change, `t
 }
 ```
 
-Backtracking also supports `maze_solver`, `subsets`, and `sudoku_solver`. Maze requests can use deterministic presets or a custom grid with start and end coordinates. Sudoku requests accept a 9 × 9 board.
+Backtracking also supports `maze_solver`, `subsets`, and `sudoku_solver`. Maze requests can use deterministic presets or a custom grid with start and end coordinates. Sudoku requests accept a 9 × 9 board; puzzles whose brute-force search exceeds 100,000 steps are rejected with HTTP 422. Permutation and subset values are limited to 12 characters each.
 
 ## Validation Errors
 

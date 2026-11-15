@@ -14,6 +14,8 @@ SudokuBoard = list[list[str]]
 BOARD_SIZE = 9
 BOX_SIZE = 3
 DIGITS = tuple(str(value) for value in range(1, 10))
+# Bounds brute-force search on adversarial puzzles; the default board needs ~80k.
+MAX_SUDOKU_STEPS = 100_000
 
 DEFAULT_SUDOKU_BOARD: SudokuInputBoard = [
     ["5", "3", ".", ".", "7", ".", ".", ".", "."],
@@ -30,7 +32,7 @@ DEFAULT_SUDOKU_BOARD: SudokuInputBoard = [
 
 def sudoku_solver_steps(
     board: SudokuInputBoard | None = None,
-    max_steps: int | None = None,
+    max_steps: int | None = MAX_SUDOKU_STEPS,
 ) -> list[BacktrackingStep]:
     """Solve a 9x9 Sudoku puzzle with classic recursive backtracking."""
 
