@@ -244,3 +244,7 @@ algorithm-visualizer/
 ## About
 
 Algorithm Visualizer is an open-source learning and portfolio project focused on making algorithm execution observable, explorable, and easier to reason about. Contributions and issue reports are welcome through the GitHub repository.
+
+## License
+
+Released under the [MIT License](LICENSE).

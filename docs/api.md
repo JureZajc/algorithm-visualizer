@@ -96,7 +96,7 @@ Generate searching steps:
 }
 ```
 
-Array requests accept at most 50 values, each between -1,000,000 and 1,000,000; random generation accepts a `size` from 0 to 50. Binary Search requires an ascending input array; an unsorted request is rejected with HTTP 422.
+Array requests accept at most 50 values, each between -1,000,000 and 1,000,000; random generation accepts a `size` from 0 to 50 and requires `min_value` to be at most `max_value`. Binary Search requires an ascending input array; an unsorted request is rejected with HTTP 422.
 
 ## Hash Tables
 
@@ -165,7 +165,7 @@ A* additionally accepts optional non-negative heuristic values keyed by node:
 }
 ```
 
-Graph requests accept at most 30 nodes and 200 edges, with node names of up to 20 characters. Missing A* heuristic values default to zero. Topological Sort requires a directed graph. Dijkstra and A* require non-negative weights. Kruskal and Prim operate on undirected graphs.
+Graph requests accept at most 30 nodes and 200 edges, with non-empty node names of up to 20 characters. Edge weights and heuristic values must be finite numbers. Missing A* heuristic values default to zero. Topological Sort requires a directed graph. Dijkstra and A* require non-negative weights. Kruskal and Prim operate on undirected graphs.
 
 ## Dynamic Programming
 
