@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, FiniteFloat, model_validator
 
 from app.algorithms.backtracking import BACKTRACKING_ALGORITHMS
 from app.algorithms.backtracking.sudoku_solver import DEFAULT_SUDOKU_BOARD
@@ -83,12 +83,19 @@ MAX_HASH_KEY_LENGTH = 32
 ArrayValue = Annotated[int, Field(ge=-MAX_ARRAY_VALUE, le=MAX_ARRAY_VALUE)]
 ArrayValues = Annotated[list[ArrayValue], Field(max_length=MAX_ARRAY_LENGTH)]
 GraphNode = Annotated[str, Field(max_length=MAX_GRAPH_NODE_LENGTH)]
+GraphNumber = int | FiniteFloat
 
 
 class GenerateRequest(BaseModel):
     size: int = Field(default=20, ge=0, le=MAX_ARRAY_LENGTH)
     min_value: ArrayValue = 1
     max_value: ArrayValue = 100
+
+    @model_validator(mode="after")
+    def validate_value_range(self) -> "GenerateRequest":
+        if self.min_value > self.max_value:
+            raise ValueError("min_value must not be greater than max_value.")
+        return self
 
 
 class SortRequest(BaseModel):
@@ -120,7 +127,7 @@ class SearchResponse(BaseModel):
 class GraphEdgeModel(BaseModel):
     source: str
     target: str
-    weight: int | float = 1
+    weight: GraphNumber = 1
 
 
 class GraphRequest(BaseModel):
@@ -130,7 +137,7 @@ class GraphRequest(BaseModel):
     target: str
     algorithm: GraphAlgorithm
     directed: bool = False
-    heuristics: dict[str, int | float] | None = None
+    heuristics: dict[str, GraphNumber] | None = None
 
     @model_validator(mode="after")
     def validate_references(self) -> "GraphRequest":
@@ -144,6 +151,8 @@ class GraphRequest(BaseModel):
             }
             for edge in self.edges
         ]
+        if any(not node.strip() for node in self.nodes):
+            raise ValueError("Graph node names must not be empty.")
         validate_graph(self.nodes, edges, self.start, self.target)
         if self.heuristics is not None:
             unknown_nodes = set(self.heuristics) - set(self.nodes)
@@ -164,7 +173,7 @@ class GraphResponse(BaseModel):
     start: str
     target: str
     directed: bool
-    heuristics: dict[str, int | float] | None
+    heuristics: dict[str, GraphNumber] | None
     steps: list[GraphStep]
     step_count: int
 

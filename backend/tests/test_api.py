@@ -818,6 +818,16 @@ def test_backtracking_steps_endpoint_rejects_invalid_list_values(
             **GRAPH_REQUEST,
             "edges": [{"source": "A", "target": "missing", "weight": 1}],
         },
+        {
+            **GRAPH_REQUEST,
+            "edges": [{"source": "A", "target": "D", "weight": "NaN"}],
+        },
+        {
+            **GRAPH_REQUEST,
+            "edges": [{"source": "A", "target": "D", "weight": "Infinity"}],
+        },
+        {**GRAPH_REQUEST, "nodes": ["A", "B", "C", "D", ""]},
+        {**GRAPH_REQUEST, "nodes": ["A", "B", "C", "D", "  "]},
     ],
 )
 def test_graph_steps_endpoint_rejects_invalid_graph(
@@ -898,10 +908,11 @@ def test_a_star_endpoint_rejects_negative_weights() -> None:
     [
         {"missing": 1},
         {"A": -1},
+        {"A": "NaN"},
     ],
 )
 def test_graph_endpoint_rejects_invalid_heuristics(
-    heuristics: dict[str, int],
+    heuristics: dict[str, object],
 ) -> None:
     response = client.post(
         "/graph/steps",
@@ -1013,6 +1024,7 @@ def test_mst_steps_endpoint(algorithm: str) -> None:
         {"size": -1},
         {"size": 5, "min_value": -1_000_001},
         {"size": 5, "max_value": 1_000_001},
+        {"size": 5, "min_value": 10, "max_value": 1},
     ],
 )
 def test_random_numbers_endpoint_rejects_out_of_bounds_input(
@@ -1164,3 +1176,13 @@ def test_backtracking_steps_endpoint_limits_sudoku_search() -> None:
 
     assert response.status_code == 422
     assert "step limit" in response.json()["detail"]
+
+
+def test_random_numbers_endpoint_accepts_equal_bounds() -> None:
+    response = client.post(
+        "/numbers/random",
+        json={"size": 3, "min_value": 7, "max_value": 7},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["numbers"] == [7, 7, 7]
