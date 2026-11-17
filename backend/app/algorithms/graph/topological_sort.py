@@ -21,7 +21,7 @@ def topological_sort_steps(
         raise ValueError("Topological sort requires a directed graph.")
 
     adjacency = build_adjacency_list(nodes, edges, directed=True)
-    in_degree = {node: 0 for node in nodes}
+    in_degree: dict[str, int | float] = {node: 0 for node in nodes}
     for edge in edges:
         in_degree[edge["target"]] += 1
 

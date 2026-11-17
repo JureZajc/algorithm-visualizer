@@ -1,6 +1,7 @@
 from app.algorithms.graph.types import (
     GraphEdge,
     GraphStep,
+    GraphStepType,
     apply_graph_pseudocode_lines,
     create_graph_step,
 )
@@ -76,7 +77,7 @@ def kruskal_steps(
         if disjoint_set.union(edge["source"], edge["target"]):
             mst_edges.append(edge.copy())
             total_weight += edge["weight"]
-            step_type = "accept_edge"
+            step_type: GraphStepType = "accept_edge"
             description = "Accept the edge because it connects two components."
         else:
             step_type = "reject_edge"

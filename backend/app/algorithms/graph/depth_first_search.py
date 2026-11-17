@@ -1,6 +1,7 @@
 from app.algorithms.graph.types import (
     GraphEdge,
     GraphStep,
+    GraphStepType,
     apply_graph_pseudocode_lines,
     create_graph_step,
 )
@@ -122,7 +123,7 @@ def depth_first_search_steps(
             )
 
     path = reconstruct_path(previous, start, target) if found else []
-    outcome = "path_found" if found else "not_found"
+    outcome: GraphStepType = "path_found" if found else "not_found"
     outcome_description = (
         f"Found path: {' -> '.join(path)}."
         if found
