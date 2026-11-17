@@ -1,7 +1,24 @@
 import type {
   BacktrackingAlgorithm,
   BacktrackingRequest,
+  SudokuBoard,
 } from "@/types/backtracking";
+
+/**
+ * Matches `DEFAULT_SUDOKU_BOARD` in the backend. Brute force solves it in
+ * 1,434 steps; the API rejects puzzles that need more than 10,000.
+ */
+export const DEFAULT_SUDOKU_BOARD: SudokuBoard = [
+  ["5", "3", ".", ".", "7", ".", ".", "1", "."],
+  ["6", ".", ".", "1", "9", "5", ".", "4", "."],
+  [".", "9", "8", ".", ".", ".", ".", "6", "."],
+  ["8", ".", ".", ".", "6", "1", ".", ".", "3"],
+  ["4", "2", ".", "8", ".", "3", ".", ".", "1"],
+  ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+  [".", "6", ".", ".", ".", ".", "2", "8", "."],
+  [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+  [".", ".", ".", ".", "8", ".", ".", "7", "9"],
+];
 
 export interface BacktrackingPreset {
   id: string;
@@ -66,21 +83,9 @@ export const BACKTRACKING_PRESETS: BacktrackingPreset[] = [
     request: { values: ["A", "B", "C"] },
   },
   {
-    id: "sudoku-classic",
-    label: "Classic puzzle",
+    id: "sudoku-starter",
+    label: "Starter puzzle",
     algorithm: "sudoku_solver",
-    request: {
-      board: [
-        ["5", "3", ".", ".", "7", ".", ".", ".", "."],
-        ["6", ".", ".", "1", "9", "5", ".", ".", "."],
-        [".", "9", "8", ".", ".", ".", ".", "6", "."],
-        ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
-        ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
-        ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
-        [".", "6", ".", ".", ".", ".", "2", "8", "."],
-        [".", ".", ".", "4", "1", "9", ".", ".", "5"],
-        [".", ".", ".", ".", "8", ".", ".", "7", "9"],
-      ],
-    },
+    request: { board: DEFAULT_SUDOKU_BOARD },
   },
 ];

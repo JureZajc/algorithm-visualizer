@@ -208,7 +208,36 @@ Other algorithms use `n` for Fibonacci, `coins` and `amount` for Coin Change, `t
 }
 ```
 
-Backtracking also supports `maze_solver`, `subsets`, and `sudoku_solver`. Maze requests can use deterministic presets or a custom grid with start and end coordinates. Sudoku requests accept a 9 × 9 board; puzzles whose brute-force search exceeds 100,000 steps are rejected with HTTP 422. Permutation and subset values are limited to 12 characters each.
+Backtracking also supports `maze_solver`, `subsets`, and `sudoku_solver`. Maze requests can use deterministic presets or a custom grid with start and end coordinates. Sudoku requests accept a 9 × 9 board; puzzles whose brute-force search exceeds 10,000 steps are rejected with HTTP 422. Permutation and subset values are limited to 12 characters each.
+
+Steps do not repeat data that a client can keep or rebuild:
+
+- **Sudoku.** The response carries `initial_board` (the normalized puzzle, with `.` for empty cells) and `fixed_cells` (the `[row, column]` positions of the givens) once, at the top level. Both are `null` for the other backtracking algorithms. Each step's `grid` holds the current board, and its `result` holds only `solved`, `solution`, `tried_value`, and `conflicts`.
+- **Permutations and subsets.** Each step's `result` holds `generated_count`, the number of results found so far. A `solution_found` step also holds `generated_item`, the one result it adds. To show the results found up to a step, collect `generated_item` from the `solution_found` steps up to and including it. The final `done` step lists every result under `permutations` or `subsets`.
+
+```json
+{
+  "algorithm": "sudoku_solver",
+  "input": { "board": [["5", "3", ".", "…"], "…"] },
+  "initial_board": [["5", "3", ".", "…"], "…"],
+  "fixed_cells": [[0, 0], [0, 1], "…"],
+  "steps": [
+    {
+      "type": "try",
+      "grid": [["5", "3", ".", "…"], "…"],
+      "active_cell": [0, 2],
+      "related_cells": [[0, 7]],
+      "description": "Try 1 at row 1, column 3.",
+      "pseudocode_line": 3,
+      "result": { "solved": false, "solution": [], "tried_value": "1", "conflicts": [[0, 7]] }
+    },
+    "…"
+  ],
+  "step_count": 1434
+}
+```
+
+The example is abbreviated with `"…"`; it shows the default puzzle's first try.
 
 ## Validation Errors
 
