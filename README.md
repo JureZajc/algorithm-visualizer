@@ -240,6 +240,7 @@ algorithm-visualizer/
 
 - [API guide and request examples](docs/api.md)
 - [UX/UI audit](docs/ux-ui-audit.md)
+- [Next improvements](docs/improvement.md)
 
 ## About
 
