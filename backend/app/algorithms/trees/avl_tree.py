@@ -1,8 +1,9 @@
-from typing import Literal
+from typing import Literal, cast
 
 from app.algorithms.trees.types import (
     RotationType,
     TreeNode,
+    TreeResult,
     TreeStep,
     TreeValue,
     clone_tree,
@@ -58,7 +59,7 @@ def avl_insert_steps(values: list[int]) -> list[TreeStep]:
             child = current[child_key]
             if child is None:
                 current[child_key] = _node(value)
-                path_nodes.append(current[child_key])
+                path_nodes.append(cast(TreeNode, current[child_key]))
                 path_values.append(value)
                 steps.append(
                     create_tree_step(
@@ -130,7 +131,7 @@ def avl_insert_steps(values: list[int]) -> list[TreeStep]:
             break
 
     _refresh_tree(root)
-    result = {
+    result: TreeResult = {
         "root": clone_tree(root),
         "values": values.copy(),
         "inorder": _inorder_values(root),

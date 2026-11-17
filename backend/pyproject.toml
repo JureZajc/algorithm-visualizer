@@ -1,7 +1,7 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "FastAPI service that turns algorithm runs into step-by-step execution states for the Algorithm Visualizer."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -13,9 +13,16 @@ dependencies = [
 [dependency-groups]
 dev = [
     "httpx2>=2.4.0",
+    "mypy>=2.4.1",
     "pytest>=9.0.3",
     "ruff>=0.15.17",
 ]
+
+[tool.mypy]
+files = ["app"]
+plugins = ["pydantic.mypy"]
+warn_redundant_casts = true
+warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

@@ -4,6 +4,7 @@ from itertools import count
 from app.algorithms.graph.types import (
     GraphEdge,
     GraphStep,
+    GraphStepType,
     apply_graph_pseudocode_lines,
     create_graph_step,
 )
@@ -200,7 +201,7 @@ def a_star_steps(
 
     path = reconstruct_path(previous, start, target) if found else []
     frontier = _frontier_nodes(priority_queue, distances, closed)
-    outcome = "path_found" if found else "not_found"
+    outcome: GraphStepType = "path_found" if found else "not_found"
     description = (
         f"Found shortest path: {' -> '.join(path)}."
         if found
