@@ -13,6 +13,7 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 ## Features
 
 - Follow an algorithm automatically or move one step at a time with play, pause, previous, next, first, last, restart, reset, seek, and speed controls.
+- Control playback from the keyboard: Space plays or pauses, Left and Right step, and Home and End jump to the first and last step. Screen readers hear steps you move to, pauses, and completion rather than every autoplay frame, and animations stop when the system asks for reduced motion.
 - Enable Learning mode to predict algorithm behavior before selected execution steps, receive feedback, and track your score and streak.
 - See the active pseudocode line, current operation, progress, elapsed time, result, and algorithm-specific state together.
 - Review descriptions, best/average/worst time complexity, space complexity, and implementation notes for every algorithm.
@@ -207,13 +208,13 @@ Validate with the dependencies already installed:
 python scripts/dev.py check
 ```
 
-This runs Ruff for the backend and development helper, pytest (including development workflow tests), then ESLint, frontend tests, and a production build. To synchronize both projects from their lockfiles before running the same checks, use:
+This runs Ruff for the backend and development helper, mypy for the backend application code, pytest (including development workflow tests), then ESLint, frontend tests, and a production build. To synchronize both projects from their lockfiles before running the same checks, use:
 
 ```bash
 python scripts/dev.py check-clean
 ```
 
-CI runs Ruff and pytest for the backend plus frontend tests and a production build on pushes and pull requests to `master`; the local `check` command additionally runs ESLint.
+CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (22). A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
 
 ## API
 

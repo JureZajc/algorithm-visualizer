@@ -1,5 +1,6 @@
 from app.algorithms.dynamic_programming.types import (
     DynamicProgrammingStep,
+    DynamicProgrammingStepType,
     create_dynamic_programming_step,
 )
 
@@ -55,7 +56,7 @@ def knapsack_steps(
             )
             if with_item > without_item:
                 table[item_index][current_capacity] = with_item
-                step_type = "choose"
+                step_type: DynamicProgrammingStepType = "choose"
                 description = (
                     f"Include item {item_index}; best value becomes {with_item}."
                 )

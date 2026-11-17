@@ -274,3 +274,31 @@ def test_real_descendant_cleanup_after_leader_exit(tmp_path):
 @pytest.mark.parametrize("command", dev.COMMAND_TOOLS)
 def test_cli_accepts_existing_commands_and_dev(command):
     assert dev.create_parser().parse_args([command]).command == command
+
+
+@pytest.mark.parametrize("command", ["check", "check-clean"])
+def test_checks_run_static_analysis_before_backend_tests(command):
+    steps = dev.steps_for(command)
+    commands = [step.command for step in steps]
+    ruff = ("uv", "run", "--no-sync", "ruff", "check", ".", "../scripts")
+    mypy = ("uv", "run", "--no-sync", "mypy")
+    tests = ("uv", "run", "--no-sync", "pytest")
+
+    assert commands.index(ruff) < commands.index(mypy) < commands.index(tests)
+    assert ("npm", "run", "lint") in commands
+    for step in steps:
+        if step.command[0] == "uv":
+            assert step.working_directory == dev.BACKEND_DIRECTORY
+
+
+def test_ci_runs_every_local_check():
+    workflow = (dev.REPOSITORY_ROOT / ".github" / "workflows" / "ci.yml").read_text()
+    run_commands = {
+        line.strip().removeprefix("run:").strip()
+        for line in workflow.splitlines()
+        if line.strip().startswith("run:")
+    }
+
+    for step in dev.steps_for("check"):
+        local = " ".join(part for part in step.command if part != "--no-sync")
+        assert local in run_commands, f"CI does not run: {local}"

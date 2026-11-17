@@ -4,11 +4,14 @@ import type {
   SudokuBoard,
   SudokuCell,
   SudokuResult,
+  SudokuRun,
 } from "@/types/backtracking";
 
 interface SudokuGridProps {
   board: SudokuBoard;
   step: BacktrackingStep | null;
+  /** Data shared by every step of the loaded run, used while a step is shown. */
+  run?: SudokuRun | null;
   editingDisabled: boolean;
   onCellChange: (row: number, column: number, value: SudokuCell) => void;
 }
@@ -31,8 +34,16 @@ function isSudokuResult(result: unknown): result is SudokuResult {
   return (
     typeof result === "object" &&
     result !== null &&
-    "fixed_cells" in result &&
-    "initial_board" in result
+    "tried_value" in result &&
+    "conflicts" in result
+  );
+}
+
+function givenCells(board: SudokuBoard): GridPosition[] {
+  return board.flatMap((row, rowIndex) =>
+    row.flatMap((cell, columnIndex) =>
+      cell === "." ? [] : [[rowIndex, columnIndex] as GridPosition],
+    ),
   );
 }
 
@@ -64,6 +75,7 @@ function normalizeSudokuInput(value: string): SudokuCell {
 export function SudokuGrid({
   board,
   step,
+  run = null,
   editingDisabled,
   onCellChange,
 }: SudokuGridProps) {
@@ -73,13 +85,7 @@ export function SudokuGrid({
   const relatedKeys = new Set((step?.related_cells ?? []).map(positionKey));
   const conflictKeys = new Set((result?.conflicts ?? []).map(positionKey));
   const fixedKeys = new Set(
-    (result?.fixed_cells ??
-      board.flatMap((row, rowIndex) =>
-        row.map((cell, columnIndex) =>
-          cell === "." ? null : ([rowIndex, columnIndex] as GridPosition),
-        ),
-      ).filter((cell): cell is GridPosition => cell !== null)
-    ).map(positionKey),
+    (step && run ? run.fixed_cells : givenCells(board)).map(positionKey),
   );
   const isSolvedStep =
     step?.type === "solution_found" || (step?.type === "done" && result?.solved);

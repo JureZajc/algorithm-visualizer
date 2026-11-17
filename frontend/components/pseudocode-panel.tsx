@@ -14,11 +14,8 @@ export function PseudocodePanel(props: PseudocodePanelProps) {
 
   if (props.isLoading) {
     return (
-      <Panel
-        className="p-5"
-        aria-label="Loading pseudocode"
-        aria-live="polite"
-      >
+      <Panel className="p-5" role="status">
+        <span className="sr-only">Loading pseudocode</span>
         <div className="mb-4 h-4 w-24 animate-pulse rounded bg-slate-200" />
         <div className="grid gap-2">
           <div className="h-8 animate-pulse rounded-lg bg-slate-100" />
@@ -31,7 +28,8 @@ export function PseudocodePanel(props: PseudocodePanelProps) {
 
   if (!metadata?.pseudocode.length) {
     return (
-      <Panel className="p-5 text-sm leading-6 text-amber-900" variant="warning" aria-live="polite">
+      // A status, not an alert: when metadata fails, the overview panel already raises the alert.
+      <Panel className="p-5 text-sm leading-6 text-amber-900" variant="warning" role="status">
         <h2 className="mb-1 font-extrabold">Pseudocode unavailable</h2>
         <p className="m-0">{props.error ?? "The selected algorithm does not include pseudocode metadata."}</p>
       </Panel>

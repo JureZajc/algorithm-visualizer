@@ -32,6 +32,13 @@ GridPosition: TypeAlias = tuple[int, int]
 BacktrackingResult: TypeAlias = dict[str, object]
 
 
+class SudokuRun(TypedDict):
+    """Sudoku board data that is the same for every step, sent once per run."""
+
+    initial_board: list[list[str]]
+    fixed_cells: list[GridPosition]
+
+
 class BacktrackingStep(TypedDict):
     """A single visual state produced by a backtracking algorithm."""
 

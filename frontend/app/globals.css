@@ -36,3 +36,19 @@ select:focus-visible {
   outline: 3px solid rgba(99, 102, 241, 0.25);
   outline-offset: 2px;
 }
+
+/* Steps still change, but without animated transitions, pulsing skeletons, or button lift. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  button:hover {
+    translate: none;
+  }
+}
