@@ -13,6 +13,7 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 ## Features
 
 - Follow an algorithm automatically or move one step at a time with play, pause, previous, next, first, last, restart, reset, seek, and speed controls.
+- Control playback from the keyboard: Space plays or pauses, Left and Right step, and Home and End jump to the first and last step. Screen readers hear steps you move to, pauses, and completion rather than every autoplay frame, and animations stop when the system asks for reduced motion.
 - Enable Learning mode to predict algorithm behavior before selected execution steps, receive feedback, and track your score and streak.
 - See the active pseudocode line, current operation, progress, elapsed time, result, and algorithm-specific state together.
 - Review descriptions, best/average/worst time complexity, space complexity, and implementation notes for every algorithm.

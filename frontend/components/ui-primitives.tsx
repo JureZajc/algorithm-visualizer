@@ -47,6 +47,14 @@ const alertVariants: Record<AlertVariant, string> = {
   success: "border-emerald-200 bg-emerald-50 text-emerald-800",
 };
 
+// Failures interrupt; informational notes wait their turn.
+const alertRoles: Record<AlertVariant, "alert" | "status"> = {
+  error: "alert",
+  warning: "alert",
+  info: "status",
+  success: "status",
+};
+
 const statusVariants: Record<StatusVariant, string> = {
   idle: "border-slate-200 bg-slate-50 text-slate-600",
   loading: "border-sky-200 bg-sky-50 text-sky-700",
@@ -168,13 +176,17 @@ export function FormField({
   label: ReactNode;
   messageId?: string;
 }) {
+  const message = error || helperText;
   return (
     <label className={joinClasses("flex flex-col gap-2 text-xs font-bold text-slate-700", className)}>
       <span>{label}</span>
       {children}
-      <InlineMessage id={messageId} tone={error ? "error" : "muted"}>
-        {error ?? helperText ?? ""}
-      </InlineMessage>
+      {message ? (
+        // A new key inserts a fresh element, so an error that replaces helper text is announced.
+        <InlineMessage id={messageId} key={error ? "error" : "helper"} tone={error ? "error" : "muted"}>
+          {message}
+        </InlineMessage>
+      ) : null}
     </label>
   );
 }
@@ -194,10 +206,28 @@ export function InlineMessage({
     info: "text-sky-700",
     success: "text-emerald-700",
   };
+  const toneRoles = {
+    muted: undefined,
+    error: "alert",
+    info: "status",
+    success: "status",
+  } as const;
 
   return (
-    <span id={id} className={joinClasses("min-h-5 text-xs font-semibold leading-5", toneClasses[tone])} aria-live="polite">
+    <span id={id} className={joinClasses("min-h-5 text-xs font-semibold leading-5", toneClasses[tone])} role={toneRoles[tone]}>
       {children}
+    </span>
+  );
+}
+
+/**
+ * A visually hidden polite status. While `silent` it is empty, so changes are not announced;
+ * the current text is announced again when it stops being silent.
+ */
+export function ScreenReaderStatus({ children, silent = false }: { children: ReactNode; silent?: boolean }) {
+  return (
+    <span className="sr-only" role="status">
+      {silent ? null : children}
     </span>
   );
 }
@@ -214,7 +244,7 @@ export function Alert({
   variant?: AlertVariant;
 }) {
   return (
-    <div className={joinClasses("mb-5 rounded-xl border px-4 py-3 text-sm leading-6", alertVariants[variant], className)} aria-live="polite">
+    <div className={joinClasses("mb-5 rounded-xl border px-4 py-3 text-sm leading-6", alertVariants[variant], className)} role={alertRoles[variant]}>
       {title ? <p className="mb-1 font-extrabold">{title}</p> : null}
       <div className="font-medium">{children}</div>
     </div>

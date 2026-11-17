@@ -243,7 +243,7 @@
 
   **Likely files:** Playback.
 
-- [ ] **6. Fix validation, error, and announcement behavior**
+- [x] **6. Fix validation, error, and announcement behavior**
 
   **Concrete problem:** Error semantics are polite generic live regions, while descriptions and step counters update live on every autoplay tick. Loading state is not consistently exposed with `aria-busy`.
 
