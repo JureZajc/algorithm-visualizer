@@ -57,7 +57,7 @@ function expectResultsAt(steps: BacktrackingStep[], index: number) {
 }
 
 function sudokuCell(row: number, column: number) {
-  return screen.getByLabelText(`Sudoku row ${row + 1}, column ${column + 1}`) as HTMLInputElement;
+  return screen.getByLabelText(sudokuCellLabel(row, column)) as HTMLInputElement;
 }
 
 function expectedSudokuValue(step: BacktrackingStep, row: number, column: number) {
@@ -68,12 +68,24 @@ function expectedSudokuValue(step: BacktrackingStep, row: number, column: number
   return value === "." ? "" : value;
 }
 
+function sudokuCellLabel(row: number, column: number) {
+  return `Sudoku row ${row + 1}, column ${column + 1}`;
+}
+
+// One label query per board: 81 separate lookups per step exceed the test timeout on CI.
+function shownSudokuValues() {
+  const cells = screen.getAllByLabelText(/^Sudoku row \d, column \d$/) as HTMLInputElement[];
+  return Object.fromEntries(cells.map((cell) => [cell.getAttribute("aria-label") ?? "", cell.value]));
+}
+
 function expectSudokuAt(steps: BacktrackingStep[], index: number) {
+  const expected: Record<string, string> = {};
   for (let row = 0; row < 9; row += 1) {
     for (let column = 0; column < 9; column += 1) {
-      expect(sudokuCell(row, column).value).toBe(expectedSudokuValue(steps[index], row, column));
+      expected[sudokuCellLabel(row, column)] = expectedSudokuValue(steps[index], row, column);
     }
   }
+  expect(shownSudokuValues()).toEqual(expected);
 }
 
 async function startRun(algorithm: BacktrackingAlgorithm) {
