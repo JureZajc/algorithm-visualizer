@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Algorithm Visualizer",
   description:
-    "Explore sorting, searching, hash tables, graph, and dynamic programming algorithms one step at a time.",
+    "Explore sorting, searching, hash table, tree, graph, dynamic programming, and backtracking algorithms one step at a time.",
 };
 
 export default function RootLayout({

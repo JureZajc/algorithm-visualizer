@@ -4,9 +4,10 @@
 
 ## Status
 
-- Audit completed
-- Implementation not started
-- Current branch: `feature/ui-polish`
+- Audit completed on 2026-07-10.
+- Phase 1 is in progress. The checkboxes below record which items have shipped.
+- Reviewed against the code on 2026-11-17: items 1, 2, and 5 have shipped. Item 4 is partly done: playback reset is labelled “Reset run,” and its other points remain. Items 3, 6, 7, 8, and 9 are open. [improvement.md](improvement.md#3-finish-ux-audit-phase-1) lists what remains for each item.
+- Phase 2 has not started.
 
 ## Audit Summary
 
@@ -173,7 +174,7 @@
 
 ## Phase 1 — Safe, High-Impact UI/UX Improvements
 
-- [ ] **1. Compact, fully named navigation**
+- [x] **1. Compact, fully named navigation**
 
   **Concrete problem:** Mobile navigation uses four rows and abbreviated visible and accessible names. The technical API badge resembles a service-health indicator.
 
@@ -187,7 +188,7 @@
 
   **Likely files:** Core UI.
 
-- [ ] **2. Prioritize the visualization in page order**
+- [x] **2. Prioritize the visualization in page order**
 
   **Concrete problem:** Full metadata pushes the principal visualization multiple screens below the controls on mobile and below the fold on common laptops.
 
@@ -229,7 +230,7 @@
 
   **Likely files:** Core UI, Playback, Category shells, and Graph editor.
 
-- [ ] **5. Make playback compact and complete**
+- [x] **5. Make playback compact and complete**
 
   **Concrete problem:** At 320px, playback uses three button rows and overflows with large step counts. Completed playback shows disabled “Resume.” “Playing” conflicts with “Running.”
 
