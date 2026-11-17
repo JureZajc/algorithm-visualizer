@@ -8,11 +8,16 @@ import { SortingVisualizer } from "@/components/sorting-visualizer";
 import { TreesVisualizer } from "@/components/trees-visualizer";
 import { run } from "./learning-fixtures";
 
+const sortingRuns: Record<string, string> = { selection_sort: "selection", insertion_sort: "insertion" };
+
 vi.mock("@/lib/api", () => ({
-  fetchSortingSteps: vi.fn(async () => ({ steps: run("bubble").steps })),
-  fetchSearchingSteps: vi.fn(async () => ({ steps: run("binary_right").steps })),
+  fetchSortingSteps: vi.fn(async (_numbers: number[], algorithm: string) => ({ steps: run(sortingRuns[algorithm] ?? "bubble").steps })),
+  fetchSearchingSteps: vi.fn(async (_numbers: number[], algorithm: string) => ({ steps: run(algorithm === "linear_search" ? "linear_found" : "binary_right").steps })),
   fetchTreeSteps: vi.fn(async (request: { algorithm: string }) => ({ steps: run(request.algorithm === "bst_insert" ? "bst_insert" : "bst_search").steps })),
-  fetchGraphSteps: vi.fn(async () => ({ steps: run("bfs").steps, nodes: run("bfs").context.nodes })),
+  fetchGraphSteps: vi.fn(async (request: { algorithm: string }) => {
+    const sample = run(request.algorithm === "dfs" ? "dfs" : "bfs");
+    return { steps: sample.steps, nodes: sample.context.nodes };
+  }),
   fetchDynamicProgrammingSteps: vi.fn(async () => ({ steps: run("fibonacci_8").steps })),
   fetchBacktrackingSteps: vi.fn(async () => ({ steps: run("n_queens").steps })),
 }));
@@ -22,10 +27,14 @@ const props = { algorithms: [], isMetadataLoading: false, metadataError: null };
 describe("visualizer learning integration", () => {
   it.each([
     { name: "sorting", component: SortingVisualizer },
+    { name: "selection sort", component: SortingVisualizer, select: "Sorting algorithm", algorithm: "selection_sort" },
+    { name: "insertion sort", component: SortingVisualizer, select: "Sorting algorithm", algorithm: "insertion_sort" },
+    { name: "linear search", component: SearchingVisualizer },
     { name: "searching", component: SearchingVisualizer, select: "Searching algorithm", algorithm: "binary_search" },
     { name: "BST insertion", component: TreesVisualizer },
     { name: "BST search", component: TreesVisualizer, select: "Tree algorithm", algorithm: "bst_search" },
     { name: "graph", component: GraphVisualizer, select: "Algorithm", algorithm: "bfs" },
+    { name: "DFS", component: GraphVisualizer, select: "Algorithm", algorithm: "dfs" },
     { name: "dynamic programming", component: DynamicProgrammingVisualizer },
     { name: "backtracking", component: BacktrackingVisualizer },
   ])("wires learning checkpoints and reset in $name", async ({ component: Component, select, algorithm }) => {

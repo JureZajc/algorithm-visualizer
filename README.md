@@ -25,8 +25,9 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 
 ### Interactive learning
 
-Learning mode supports Bubble Sort, Binary Search, BST Insert, BST Search, BFS,
-Fibonacci DP, and N-Queens. Enable it within the visualizer before starting a run:
+Learning mode supports Bubble Sort, Selection Sort, Insertion Sort, Linear Search,
+Binary Search, BST Insert, BST Search, BFS, DFS, Fibonacci DP, and N-Queens.
+Enable it within the visualizer before starting a run:
 
 ```text
 Run visualization → pause at a learning checkpoint → predict the next step
@@ -41,8 +42,14 @@ let you revisit earlier steps without earning points again.
 Accuracy counts submitted answers only. Skipping awards no points and resets the
 current streak. Restart/Replay starts a fresh learning session; pausing preserves
 it. Turning Learning mode off keeps your score, but checkpoints passed with the
-mode off cannot subsequently earn points. All progress stays in memory for the
-current run. Other algorithms continue to support normal visualization.
+mode off cannot subsequently earn points. Other algorithms continue to support
+normal visualization.
+
+Progress within a run stays in memory. When a session reaches the last step, its
+score becomes the algorithm's best score if it has more correct answers than the
+saved one, or the same number from fewer submitted answers. The panel shows the
+best score for the selected algorithm. Best scores are saved in the browser's
+`localStorage`; if storage is unavailable, they last until the page is reloaded.
 
 ## Supported Algorithms
 

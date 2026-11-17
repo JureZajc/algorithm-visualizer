@@ -1,20 +1,21 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
 import { useStepPlayback } from "@/hooks/use-step-playback";
-import type { LearningStep } from "@/learning/types";
+import { BEST_SCORES_STORAGE_KEY, createBestScoreStore, type BestScoreStore } from "@/learning/best-scores";
+import type { LearningQuestion, LearningStep } from "@/learning/types";
 import { run } from "./learning-fixtures";
 
-function setup(name = "bubble", autoplay = false) {
+function setup(name = "bubble", autoplay = false, bestScores?: BestScoreStore) {
   vi.useFakeTimers();
   const sample = run(name);
-  const hook = renderHook(({ speed }) => useLearningPlayback<LearningStep>(speed, sample.algorithm), { initialProps: { speed: 100 } });
+  const hook = renderHook(({ speed }) => useLearningPlayback<LearningStep>(speed, sample.algorithm, bestScores), { initialProps: { speed: 100 } });
   act(() => { hook.result.current.learning.setEnabled(true); hook.result.current.load(sample.steps, autoplay, sample.context); });
   return { ...hook, sample };
 }
 
 describe("learning playback", () => {
-  it.each(["bubble", "binary_right", "bst_insert", "bst_search", "bfs", "fibonacci_8", "n_queens"])("stops before the revealing snapshot in %s", (name) => {
+  it.each(["bubble", "selection", "insertion", "linear_found", "binary_right", "bst_insert", "bst_search", "bfs", "dfs", "fibonacci_8", "n_queens"])("stops before the revealing snapshot in %s", (name) => {
     const { result, sample } = setup(name);
     act(() => result.current.jumpToEnd());
     const checkpoint = result.current.learning.activeQuestion!;
@@ -204,5 +205,52 @@ describe("learning playback", () => {
     expect(unsupported.result.current.currentStepIndex).toBe(1);
     expect(unsupported.result.current.learning.enabled).toBe(false);
     expect(unsupported.result.current.learning.activeQuestion).toBeNull();
+  });
+});
+
+describe("learning best score", () => {
+  beforeEach(() => localStorage.clear());
+
+  function finish(result: ReturnType<typeof setup>["result"], choose: (question: LearningQuestion) => number) {
+    for (let attempts = 0; attempts < 12 && !result.current.learning.isComplete; attempts++) {
+      act(() => result.current.jumpToEnd());
+      const question = result.current.learning.activeQuestion;
+      if (!question) continue;
+      act(() => result.current.learning.submit(choose(question)));
+      act(() => result.current.learning.continuePlayback());
+    }
+    expect(result.current.learning.isComplete).toBe(true);
+  }
+
+  it("saves a finished session's score and keeps the best one", () => {
+    const { result } = setup();
+    act(() => result.current.next());
+    act(() => result.current.learning.submit(result.current.learning.activeQuestion!.correctChoice));
+    expect(result.current.learning.bestScore).toBeNull();
+    act(() => result.current.learning.continuePlayback());
+    finish(result, (question) => question.correctChoice);
+    const total = result.current.learning.session.questions.length;
+    expect(result.current.learning.bestScore).toEqual({ correct: total, answered: total });
+    expect(JSON.parse(localStorage.getItem(BEST_SCORES_STORAGE_KEY)!)).toEqual({ bubble_sort: { correct: total, answered: total } });
+    act(() => result.current.restart());
+    finish(result, (question) => (question.correctChoice + 1) % question.choices.length);
+    expect(result.current.learning.session.correct).toBe(0);
+    expect(result.current.learning.bestScore).toEqual({ correct: total, answered: total });
+  });
+
+  it("reads saved best scores per algorithm on a new page load", () => {
+    localStorage.setItem(BEST_SCORES_STORAGE_KEY, JSON.stringify({ bubble_sort: { correct: 3, answered: 4 } }));
+    expect(renderHook(() => useLearningPlayback<LearningStep>(100, "bubble_sort")).result.current.learning.bestScore).toEqual({ correct: 3, answered: 4 });
+    expect(renderHook(() => useLearningPlayback<LearningStep>(100, "selection_sort")).result.current.learning.bestScore).toBeNull();
+  });
+
+  it("keeps the best score in memory when storage is unavailable", () => {
+    const store = createBestScoreStore(() => { throw new DOMException("Storage is disabled.", "SecurityError"); });
+    const { result } = setup("selection", false, store);
+    expect(result.current.learning.bestScore).toBeNull();
+    finish(result, (question) => question.correctChoice);
+    const total = result.current.learning.session.questions.length;
+    expect(result.current.learning.bestScore).toEqual({ correct: total, answered: total });
+    expect(localStorage.getItem(BEST_SCORES_STORAGE_KEY)).toBeNull();
   });
 });
