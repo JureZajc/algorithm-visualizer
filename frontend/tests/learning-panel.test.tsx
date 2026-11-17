@@ -1,13 +1,14 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { LearningPanel } from "@/components/learning-panel";
 import { StepControls } from "@/components/step-controls";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
+import { BEST_SCORES_STORAGE_KEY, createBestScoreStore, type BestScoreStore } from "@/learning/best-scores";
 import type { LearningStep } from "@/learning/types";
 import { run } from "./learning-fixtures";
 
-function Harness({ algorithm = "bubble_sort" }: { algorithm?: string }) {
-  const playback = useLearningPlayback<LearningStep>(100, algorithm);
+function Harness({ algorithm = "bubble_sort", bestScores }: { algorithm?: string; bestScores?: BestScoreStore }) {
+  const playback = useLearningPlayback<LearningStep>(100, algorithm, bestScores);
   const sample = run("bubble");
   return <>
     <button onClick={() => playback.load(sample.steps, false)}>Load run</button>
@@ -28,6 +29,8 @@ function openQuestion() {
 }
 
 describe("learning panel", () => {
+  beforeEach(() => localStorage.clear());
+
   it("shows a focused, labeled radio group and blocks forward controls", () => {
     openQuestion();
     expect(document.activeElement).toBe(screen.getByRole("heading", { name: "What happens next?" }));
@@ -92,5 +95,35 @@ describe("learning panel", () => {
     act(() => fireEvent.click(screen.getByRole("checkbox", { name: "Learning mode" })));
     expect(screen.queryByRole("heading", { name: "What happens next?" })).toBeNull();
     expect((screen.getByRole("button", { name: "Next step" }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("shows the best score saved for the selected algorithm", () => {
+    localStorage.setItem(BEST_SCORES_STORAGE_KEY, JSON.stringify({ bubble_sort: { correct: 5, answered: 6 } }));
+    const { unmount } = render(<Harness />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Learning mode" }));
+    expect(screen.getByText("Best score: 5 / 6")).toBeTruthy();
+    unmount();
+    render(<Harness algorithm="selection_sort" />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Learning mode" }));
+    expect(screen.getByText("Best score: —")).toBeTruthy();
+  });
+
+  it("shows a finished session as the best score when storage is unavailable", () => {
+    const bestScores = createBestScoreStore(() => { throw new DOMException("Storage is disabled.", "SecurityError"); });
+    render(<Harness bestScores={bestScores} />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Learning mode" }));
+    fireEvent.click(screen.getByRole("button", { name: "Load run" }));
+    expect(screen.getByText("Best score: —")).toBeTruthy();
+    for (let i = 0; i < 12 && !screen.queryByRole("heading", { name: "Learning session complete" }); i++) {
+      fireEvent.click(screen.getByRole("button", { name: "Jump to last step" }));
+      if (screen.queryByRole("button", { name: "Submit answer" })) {
+        fireEvent.click(screen.getAllByRole("radio")[0]);
+        fireEvent.submit(screen.getByRole("button", { name: "Submit answer" }).closest("form")!);
+        fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+      }
+    }
+    expect(screen.getByRole("heading", { name: "Learning session complete" })).toBeTruthy();
+    const score = screen.getByText(/^Score: /).textContent!.replace("Score: ", "");
+    expect(screen.getByText(`Best score: ${score}`)).toBeTruthy();
   });
 });

@@ -1,5 +1,5 @@
 import { Alert, Panel } from "@/components/ui-primitives";
-import type { AlgorithmMetadata } from "@/types/algorithm";
+import type { AlgorithmCategory, AlgorithmMetadata } from "@/types/algorithm";
 
 interface AlgorithmMetadataPanelProps {
   algorithmId: string;
@@ -14,12 +14,27 @@ const complexityLabels = [
   ["Worst time", "worst"],
 ] as const;
 
+const categoryLabels: Record<AlgorithmCategory, string> = {
+  sorting: "Sorting",
+  searching: "Searching",
+  graph: "Graph / Pathfinding",
+  dynamic_programming: "Dynamic Programming",
+  backtracking: "Backtracking",
+  trees: "Trees",
+  hash_tables: "Hash Tables",
+};
+
+export function formatCategory(category: string) {
+  return categoryLabels[category as AlgorithmCategory] ?? category.replaceAll("_", " ");
+}
+
 export function AlgorithmMetadataPanel(props: AlgorithmMetadataPanelProps) {
   const metadata = props.algorithms.find((item) => item.id === props.algorithmId);
 
   if (props.isLoading) {
     return (
-      <Panel className="mb-5 p-5" variant="subtle" aria-live="polite" aria-label="Loading algorithm details">
+      <Panel className="mb-5 p-5" variant="subtle" role="status">
+        <span className="sr-only">Loading algorithm details</span>
         <div className="mb-3 h-4 w-28 animate-pulse rounded bg-slate-200" />
         <div className="mb-2 h-6 w-52 animate-pulse rounded bg-slate-200" />
         <div className="h-4 max-w-2xl animate-pulse rounded bg-slate-100" />
@@ -40,7 +55,7 @@ export function AlgorithmMetadataPanel(props: AlgorithmMetadataPanelProps) {
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">
           <span className="mb-2 inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-indigo-700">
-            {metadata.category}
+            {formatCategory(metadata.category)}
           </span>
           <h2 id={`metadata-${metadata.id}`} className="mb-1 text-xl font-extrabold tracking-normal text-slate-950">Algorithm overview</h2>
           <h3 className="mb-1 text-lg font-extrabold tracking-normal text-slate-900">{metadata.name}</h3>

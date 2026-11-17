@@ -13,6 +13,7 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 ## Features
 
 - Follow an algorithm automatically or move one step at a time with play, pause, previous, next, first, last, restart, reset, seek, and speed controls.
+- Control playback from the keyboard: Space plays or pauses, Left and Right step, and Home and End jump to the first and last step. Screen readers hear steps you move to, pauses, and completion rather than every autoplay frame, and animations stop when the system asks for reduced motion.
 - Enable Learning mode to predict algorithm behavior before selected execution steps, receive feedback, and track your score and streak.
 - See the active pseudocode line, current operation, progress, elapsed time, result, and algorithm-specific state together.
 - Review descriptions, best/average/worst time complexity, space complexity, and implementation notes for every algorithm.
@@ -24,8 +25,9 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 
 ### Interactive learning
 
-Learning mode supports Bubble Sort, Binary Search, BST Insert, BST Search, BFS,
-Fibonacci DP, and N-Queens. Enable it within the visualizer before starting a run:
+Learning mode supports Bubble Sort, Selection Sort, Insertion Sort, Linear Search,
+Binary Search, BST Insert, BST Search, BFS, DFS, Fibonacci DP, and N-Queens.
+Enable it within the visualizer before starting a run:
 
 ```text
 Run visualization → pause at a learning checkpoint → predict the next step
@@ -40,8 +42,14 @@ let you revisit earlier steps without earning points again.
 Accuracy counts submitted answers only. Skipping awards no points and resets the
 current streak. Restart/Replay starts a fresh learning session; pausing preserves
 it. Turning Learning mode off keeps your score, but checkpoints passed with the
-mode off cannot subsequently earn points. All progress stays in memory for the
-current run. Other algorithms continue to support normal visualization.
+mode off cannot subsequently earn points. Other algorithms continue to support
+normal visualization.
+
+Progress within a run stays in memory. When a session reaches the last step, its
+score becomes the algorithm's best score if it has more correct answers than the
+saved one, or the same number from fewer submitted answers. The panel shows the
+best score for the selected algorithm. Best scores are saved in the browser's
+`localStorage`; if storage is unavailable, they last until the page is reloaded.
 
 ## Supported Algorithms
 
@@ -200,13 +208,13 @@ Validate with the dependencies already installed:
 python scripts/dev.py check
 ```
 
-This runs Ruff for the backend and development helper, pytest (including development workflow tests), then ESLint, frontend tests, and a production build. To synchronize both projects from their lockfiles before running the same checks, use:
+This runs Ruff for the backend and development helper, mypy for the backend application code, pytest (including development workflow tests), then ESLint, frontend tests, and a production build. To synchronize both projects from their lockfiles before running the same checks, use:
 
 ```bash
 python scripts/dev.py check-clean
 ```
 
-CI runs Ruff and pytest for the backend plus frontend tests and a production build on pushes and pull requests to `master`; the local `check` command additionally runs ESLint.
+CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (22). A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
 
 ## API
 

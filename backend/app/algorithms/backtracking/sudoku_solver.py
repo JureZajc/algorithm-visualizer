@@ -3,6 +3,7 @@ from app.algorithms.backtracking.types import (
     BacktrackingStep,
     BacktrackingStepType,
     GridPosition,
+    SudokuRun,
     create_backtracking_step,
 )
 
@@ -14,15 +15,17 @@ SudokuBoard = list[list[str]]
 BOARD_SIZE = 9
 BOX_SIZE = 3
 DIGITS = tuple(str(value) for value in range(1, 10))
-# Bounds brute-force search on adversarial puzzles; the default board needs ~80k.
-MAX_SUDOKU_STEPS = 100_000
+# Each step snapshots the board, so this also caps the response at a few MB.
+# Brute force on harder puzzles needs far more steps and is rejected.
+MAX_SUDOKU_STEPS = 10_000
 
+# Solved by brute force in 1,434 steps, including 51 backtracks.
 DEFAULT_SUDOKU_BOARD: SudokuInputBoard = [
-    ["5", "3", ".", ".", "7", ".", ".", ".", "."],
-    ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+    ["5", "3", ".", ".", "7", ".", ".", "1", "."],
+    ["6", ".", ".", "1", "9", "5", ".", "4", "."],
     [".", "9", "8", ".", ".", ".", ".", "6", "."],
-    ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
-    ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+    ["8", ".", ".", ".", "6", "1", ".", ".", "3"],
+    ["4", "2", ".", "8", ".", "3", ".", ".", "1"],
     ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
     [".", "6", ".", ".", ".", ".", "2", "8", "."],
     [".", ".", ".", "4", "1", "9", ".", ".", "5"],
@@ -30,17 +33,30 @@ DEFAULT_SUDOKU_BOARD: SudokuInputBoard = [
 ]
 
 
+def sudoku_run(board: SudokuInputBoard | None = None) -> SudokuRun:
+    """Return the board data that stays the same for every step of a run."""
+
+    initial_board = normalize_sudoku_board(board or DEFAULT_SUDOKU_BOARD)
+    _validate_givens(initial_board)
+    return {
+        "initial_board": initial_board,
+        "fixed_cells": _fixed_cells(initial_board),
+    }
+
+
 def sudoku_solver_steps(
     board: SudokuInputBoard | None = None,
     max_steps: int | None = MAX_SUDOKU_STEPS,
 ) -> list[BacktrackingStep]:
-    """Solve a 9x9 Sudoku puzzle with classic recursive backtracking."""
+    """Solve a 9x9 Sudoku puzzle with classic recursive backtracking.
 
-    initial_board = normalize_sudoku_board(board or DEFAULT_SUDOKU_BOARD)
-    _validate_givens(initial_board)
+    Steps leave out the initial board and the fixed cells; `sudoku_run`
+    returns them once for the whole run.
+    """
 
-    working_board = [row.copy() for row in initial_board]
-    fixed_cells = _fixed_cells(initial_board)
+    run = sudoku_run(board)
+    working_board = [row.copy() for row in run["initial_board"]]
+    fixed_cells = run["fixed_cells"]
     steps: list[BacktrackingStep] = []
 
     def add_step(step: BacktrackingStep) -> None:
@@ -54,8 +70,6 @@ def sudoku_solver_steps(
         _create_sudoku_step(
             "try",
             working_board,
-            initial_board,
-            fixed_cells,
             "Start with the submitted Sudoku puzzle.",
             pseudocode_line=1,
         )
@@ -72,8 +86,6 @@ def sudoku_solver_steps(
                 _create_sudoku_step(
                     "solution_found",
                     working_board,
-                    initial_board,
-                    fixed_cells,
                     "Every cell is filled without conflicts.",
                     active_cell=(BOARD_SIZE - 1, BOARD_SIZE - 1),
                     related_cells=fixed_cells,
@@ -92,8 +104,6 @@ def sudoku_solver_steps(
                 _create_sudoku_step(
                     "try",
                     working_board,
-                    initial_board,
-                    fixed_cells,
                     f"Try {digit} at row {row + 1}, column {column + 1}.",
                     active_cell=empty_cell,
                     related_cells=related_cells,
@@ -108,8 +118,6 @@ def sudoku_solver_steps(
                     _create_sudoku_step(
                         "dead_end",
                         working_board,
-                        initial_board,
-                        fixed_cells,
                         f"{digit} conflicts with an existing value.",
                         active_cell=empty_cell,
                         related_cells=conflicts,
@@ -125,8 +133,6 @@ def sudoku_solver_steps(
                 _create_sudoku_step(
                     "place",
                     working_board,
-                    initial_board,
-                    fixed_cells,
                     f"Place {digit} at row {row + 1}, column {column + 1}.",
                     active_cell=empty_cell,
                     related_cells=_peer_cells(row, column),
@@ -143,8 +149,6 @@ def sudoku_solver_steps(
                 _create_sudoku_step(
                     "remove",
                     working_board,
-                    initial_board,
-                    fixed_cells,
                     f"Remove {digit} from row {row + 1}, column {column + 1}.",
                     active_cell=empty_cell,
                     related_cells=_peer_cells(row, column),
@@ -160,8 +164,6 @@ def sudoku_solver_steps(
         _create_sudoku_step(
             "done",
             solution if solved else working_board,
-            initial_board,
-            fixed_cells,
             "Sudoku puzzle solved." if solved else "No solution exists for this puzzle.",
             active_cell=None,
             related_cells=fixed_cells if solved else [],
@@ -297,8 +299,6 @@ def _fixed_cells(board: SudokuBoard) -> list[GridPosition]:
 def _create_sudoku_step(
     step_type: BacktrackingStepType,
     board: SudokuBoard,
-    initial_board: SudokuBoard,
-    fixed_cells: list[GridPosition],
     description: str,
     *,
     active_cell: GridPosition | None = None,
@@ -309,12 +309,10 @@ def _create_sudoku_step(
     solved: bool = False,
     solution: SudokuBoard | None = None,
 ) -> BacktrackingStep:
+    # The step's grid already holds the board, so the result does not repeat it.
     result: BacktrackingResult = {
         "solved": solved,
-        "board": [row.copy() for row in board],
-        "initial_board": [row.copy() for row in initial_board],
         "solution": [row.copy() for row in solution] if solution else [],
-        "fixed_cells": [list(position) for position in fixed_cells],
         "tried_value": tried_value,
         "conflicts": [list(position) for position in conflicts or []],
     }

@@ -4,13 +4,18 @@ from typing import Annotated
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel, Field, FiniteFloat, model_validator
 
 from app.algorithms.backtracking import BACKTRACKING_ALGORITHMS
-from app.algorithms.backtracking.sudoku_solver import DEFAULT_SUDOKU_BOARD
+from app.algorithms.backtracking.sudoku_solver import (
+    DEFAULT_SUDOKU_BOARD,
+    sudoku_run,
+)
 from app.algorithms.backtracking.types import (
     BacktrackingAlgorithm,
     BacktrackingStep,
+    GridPosition,
     MazePreset,
 )
 from app.algorithms.dynamic_programming import DYNAMIC_PROGRAMMING_ALGORITHMS
@@ -69,6 +74,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Step responses repeat a lot of structure and compress well; level 5 keeps
+# most of the gain of level 9 at a lower CPU cost.
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
 
 
 # Step responses snapshot the full state per step, so inputs stay small.
@@ -358,6 +366,9 @@ class BacktrackingResponse(BaseModel):
     input: dict[str, object]
     steps: list[BacktrackingStep]
     step_count: int
+    # Sudoku only, and null otherwise: data that every step shares, sent once.
+    initial_board: list[list[str]] | None = None
+    fixed_cells: list[GridPosition] | None = None
 
 
 class TreeRequest(BaseModel):
@@ -704,6 +715,7 @@ def backtracking_steps(request: BacktrackingRequest) -> BacktrackingResponse:
 
     try:
         steps = BACKTRACKING_ALGORITHMS[request.algorithm](**algorithm_input)
+        run = sudoku_run(request.board) if request.algorithm == "sudoku_solver" else None
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
@@ -712,6 +724,8 @@ def backtracking_steps(request: BacktrackingRequest) -> BacktrackingResponse:
         input=algorithm_input,
         steps=steps,
         step_count=len(steps),
+        initial_board=run["initial_board"] if run else None,
+        fixed_cells=run["fixed_cells"] if run else None,
     )
 
 

@@ -1,4 +1,5 @@
-import { Button, StatusBadge } from "@/components/ui-primitives";
+import { Button, ScreenReaderStatus, StatusBadge } from "@/components/ui-primitives";
+import { usePlaybackShortcuts, type PlaybackShortcut } from "@/hooks/use-playback-shortcuts";
 
 interface StepControlsProps {
   currentStepIndex: number;
@@ -21,6 +22,9 @@ export function StepControls(props: StepControlsProps) {
   const isAtEnd = !hasSteps || props.currentStepIndex >= props.totalSteps - 1;
   const displayedStep = hasSteps ? props.currentStepIndex + 1 : 0;
   const controlsDisabled = props.isLoading || !hasSteps;
+  const canGoBack = !controlsDisabled && !isAtStart;
+  const canGoForward = !controlsDisabled && !isAtEnd && !props.learningBlocked;
+  const canTogglePlayback = !controlsDisabled && !props.learningBlocked;
   const statusVariant = props.isLoading
     ? "loading"
     : !hasSteps
@@ -40,6 +44,16 @@ export function StepControls(props: StepControlsProps) {
           ? "Complete"
           : "Paused";
   const playLabel = props.isPlaying ? "Pause" : hasSteps && isAtEnd ? "Replay" : props.currentStepIndex <= 0 ? "Play" : "Resume";
+  const onPlayButton = isAtEnd && !props.isPlaying ? props.onRestart : props.onTogglePlayback;
+  const shortcutActions: Record<PlaybackShortcut, (() => void) | null> = {
+    toggle: onPlayButton,
+    previous: canGoBack ? props.onPrevious : null,
+    next: canGoForward ? props.onNext : null,
+    first: canGoBack ? props.onJumpToStart : null,
+    last: canGoForward ? props.onJumpToEnd : null,
+  };
+
+  usePlaybackShortcuts(canTogglePlayback, (shortcut) => shortcutActions[shortcut]?.());
 
   return (
     <div className="grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3 md:grid-cols-[auto_minmax(12rem,1fr)] md:items-center">
@@ -49,7 +63,7 @@ export function StepControls(props: StepControlsProps) {
           className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
           aria-label="Jump to first step"
-          disabled={controlsDisabled || isAtStart}
+          disabled={!canGoBack}
           onClick={props.onJumpToStart}
         >
           First
@@ -59,7 +73,7 @@ export function StepControls(props: StepControlsProps) {
           className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
           aria-label="Previous step"
-          disabled={controlsDisabled || isAtStart}
+          disabled={!canGoBack}
           onClick={props.onPrevious}
         >
           Prev
@@ -70,8 +84,8 @@ export function StepControls(props: StepControlsProps) {
           variant="soft"
           type="button"
           aria-label={playLabel === "Replay" ? "Replay loaded steps" : playLabel === "Resume" ? "Resume playback" : `${playLabel} playback`}
-          disabled={controlsDisabled || props.learningBlocked}
-          onClick={isAtEnd && !props.isPlaying ? props.onRestart : props.onTogglePlayback}
+          disabled={!canTogglePlayback}
+          onClick={onPlayButton}
         >
           {playLabel}
         </Button>
@@ -80,7 +94,7 @@ export function StepControls(props: StepControlsProps) {
           className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
           aria-label="Next step"
-          disabled={controlsDisabled || isAtEnd || props.learningBlocked}
+          disabled={!canGoForward}
           onClick={props.onNext}
         >
           Next
@@ -90,7 +104,7 @@ export function StepControls(props: StepControlsProps) {
           className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
           aria-label="Jump to last step"
-          disabled={controlsDisabled || isAtEnd || props.learningBlocked}
+          disabled={!canGoForward}
           onClick={props.onJumpToEnd}
         >
           Last
@@ -101,9 +115,11 @@ export function StepControls(props: StepControlsProps) {
         <span className="flex flex-wrap items-center justify-between gap-2">
           <span className="inline-flex min-w-0 flex-wrap items-center gap-2">
             Choose a step
-            <StatusBadge label={statusLabel} variant={statusVariant} />
+            <span className="inline-flex" role="status">
+              <StatusBadge label={statusLabel} variant={statusVariant} />
+            </span>
           </span>
-          <span className="min-w-0 max-w-full break-all text-right font-mono text-sm text-indigo-600" aria-live="polite">
+          <span className="min-w-0 max-w-full break-all text-right font-mono text-sm text-indigo-600">
             Step {displayedStep} / {props.totalSteps}
           </span>
         </span>
@@ -119,6 +135,10 @@ export function StepControls(props: StepControlsProps) {
           onChange={(event) => props.onSeek(Number(event.target.value))}
         />
       </label>
+      {/* Announce the step after a manual move, a pause, or completion; stay quiet on autoplay ticks. */}
+      <ScreenReaderStatus silent={!hasSteps || props.isLoading || props.isPlaying}>
+        {`Step ${displayedStep} of ${props.totalSteps}`}
+      </ScreenReaderStatus>
     </div>
   );
 }

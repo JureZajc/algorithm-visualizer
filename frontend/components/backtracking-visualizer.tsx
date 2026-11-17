@@ -16,6 +16,7 @@ import { LearningPanel } from "@/components/learning-panel";
 import { fetchBacktrackingSteps } from "@/lib/api";
 import {
   BACKTRACKING_PRESETS,
+  DEFAULT_SUDOKU_BOARD,
   type BacktrackingPreset,
 } from "@/lib/backtracking-presets";
 import type { MetadataSourceProps } from "@/types/algorithm";
@@ -32,6 +33,7 @@ import {
   type MazeTool,
   type SudokuBoard,
   type SudokuCell,
+  type SudokuRun,
 } from "@/types/backtracking";
 
 interface BacktrackingForm {
@@ -81,18 +83,6 @@ const selectedToolClasses: Record<MazeTool, string> = {
   start: "border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-100",
   end: "border-rose-600 bg-rose-600 text-white shadow-lg shadow-rose-100",
 };
-
-const DEFAULT_SUDOKU_BOARD: SudokuBoard = [
-  ["5", "3", ".", ".", "7", ".", ".", ".", "."],
-  ["6", ".", ".", "1", "9", "5", ".", ".", "."],
-  [".", "9", "8", ".", ".", ".", ".", "6", "."],
-  ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
-  ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
-  ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
-  [".", "6", ".", ".", ".", ".", "2", "8", "."],
-  [".", ".", ".", "4", "1", "9", ".", ".", "5"],
-  [".", ".", ".", ".", "8", ".", ".", "7", "9"],
-];
 
 function parseInteger(rawValue: string, label: string) {
   const value = Number(rawValue.trim());
@@ -403,7 +393,7 @@ function describeResult(
     return `${result.count} subsets`;
   }
 
-  if (algorithm === "sudoku_solver" && "fixed_cells" in result) {
+  if (algorithm === "sudoku_solver" && "conflicts" in result) {
     return result.solved ? "Solved puzzle" : "No solution";
   }
 
@@ -426,6 +416,8 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [controlMessage, setControlMessage] = useState<string | null>(null);
+  // Playback holds only the steps; run-level Sudoku data is kept here.
+  const [sudokuRun, setSudokuRun] = useState<SudokuRun | null>(null);
   const playback = useLearningPlayback<BacktrackingStep>(speed, algorithm);
   const currentStep = playback.currentStep;
   const availablePresets = BACKTRACKING_PRESETS.filter(
@@ -610,6 +602,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
 
     setError(null);
     setIsLoading(true);
+    setSudokuRun(null);
     playback.reset();
     try {
       const request = createRequest(
@@ -618,7 +611,15 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
         algorithm === "maze_solver" ? mazeGrid : undefined,
         algorithm === "sudoku_solver" ? sudokuBoard : undefined,
       );
-      playback.load((await fetchBacktrackingSteps(request)).steps);
+      const response = await fetchBacktrackingSteps(request);
+      const initialBoard = response.initial_board ?? null;
+      const fixedCells = response.fixed_cells ?? null;
+      setSudokuRun(
+        initialBoard && fixedCells
+          ? { initial_board: initialBoard, fixed_cells: fixedCells }
+          : null,
+      );
+      playback.load(response.steps);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Could not load backtracking steps.");
     } finally {
@@ -819,12 +820,14 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
             <BacktrackingListVisualizer
               algorithm={algorithm}
               values={listValues}
-              step={currentStep}
+              steps={playback.steps}
+              stepIndex={playback.currentStepIndex}
             />
           ) : algorithm === "sudoku_solver" ? (
             <SudokuGrid
               board={sudokuBoard}
               step={currentStep}
+              run={sudokuRun}
               editingDisabled={editingDisabled || playback.steps.length > 0}
               onCellChange={editSudokuCell}
             />

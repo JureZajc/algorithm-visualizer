@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { useStepPlayback, type PlaybackGuard } from "@/hooks/use-step-playback";
+import { bestScoreStore, type BestScoreStore } from "@/learning/best-scores";
 import { selectCheckpoints } from "@/learning/checkpoint-selector";
 import { generateQuestions, supportsLearning } from "@/learning/question-generator";
 import { createSession, sessionAccuracy, sessionReducer, type SessionAction } from "@/learning/session";
 import type { LearningRunContext, LearningStep } from "@/learning/types";
 
-export function useLearningPlayback<T extends LearningStep>(speed: number, algorithm: string) {
+export function useLearningPlayback<T extends LearningStep>(speed: number, algorithm: string, bestScores: BestScoreStore = bestScoreStore) {
   const [enabled, setEnabledState] = useState(false);
   const enabledRef = useRef(false);
   const [session, setSession] = useState(createSession);
@@ -83,6 +84,17 @@ export function useLearningPlayback<T extends LearningStep>(speed: number, algor
 
   const activeQuestion = session.questions.find((question) => question.id === session.activeId) ?? null;
   const blocked = enabled && supported && activeQuestion !== null;
+  const isComplete = enabled && supported && playback.isComplete && !activeQuestion;
+  // The server render has no storage, so saved scores appear after hydration.
+  const bestScore = useSyncExternalStore(bestScores.subscribe, () => bestScores.get(algorithm), () => null);
+
+  // Only a finished session counts toward the best score.
+  useEffect(() => {
+    const runAlgorithm = runAlgorithmRef.current;
+    if (!isComplete || !runAlgorithm) return;
+    bestScores.record(runAlgorithm, { correct: sessionRef.current.correct, answered: sessionRef.current.answered });
+  }, [bestScores, isComplete]);
+
   return {
     ...playback,
     load, reset, restart,
@@ -96,7 +108,8 @@ export function useLearningPlayback<T extends LearningStep>(speed: number, algor
       activeQuestion,
       outcome: activeQuestion ? session.outcomes[activeQuestion.id] : undefined,
       accuracy: sessionAccuracy(session),
-      isComplete: enabled && supported && playback.isComplete && !activeQuestion,
+      bestScore,
+      isComplete,
       setEnabled,
       submit: (choice: number) => {
         if (sessionRef.current.activeId) updateSession({ type: "answer", id: sessionRef.current.activeId, choice });

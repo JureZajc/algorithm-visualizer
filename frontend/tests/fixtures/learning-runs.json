@@ -6575,5 +6575,1751 @@
       }
     ],
     "context": {}
+  },
+  "selection": {
+    "algorithm": "selection_sort",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 3 and 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 1 and 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          3
+        ],
+        "array": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 1 and 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          4
+        ],
+        "array": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 1 and 5.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          5
+        ],
+        "array": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 1 and 2.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "swap",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Move the smallest remaining value to index 0.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 3 and 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          3
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 3 and 1.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          4
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 1 and 5.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          5
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 1 and 2.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "swap",
+        "indices": [
+          1,
+          3
+        ],
+        "array": [
+          1,
+          1,
+          4,
+          3,
+          5,
+          2
+        ],
+        "description": "Move the smallest remaining value to index 1.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2,
+          3
+        ],
+        "array": [
+          1,
+          1,
+          4,
+          3,
+          5,
+          2
+        ],
+        "description": "Compare 4 and 3.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          4
+        ],
+        "array": [
+          1,
+          1,
+          4,
+          3,
+          5,
+          2
+        ],
+        "description": "Compare 3 and 5.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          5
+        ],
+        "array": [
+          1,
+          1,
+          4,
+          3,
+          5,
+          2
+        ],
+        "description": "Compare 3 and 2.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "swap",
+        "indices": [
+          2,
+          5
+        ],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          5,
+          4
+        ],
+        "description": "Move the smallest remaining value to index 2.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          4
+        ],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          5,
+          4
+        ],
+        "description": "Compare 3 and 5.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          5
+        ],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          5,
+          4
+        ],
+        "description": "Compare 3 and 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          4,
+          5
+        ],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          5,
+          4
+        ],
+        "description": "Compare 5 and 4.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "swap",
+        "indices": [
+          4,
+          5
+        ],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "description": "Move the smallest remaining value to index 4.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "description": "Selection sort is complete.",
+        "pseudocode_line": 6
+      }
+    ],
+    "context": {}
+  },
+  "selection_sorted": {
+    "algorithm": "selection_sort",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 1 and 2.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          2
+        ],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 1 and 3.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 2 and 3.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Selection sort is complete.",
+        "pseudocode_line": 6
+      }
+    ],
+    "context": {}
+  },
+  "insertion": {
+    "algorithm": "insertion_sort",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 3 with 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          1
+        ],
+        "array": [
+          3,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Shift 3 one position to the right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          0
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Insert 1 at index 0.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 3 with 4.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2,
+          3
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          1,
+          5,
+          2
+        ],
+        "description": "Compare 4 with 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          3
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          4,
+          5,
+          2
+        ],
+        "description": "Shift 4 one position to the right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          3,
+          4,
+          4,
+          5,
+          2
+        ],
+        "description": "Compare 3 with 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          2
+        ],
+        "array": [
+          1,
+          3,
+          3,
+          4,
+          5,
+          2
+        ],
+        "description": "Shift 3 one position to the right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          1,
+          3,
+          3,
+          4,
+          5,
+          2
+        ],
+        "description": "Compare 1 with 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          1
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          4,
+          5,
+          2
+        ],
+        "description": "Insert 1 at index 1.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          4
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          4,
+          5,
+          2
+        ],
+        "description": "Compare 4 with 5.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          4,
+          5
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          4,
+          5,
+          2
+        ],
+        "description": "Compare 5 with 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          5
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          4,
+          5,
+          5
+        ],
+        "description": "Shift 5 one position to the right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          3,
+          4
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          4,
+          5,
+          5
+        ],
+        "description": "Compare 4 with 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          4
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          4,
+          4,
+          5
+        ],
+        "description": "Shift 4 one position to the right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2,
+          3
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          4,
+          4,
+          5
+        ],
+        "description": "Compare 3 with 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          3
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          3,
+          4,
+          5
+        ],
+        "description": "Shift 3 one position to the right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          1,
+          3,
+          3,
+          4,
+          5
+        ],
+        "description": "Compare 1 with 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          2
+        ],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "description": "Insert 2 at index 2.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "description": "Insertion sort is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {}
+  },
+  "insertion_sorted": {
+    "algorithm": "insertion_sort",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 1 with 2.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Compare 2 with 3.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          2,
+          3
+        ],
+        "description": "Insertion sort is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {}
+  },
+  "insertion_duplicates": {
+    "algorithm": "insertion_sort",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0,
+          1
+        ],
+        "array": [
+          3,
+          1,
+          5,
+          5
+        ],
+        "description": "Compare 3 with 1.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          1
+        ],
+        "array": [
+          3,
+          3,
+          5,
+          5
+        ],
+        "description": "Shift 3 one position to the right.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "overwrite",
+        "indices": [
+          0
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          5
+        ],
+        "description": "Insert 1 at index 0.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1,
+          2
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          5
+        ],
+        "description": "Compare 3 with 5.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2,
+          3
+        ],
+        "array": [
+          1,
+          3,
+          5,
+          5
+        ],
+        "description": "Compare 5 with 5.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          1,
+          3,
+          5,
+          5
+        ],
+        "description": "Insertion sort is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {}
+  },
+  "linear_found": {
+    "algorithm": "linear_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0
+        ],
+        "array": [
+          5,
+          3,
+          8,
+          3
+        ],
+        "description": "Compare 5 with target 8.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1
+        ],
+        "array": [
+          5,
+          3,
+          8,
+          3
+        ],
+        "description": "Compare 3 with target 8.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2
+        ],
+        "array": [
+          5,
+          3,
+          8,
+          3
+        ],
+        "description": "Compare 8 with target 8.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "found",
+        "indices": [
+          2
+        ],
+        "array": [
+          5,
+          3,
+          8,
+          3
+        ],
+        "description": "Found 8 at index 2.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          5,
+          3,
+          8,
+          3
+        ],
+        "description": "Linear search is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {
+      "target": 8
+    }
+  },
+  "linear_first": {
+    "algorithm": "linear_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0
+        ],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Compare 5 with target 5.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "found",
+        "indices": [
+          0
+        ],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Found 5 at index 0.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Linear search is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {
+      "target": 5
+    }
+  },
+  "linear_absent": {
+    "algorithm": "linear_search",
+    "steps": [
+      {
+        "type": "compare",
+        "indices": [
+          0
+        ],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Compare 5 with target 4.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          1
+        ],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Compare 3 with target 4.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "compare",
+        "indices": [
+          2
+        ],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Compare 8 with target 4.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "not_found",
+        "indices": [],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Target 4 is not in the array.",
+        "pseudocode_line": 4
+      },
+      {
+        "type": "done",
+        "indices": [],
+        "array": [
+          5,
+          3,
+          8
+        ],
+        "description": "Linear search is complete.",
+        "pseudocode_line": 5
+      }
+    ],
+    "context": {
+      "target": 4
+    }
+  },
+  "dfs": {
+    "algorithm": "dfs",
+    "steps": [
+      {
+        "type": "push",
+        "current": "A",
+        "neighbor": null,
+        "edge": null,
+        "visited": [],
+        "frontier": [
+          "A"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Push start node A onto the stack.",
+        "pseudocode_line": 1
+      },
+      {
+        "type": "pop",
+        "current": "A",
+        "neighbor": null,
+        "edge": null,
+        "visited": [],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Pop A from the stack.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "A",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node A.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "inspect_edge",
+        "current": "A",
+        "neighbor": "C",
+        "edge": {
+          "source": "A",
+          "target": "C",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": null,
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from A to C.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "push",
+        "current": "A",
+        "neighbor": "C",
+        "edge": {
+          "source": "A",
+          "target": "C",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": "A",
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Push C onto the stack.",
+        "pseudocode_line": 6
+      },
+      {
+        "type": "inspect_edge",
+        "current": "A",
+        "neighbor": "B",
+        "edge": {
+          "source": "A",
+          "target": "B",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": "A",
+          "B": null,
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from A to B.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "push",
+        "current": "A",
+        "neighbor": "B",
+        "edge": {
+          "source": "A",
+          "target": "B",
+          "weight": 1
+        },
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "C",
+          "B"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Push B onto the stack.",
+        "pseudocode_line": 6
+      },
+      {
+        "type": "pop",
+        "current": "B",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Pop B from the stack.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "B",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node B.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "inspect_edge",
+        "current": "B",
+        "neighbor": "D",
+        "edge": {
+          "source": "B",
+          "target": "D",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": null,
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from B to D.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "push",
+        "current": "B",
+        "neighbor": "D",
+        "edge": {
+          "source": "B",
+          "target": "D",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C",
+          "D"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Push D onto the stack.",
+        "pseudocode_line": 6
+      },
+      {
+        "type": "inspect_edge",
+        "current": "B",
+        "neighbor": "A",
+        "edge": {
+          "source": "B",
+          "target": "A",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C",
+          "D"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from B to A.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "pop",
+        "current": "D",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Pop D from the stack.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "D",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "D"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node D.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "inspect_edge",
+        "current": "D",
+        "neighbor": "E",
+        "edge": {
+          "source": "D",
+          "target": "E",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B",
+          "D"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": null,
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from D to E.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "push",
+        "current": "D",
+        "neighbor": "E",
+        "edge": {
+          "source": "D",
+          "target": "E",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B",
+          "D"
+        ],
+        "frontier": [
+          "C",
+          "E"
+        ],
+        "distances": null,
+        "previous": {
+          "E": "D",
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Push E onto the stack.",
+        "pseudocode_line": 6
+      },
+      {
+        "type": "inspect_edge",
+        "current": "D",
+        "neighbor": "C",
+        "edge": {
+          "source": "D",
+          "target": "C",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B",
+          "D"
+        ],
+        "frontier": [
+          "C",
+          "E"
+        ],
+        "distances": null,
+        "previous": {
+          "E": "D",
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from D to C.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "inspect_edge",
+        "current": "D",
+        "neighbor": "B",
+        "edge": {
+          "source": "D",
+          "target": "B",
+          "weight": 1
+        },
+        "visited": [
+          "A",
+          "B",
+          "D"
+        ],
+        "frontier": [
+          "C",
+          "E"
+        ],
+        "distances": null,
+        "previous": {
+          "E": "D",
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Inspect edge from D to B.",
+        "pseudocode_line": 5
+      },
+      {
+        "type": "pop",
+        "current": "E",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "D"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": "D",
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Pop E from the stack.",
+        "pseudocode_line": 2
+      },
+      {
+        "type": "visit",
+        "current": "E",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "D",
+          "E"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": "D",
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Visit node E.",
+        "pseudocode_line": 3
+      },
+      {
+        "type": "path_found",
+        "current": "E",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "D",
+          "E"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": "D",
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [
+          "A",
+          "B",
+          "D",
+          "E"
+        ],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Found path: A -> B -> D -> E.",
+        "pseudocode_line": 7
+      },
+      {
+        "type": "done",
+        "current": "E",
+        "neighbor": null,
+        "edge": null,
+        "visited": [
+          "A",
+          "B",
+          "D",
+          "E"
+        ],
+        "frontier": [
+          "C"
+        ],
+        "distances": null,
+        "previous": {
+          "E": "D",
+          "D": "B",
+          "C": "A",
+          "B": "A",
+          "A": null
+        },
+        "path": [
+          "A",
+          "B",
+          "D",
+          "E"
+        ],
+        "result": [],
+        "frontier_edges": [],
+        "mst_edges": [],
+        "total_weight": null,
+        "description": "Depth-first search is complete.",
+        "pseudocode_line": 8
+      }
+    ],
+    "context": {
+      "nodes": [
+        "E",
+        "D",
+        "C",
+        "B",
+        "A"
+      ]
+    }
   }
 }

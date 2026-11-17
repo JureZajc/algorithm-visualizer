@@ -1,7 +1,9 @@
 from app.algorithms.hash_tables.types import (
     HashKey,
+    HashTableBucket,
     HashTableSnapshot,
     HashTableStep,
+    HashTableStepType,
     create_hash_table,
     create_hash_table_step,
 )
@@ -326,7 +328,7 @@ def hash_search_linear_probing_steps(
         bucket_index = (hash_index + offset) % table_size
         bucket = table["buckets"][bucket_index]
         visited.append(bucket_index)
-        step_type = "inspect_bucket" if offset == 0 else "probe"
+        step_type: HashTableStepType = "inspect_bucket" if offset == 0 else "probe"
         pseudocode_line = 2 if offset == 0 else 5
         description = (
             f"Inspect slot {bucket_index}."
@@ -477,7 +479,7 @@ def _build_linear_table(
     return table
 
 
-def _first_item(bucket: dict[str, object]) -> HashKey | None:
+def _first_item(bucket: HashTableBucket) -> HashKey | None:
     items = bucket["items"]
     if isinstance(items, list) and items:
         item = items[0]

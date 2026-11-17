@@ -17,7 +17,7 @@ def subsets_steps(values: list[str]) -> list[BacktrackingStep]:
             "try",
             items,
             partial,
-            generated,
+            len(generated),
             "Start with an empty subset.",
             depth=0,
             decision="start",
@@ -34,11 +34,12 @@ def subsets_steps(values: list[str]) -> list[BacktrackingStep]:
                     "solution_found",
                     items,
                     partial,
-                    generated,
+                    len(generated),
                     f"Record subset: {subset_label}.",
                     depth=index,
                     decision="record",
                     pseudocode_line=2,
+                    generated_item=partial,
                 )
             )
             return
@@ -49,7 +50,7 @@ def subsets_steps(values: list[str]) -> list[BacktrackingStep]:
                 "try",
                 items,
                 partial,
-                generated,
+                len(generated),
                 f"Decide whether to include {item!r}.",
                 depth=index,
                 active_item=item,
@@ -65,7 +66,7 @@ def subsets_steps(values: list[str]) -> list[BacktrackingStep]:
                 "choose",
                 items,
                 partial,
-                generated,
+                len(generated),
                 f"Include {item!r} in the current subset.",
                 depth=index + 1,
                 active_item=item,
@@ -82,7 +83,7 @@ def subsets_steps(values: list[str]) -> list[BacktrackingStep]:
                 "unchoose",
                 items,
                 partial,
-                generated,
+                len(generated),
                 f"Remove {removed!r} before exploring the exclude branch.",
                 depth=index,
                 active_item=removed,
@@ -97,7 +98,7 @@ def subsets_steps(values: list[str]) -> list[BacktrackingStep]:
                 "try",
                 items,
                 partial,
-                generated,
+                len(generated),
                 f"Exclude {item!r} and continue.",
                 depth=index + 1,
                 active_item=item,
@@ -129,7 +130,7 @@ def _create_list_step(
     step_type: BacktrackingStepType,
     values: list[str],
     partial: list[str],
-    generated: list[list[str]],
+    generated_count: int,
     description: str,
     *,
     depth: int,
@@ -137,7 +138,10 @@ def _create_list_step(
     pseudocode_line: int,
     active_item: str | None = None,
     active_index: int | None = None,
+    generated_item: list[str] | None = None,
 ) -> BacktrackingStep:
+    # Steps do not repeat the results found so far: a solution_found step
+    # carries the one result it adds, and clients rebuild the list from those.
     result: BacktrackingResult = {
         "values": values.copy(),
         "partial": partial.copy(),
@@ -145,9 +149,10 @@ def _create_list_step(
         "active_index": active_index,
         "depth": depth,
         "decision": decision,
-        "generated": [item.copy() for item in generated],
-        "generated_count": len(generated),
+        "generated_count": generated_count,
     }
+    if generated_item is not None:
+        result["generated_item"] = generated_item.copy()
     return create_backtracking_step(
         step_type,
         [],

@@ -18,7 +18,7 @@ def permutations_steps(values: list[str]) -> list[BacktrackingStep]:
             "try",
             items,
             partial,
-            generated,
+            len(generated),
             "Start with an empty permutation.",
             depth=0,
             pseudocode_line=1,
@@ -33,10 +33,11 @@ def permutations_steps(values: list[str]) -> list[BacktrackingStep]:
                     "solution_found",
                     items,
                     partial,
-                    generated,
+                    len(generated),
                     f"Completed permutation: {', '.join(partial)}.",
                     depth=depth,
                     pseudocode_line=2,
+                    generated_item=partial,
                 )
             )
             return
@@ -47,7 +48,7 @@ def permutations_steps(values: list[str]) -> list[BacktrackingStep]:
                     "try",
                     items,
                     partial,
-                    generated,
+                    len(generated),
                     f"Consider {item!r} for position {depth + 1}.",
                     depth=depth,
                     active_item=item,
@@ -66,7 +67,7 @@ def permutations_steps(values: list[str]) -> list[BacktrackingStep]:
                     "choose",
                     items,
                     partial,
-                    generated,
+                    len(generated),
                     f"Choose {item!r} for the current permutation.",
                     depth=depth + 1,
                     active_item=item,
@@ -85,7 +86,7 @@ def permutations_steps(values: list[str]) -> list[BacktrackingStep]:
                     "unchoose",
                     items,
                     partial,
-                    generated,
+                    len(generated),
                     f"Unchoose {removed!r} and try another option.",
                     depth=depth,
                     active_item=removed,
@@ -116,7 +117,7 @@ def _create_list_step(
     step_type: BacktrackingStepType,
     values: list[str],
     partial: list[str],
-    generated: list[list[str]],
+    generated_count: int,
     description: str,
     *,
     depth: int,
@@ -124,7 +125,10 @@ def _create_list_step(
     active_item: str | None = None,
     active_index: int | None = None,
     used: list[bool] | None = None,
+    generated_item: list[str] | None = None,
 ) -> BacktrackingStep:
+    # Steps do not repeat the results found so far: a solution_found step
+    # carries the one result it adds, and clients rebuild the list from those.
     result: BacktrackingResult = {
         "values": values.copy(),
         "partial": partial.copy(),
@@ -132,9 +136,10 @@ def _create_list_step(
         "active_index": active_index,
         "depth": depth,
         "used": used.copy() if used is not None else [],
-        "generated": [item.copy() for item in generated],
-        "generated_count": len(generated),
+        "generated_count": generated_count,
     }
+    if generated_item is not None:
+        result["generated_item"] = generated_item.copy()
     return create_backtracking_step(
         step_type,
         [],

@@ -98,6 +98,11 @@ def steps_for(command: str) -> tuple[Step, ...]:
         ("uv", "run", "--no-sync", "ruff", "check", ".", "../scripts"),
         BACKEND_DIRECTORY,
     )
+    backend_mypy = Step(
+        "Backend: running mypy",
+        ("uv", "run", "--no-sync", "mypy"),
+        BACKEND_DIRECTORY,
+    )
     backend_tests = Step(
         "Backend: running tests",
         ("uv", "run", "--no-sync", "pytest"),
@@ -133,7 +138,14 @@ def steps_for(command: str) -> tuple[Step, ...]:
             ),
         )
     if command == "check":
-        return (backend_ruff, backend_tests, frontend_lint, frontend_tests, frontend_build)
+        return (
+            backend_ruff,
+            backend_mypy,
+            backend_tests,
+            frontend_lint,
+            frontend_tests,
+            frontend_build,
+        )
     if command == "check-clean":
         return (
             Step(
@@ -142,6 +154,7 @@ def steps_for(command: str) -> tuple[Step, ...]:
                 BACKEND_DIRECTORY,
             ),
             backend_ruff,
+            backend_mypy,
             backend_tests,
             Step(
                 "Frontend: installing locked dependencies",
