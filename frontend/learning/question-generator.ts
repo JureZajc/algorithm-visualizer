@@ -1,7 +1,7 @@
-import { binarySearchQuestion, bubbleSortQuestion } from "./arrays";
+import { binarySearchQuestion, bubbleSortQuestion, insertionSortQuestion, linearSearchQuestion, selectionSortQuestion } from "./arrays";
 import { nQueensQuestion } from "./backtracking";
 import { fibonacciQuestion } from "./dynamic-programming";
-import { bfsQuestion } from "./graph";
+import { bfsQuestion, dfsQuestion } from "./graph";
 import { treeQuestion } from "./trees";
 import type { LearningQuestion, LearningRunContext, LearningStep } from "./types";
 
@@ -9,10 +9,14 @@ type Strategy = (steps: readonly LearningStep[], index: number, context: Learnin
 
 const strategies: Record<string, Strategy> = {
   bubble_sort: bubbleSortQuestion,
+  selection_sort: selectionSortQuestion,
+  insertion_sort: insertionSortQuestion,
+  linear_search: linearSearchQuestion,
   binary_search: binarySearchQuestion,
   bst_insert: (steps, index) => treeQuestion("bst_insert", steps, index),
   bst_search: (steps, index) => treeQuestion("bst_search", steps, index),
   bfs: bfsQuestion,
+  dfs: dfsQuestion,
   fibonacci: fibonacciQuestion,
   n_queens: nQueensQuestion,
 };

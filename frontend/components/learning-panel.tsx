@@ -27,6 +27,7 @@ export function LearningPanel({ learning, isLoading = false }: { learning: Learn
           <span>Streak: {learning.session.currentStreak}</span>
           <span>Best streak: {learning.session.bestStreak}</span>
           <span>Skipped: {learning.session.skipped}</span>
+          <span>Best score: {learning.bestScore ? `${learning.bestScore.correct} / ${learning.bestScore.answered}` : "—"}</span>
         </div>
         {learning.activeQuestion ? <QuestionPanel key={learning.activeQuestion.id} question={learning.activeQuestion} learning={learning} /> : null}
         {learning.isComplete ? <div className="mt-4 rounded-xl border border-indigo-200 bg-white p-4" role="status">

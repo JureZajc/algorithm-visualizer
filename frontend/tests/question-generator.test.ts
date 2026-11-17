@@ -21,7 +21,7 @@ describe("question generation", () => {
     }
   });
 
-  it.each(["bubble", "binary_right", "bst_insert", "bst_search", "bfs", "fibonacci_8", "n_queens"])("provides checkpoints for supported algorithm %s", (name) => {
+  it.each(["bubble", "selection", "insertion", "linear_found", "binary_right", "bst_insert", "bst_search", "bfs", "dfs", "fibonacci_8", "n_queens"])("provides checkpoints for supported algorithm %s", (name) => {
     const { algorithm, steps, context } = run(name);
     expect(selectCheckpoints(generateQuestions(algorithm, steps, context), steps.length).length).toBeGreaterThan(0);
   });
@@ -36,6 +36,82 @@ describe("question generation", () => {
     const sorted = run("bubble_sorted");
     expect(generateQuestions(sorted.algorithm, sorted.steps).at(-1)?.choices).toContain("Finish sorting");
     expect(generateQuestions(sorted.algorithm, sorted.steps).at(-1)?.correctChoice).toBe(2);
+  });
+
+  it.each(["selection", "insertion", "linear_found", "linear_absent", "dfs"])("derives %s questions from step state, not descriptions or pseudocode lines", (name) => {
+    const sample = run(name);
+    const expected = generateQuestions(sample.algorithm, sample.steps, sample.context);
+    for (const step of sample.steps) {
+      step.description = "unrelated text";
+      delete step.pseudocode_line;
+    }
+    expect(generateQuestions(sample.algorithm, sample.steps, sample.context)).toEqual(expected);
+  });
+
+  it("tracks the Selection Sort minimum, keeps the first of equal values, and places it without equal distractors", () => {
+    const sample = run("selection");
+    const questions = generateQuestions(sample.algorithm, sample.steps);
+    const candidates = questions.filter((item) => item.kind === "minimum-candidate");
+    expect(candidates.some((item) => item.correctChoice === 0)).toBe(true);
+    expect(candidates.some((item) => item.correctChoice === 1)).toBe(true);
+    const tie = candidates.find((item) => item.prompt.includes("minimum is 1 at index 1") && item.prompt.includes("1 at index 3"));
+    expect(tie?.choices[tie.correctChoice]).toBe("Index 1 (1)");
+    const placements = questions.filter((item) => item.kind === "place-minimum");
+    expect(placements.map((item) => item.stepIndex)).toEqual([5, 10, 14, 18]);
+    expect(placements[0].choices).toEqual(["3 at index 0", "1 at index 1", "4 at index 2", "2 at index 5"]);
+    expect(placements[0].correctChoice).toBe(1);
+    expect(placements.at(-1)?.choices).toEqual(["5 at index 4", "4 at index 5"]);
+    // A pass whose minimum is already in place ends without a swap, so it asks nothing.
+    expect(questions.some((item) => item.stepIndex === 17)).toBe(false);
+    const sorted = run("selection_sorted");
+    expect(generateQuestions(sorted.algorithm, sorted.steps).map((item) => item.kind)).toEqual(["minimum-candidate"]);
+  });
+
+  it("follows the value Insertion Sort is inserting across shifts", () => {
+    const sample = run("insertion");
+    const questions = generateQuestions(sample.algorithm, sample.steps);
+    const decisions = questions.filter((item) => item.kind === "shift-or-stop");
+    // After a shift, the inserted value's slot holds a copy of the shifted value.
+    expect(decisions.map((item) => item.prompt.split(":")[0])).toEqual(
+      ["Inserting 1", "Inserting 4", "Inserting 1", "Inserting 1", "Inserting 1", "Inserting 5", "Inserting 2", "Inserting 2", "Inserting 2", "Inserting 2"]);
+    expect(decisions.filter((item) => item.correctChoice === 0).map((item) => item.stepIndex)).toEqual([1, 5, 7, 12, 14, 16]);
+    const equal = decisions.find((item) => item.stepIndex === 9);
+    expect(equal?.prompt).toBe("Inserting 1: it was compared with 1 at index 0. What happens next?");
+    expect(equal?.choices[equal.correctChoice]).toBe("Stop shifting: 1 belongs at index 1");
+    expect(decisions.find((item) => item.stepIndex === 4)?.explanation).toContain("where it already is");
+    const nextValues = questions.filter((item) => item.kind === "next-value");
+    expect(nextValues.map((item) => [item.stepIndex, item.choices[item.correctChoice]])).toEqual([[3, "4 at index 2"], [10, "5 at index 4"]]);
+    const sorted = run("insertion_sorted");
+    expect(generateQuestions(sorted.algorithm, sorted.steps).map((item) => item.correctChoice)).toEqual([1, 1]);
+    // The second 5 would also be "5", so it is not offered next to the one being inserted.
+    const duplicates = run("insertion_duplicates");
+    const next = generateQuestions(duplicates.algorithm, duplicates.steps).find((item) => item.kind === "next-value");
+    expect(next?.choices).toEqual(["1 at index 0", "3 at index 1", "5 at index 2"]);
+    expect(next?.correctChoice).toBe(2);
+  });
+
+  it.each([["linear_found", [0, 0, 1]], ["linear_first", [1]], ["linear_absent", [0, 0, 2]]] as const)("predicts linear search actions for %s", (name, answers) => {
+    const sample = run(name);
+    const questions = generateQuestions(sample.algorithm, sample.steps, sample.context);
+    expect(questions.map((item) => item.correctChoice)).toEqual(answers);
+    expect(questions.every((item) => item.prompt.startsWith(`Target: ${sample.context.target}.`))).toBe(true);
+    expect(generateQuestions(sample.algorithm, sample.steps)).toEqual([]);
+  });
+
+  it("uses LIFO stack order for DFS and predicts which neighbors are pushed", () => {
+    const sample = run("dfs");
+    const questions = generateQuestions(sample.algorithm, sample.steps, sample.context);
+    const pops = questions.filter((item) => item.kind === "pop-node");
+    expect(pops.map((item) => item.choices[item.correctChoice])).toEqual(["Node A", "Node B"]);
+    // C sits below B on the stack: the node a queue would take is offered as a distractor.
+    expect(pops[1].choices).toContain("Node C");
+    const decisions = questions.filter((item) => item.kind === "push-decision");
+    expect(decisions.map((item) => item.choices[item.correctChoice].split(" ")[0])).toEqual(["Push", "Push", "Push", "Skip", "Push", "Skip", "Skip"]);
+    expect(decisions.find((item) => item.prompt.includes("D → C"))?.explanation).toContain("already on the stack");
+    expect(decisions.find((item) => item.prompt.includes("B → A"))?.explanation).toContain("already visited");
+    const withoutLabels = generateQuestions(sample.algorithm, sample.steps, { nodes: ["A"] });
+    expect(withoutLabels.some((item) => item.kind === "pop-node")).toBe(false);
+    expect(withoutLabels.filter((item) => item.kind === "push-decision")).toEqual(decisions);
   });
 
   it.each([['binary_right', 1], ['binary_left', 0], ['binary_found', 2], ['binary_absent', 3]] as const)("predicts search transitions for %s", (name, correct) => {
