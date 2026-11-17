@@ -11,7 +11,9 @@ import type {
 interface BacktrackingListVisualizerProps {
   algorithm: BacktrackingAlgorithm;
   values: string[];
-  step: BacktrackingStep | null;
+  steps: BacktrackingStep[];
+  /** Index of the shown step in `steps`, or -1 when no run is loaded. */
+  stepIndex: number;
 }
 
 const chipClasses = {
@@ -52,23 +54,41 @@ function formatResult(items: string[]) {
   return items.length ? items.join(", ") : "empty set";
 }
 
+/**
+ * Rebuild the results found up to and including `stepIndex`. Steps do not
+ * repeat the list; each `solution_found` step carries the one result it adds,
+ * so seeking to a step gives the same list as playing through to it.
+ */
+export function generatedResultsThrough(
+  steps: BacktrackingStep[],
+  stepIndex: number,
+): string[][] {
+  const generated: string[][] = [];
+  const lastIndex = Math.min(stepIndex, steps.length - 1);
+  for (let index = 0; index <= lastIndex; index += 1) {
+    const step = steps[index];
+    if (step.type === "solution_found" && isListState(step.result)) {
+      if (step.result.generated_item) generated.push(step.result.generated_item);
+    }
+  }
+  return generated;
+}
+
 export function BacktrackingListVisualizer({
   algorithm,
   values,
-  step,
+  steps,
+  stepIndex,
 }: BacktrackingListVisualizerProps) {
+  const step = steps[stepIndex] ?? null;
   const state = isListState(step?.result) ? step.result : null;
-  const finalPermutations = isPermutationsResult(step?.result)
-    ? step.result.permutations
-    : null;
-  const finalSubsets = isSubsetsResult(step?.result) ? step.result.subsets : null;
   const finalValues =
     isPermutationsResult(step?.result) || isSubsetsResult(step?.result)
       ? step.result.values
       : null;
   const displayValues = state?.values ?? finalValues ?? values;
   const partial = state?.partial ?? [];
-  const generated = state?.generated ?? finalPermutations ?? finalSubsets ?? [];
+  const generated = generatedResultsThrough(steps, stepIndex);
   const activeIndex = state?.active_index ?? null;
   const activeItem = state?.active_item ?? null;
   const used = state?.used ?? [];
@@ -104,7 +124,7 @@ export function BacktrackingListVisualizer({
       <div className="grid gap-3 sm:grid-cols-3">
         <Metric label="Depth">{depth}</Metric>
         <Metric label="Active item">{activeItem ?? "None"}</Metric>
-        <Metric label="Generated">{state?.generated_count ?? 0}</Metric>
+        <Metric label="Generated">{generated.length}</Metric>
       </div>
 
       {decision ? (

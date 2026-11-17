@@ -1,6 +1,7 @@
 from app.algorithms.dynamic_programming.types import (
     DynamicProgrammingCell,
     DynamicProgrammingStep,
+    DynamicProgrammingStepType,
     create_dynamic_programming_step,
 )
 
@@ -62,7 +63,7 @@ def coin_change_steps(coins: list[int], amount: int) -> list[DynamicProgrammingS
             )
             table[row][current_amount] = min(without_coin, with_coin)
             chose_coin = with_coin < without_coin
-            step_type = "choose" if chose_coin else "skip"
+            step_type: DynamicProgrammingStepType = "choose" if chose_coin else "skip"
             description = (
                 f"Use coin {coin}; {current_amount} needs {with_coin} coins."
                 if chose_coin

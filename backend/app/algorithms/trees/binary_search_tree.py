@@ -1,7 +1,9 @@
 from collections.abc import Callable
+from typing import Literal
 
 from app.algorithms.trees.types import (
     TreeNode,
+    TreeResult,
     TreeStep,
     TreeValue,
     clone_tree,
@@ -47,7 +49,9 @@ def bst_insert_steps(values: list[int]) -> list[TreeStep]:
                 )
             )
 
-            child_key = "left" if value < current["value"] else "right"
+            child_key: Literal["left", "right"] = (
+                "left" if value < current["value"] else "right"
+            )
             child = current[child_key]
             if child is None:
                 current[child_key] = _node(value)
@@ -66,7 +70,7 @@ def bst_insert_steps(values: list[int]) -> list[TreeStep]:
                 break
             current = child
 
-    result = {
+    result: TreeResult = {
         "root": clone_tree(root),
         "values": values.copy(),
         "inorder": _inorder_values(root),
@@ -233,7 +237,7 @@ def _traversal_steps(
     steps: list[TreeStep] = []
     visited: list[TreeValue] = []
     visit(root, root, steps, visited, [])
-    result = {"order": visited.copy()}
+    result: TreeResult = {"order": visited.copy()}
     steps.append(
         create_tree_step(
             "done",

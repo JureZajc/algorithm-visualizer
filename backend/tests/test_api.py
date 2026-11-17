@@ -748,6 +748,77 @@ def test_backtracking_steps_endpoint_supports_sudoku_solver() -> None:
         "2",
     ]
     assert body["step_count"] == len(body["steps"])
+    assert body["initial_board"][0] == ["5", "3", "4", "6", "7", "8", "9", ".", "."]
+    assert len(body["fixed_cells"]) == 79
+    assert [0, 0] in body["fixed_cells"]
+    assert [0, 7] not in body["fixed_cells"]
+    for step in body["steps"]:
+        assert set(step["result"]) == {"solved", "solution", "tried_value", "conflicts"}
+
+
+def test_backtracking_steps_endpoint_sends_sudoku_run_data_once() -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={
+            "algorithm": "sudoku_solver",
+            "board": [[0] * 9, *([["."] * 9] * 8)],
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["initial_board"] == [["."] * 9 for _ in range(9)]
+    assert body["fixed_cells"] == []
+    assert body["steps"][0]["grid"] == body["initial_board"]
+
+
+def test_backtracking_steps_endpoint_solves_default_sudoku_quickly() -> None:
+    response = client.post("/backtracking/steps", json={"algorithm": "sudoku_solver"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["step_count"] < 2_000
+    assert body["steps"][-1]["result"]["solved"] is True
+    assert body["steps"][0]["grid"] == body["initial_board"]
+    assert body["input"]["board"] == body["initial_board"]
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"algorithm": "n_queens", "size": 4},
+        {"algorithm": "maze_solver", "rows": 5, "cols": 6},
+        {"algorithm": "permutations", "values": ["A", "B"]},
+        {"algorithm": "subsets", "values": ["A", "B"]},
+    ],
+)
+def test_backtracking_steps_endpoint_omits_sudoku_run_data_for_other_algorithms(
+    payload: dict[str, object],
+) -> None:
+    response = client.post("/backtracking/steps", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["initial_board"] is None
+    assert body["fixed_cells"] is None
+
+
+@pytest.mark.parametrize("algorithm", ["permutations", "subsets"])
+def test_backtracking_list_steps_send_each_result_once(algorithm: str) -> None:
+    response = client.post(
+        "/backtracking/steps",
+        json={"algorithm": algorithm, "values": ["A", "B", "C"]},
+    )
+
+    assert response.status_code == 200
+    steps = response.json()["steps"]
+    added = [
+        step["result"]["generated_item"]
+        for step in steps
+        if step["type"] == "solution_found"
+    ]
+    assert all("generated" not in step["result"] for step in steps)
+    assert added == steps[-1]["result"][algorithm]
 
 
 @pytest.mark.parametrize(
@@ -1176,6 +1247,30 @@ def test_backtracking_steps_endpoint_limits_sudoku_search() -> None:
 
     assert response.status_code == 422
     assert "step limit" in response.json()["detail"]
+
+
+def test_backtracking_steps_endpoint_rejects_former_classic_sudoku_preset() -> None:
+    # Brute force needs 79,464 steps for this puzzle, above the 10,000 limit.
+    response = client.post(
+        "/backtracking/steps",
+        json={
+            "algorithm": "sudoku_solver",
+            "board": [
+                ["5", "3", ".", ".", "7", ".", ".", ".", "."],
+                ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+                [".", "9", "8", ".", ".", ".", ".", "6", "."],
+                ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+                ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+                ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+                [".", "6", ".", ".", ".", ".", "2", "8", "."],
+                [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+                [".", ".", ".", ".", "8", ".", ".", "7", "9"],
+            ],
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"] == "Sudoku step limit of 10000 was exceeded."
 
 
 def test_random_numbers_endpoint_accepts_equal_bounds() -> None:
