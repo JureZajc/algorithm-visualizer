@@ -200,13 +200,13 @@ Validate with the dependencies already installed:
 python scripts/dev.py check
 ```
 
-This runs Ruff for the backend and development helper, pytest (including development workflow tests), then ESLint, frontend tests, and a production build. To synchronize both projects from their lockfiles before running the same checks, use:
+This runs Ruff for the backend and development helper, mypy for the backend application code, pytest (including development workflow tests), then ESLint, frontend tests, and a production build. To synchronize both projects from their lockfiles before running the same checks, use:
 
 ```bash
 python scripts/dev.py check-clean
 ```
 
-CI runs Ruff and pytest for the backend plus frontend tests and a production build on pushes and pull requests to `master`; the local `check` command additionally runs ESLint.
+CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (22). A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
 
 ## API
 
