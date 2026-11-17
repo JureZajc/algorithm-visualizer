@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Legend, Panel, StatusBadge } from "@/components/ui-primitives";
+import { Legend, Panel, ScreenReaderStatus, StatusBadge } from "@/components/ui-primitives";
 
 export type VisualizerStatus = "idle" | "loading" | "running" | "paused" | "complete" | "invalid" | "error";
 
@@ -58,14 +58,16 @@ export function VisualizationPanel({
   title: string;
 }) {
   return (
-    <Panel className={className ?? "min-w-0 p-5"} variant="visualization">
+    <Panel className={className ?? "min-w-0 p-5"} variant="visualization" aria-busy={status === "loading"}>
       <div className="mb-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <h2 className="m-0 text-lg font-extrabold tracking-normal text-slate-900">{title}</h2>
             <StatusBadge label={statusLabel ?? statusLabels[status]} variant={status} />
           </div>
-          <p className="m-0 min-h-6 text-sm leading-6 text-slate-500" aria-live="polite">{description}</p>
+          <p className="m-0 min-h-6 text-sm leading-6 text-slate-500">{description}</p>
+          {/* Autoplay changes the description on every tick; announce it only when playback rests. */}
+          <ScreenReaderStatus silent={status === "loading" || status === "running"}>{description}</ScreenReaderStatus>
           {resultSummary ? (
             <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-800" aria-live="polite">
               {resultSummary}
