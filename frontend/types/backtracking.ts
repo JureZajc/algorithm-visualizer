@@ -58,7 +58,8 @@ export interface ListBacktrackingState {
   depth: number;
   used?: boolean[];
   decision?: string;
-  generated: string[][];
+  /** Sent only on `solution_found` steps: the one result that step adds. */
+  generated_item?: string[];
   generated_count: number;
 }
 
@@ -76,12 +77,15 @@ export interface SubsetsResult {
 
 export interface SudokuResult {
   solved: boolean;
-  board: SudokuBoard;
-  initial_board: SudokuBoard;
   solution: SudokuBoard | [];
-  fixed_cells: GridPosition[];
   tried_value: SudokuCell | null;
   conflicts: GridPosition[];
+}
+
+/** Sudoku data that every step shares; the API sends it once per run. */
+export interface SudokuRun {
+  initial_board: SudokuBoard;
+  fixed_cells: GridPosition[];
 }
 
 export type BacktrackingResult =
@@ -120,6 +124,10 @@ export interface BacktrackingResponse {
   input: Record<string, unknown>;
   steps: BacktrackingStep[];
   step_count: number;
+  /** Sudoku only; null for the other algorithms. */
+  initial_board: SudokuBoard | null;
+  /** Sudoku only; null for the other algorithms. */
+  fixed_cells: GridPosition[] | null;
 }
 
 export const BACKTRACKING_ALGORITHM_LABELS: Record<
