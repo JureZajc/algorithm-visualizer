@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
 import { LearningPanel } from "@/components/learning-panel";
@@ -13,6 +13,7 @@ import { useLearningPlayback } from "@/hooks/use-learning-playback";
 import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
 import { SORTING_PRESETS } from "@/lib/array-presets";
+import { parseSortingQuery, sortingQuery, type QueryStateProps } from "@/lib/url-state";
 import type { ArrayStepType, MetadataSourceProps } from "@/types/algorithm";
 import { ALGORITHM_LABELS, type AlgorithmStep, type SortingAlgorithm } from "@/types/sorting";
 
@@ -50,12 +51,17 @@ function sortingLegend(algorithm: SortingAlgorithm): LegendItem[] {
   return [...ALGORITHM_STEP_TYPES[algorithm], "done" as const].map((type) => LEGEND_ITEMS[type]);
 }
 
-export function SortingVisualizer(props: MetadataSourceProps) {
-  const [algorithm, setAlgorithm] = useState<SortingAlgorithm>("bubble_sort");
-  const [count, setCount] = useState(DEFAULT_NUMBERS.length);
+export function SortingVisualizer({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseSortingQuery(initialQuery));
+  const [algorithm, setAlgorithm] = useState<SortingAlgorithm>(restored.algorithm ?? "bubble_sort");
+  const [count, setCount] = useState((restored.numbers ?? DEFAULT_NUMBERS).length);
   const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(320);
-  const [initialNumbers, setInitialNumbers] = useState(DEFAULT_NUMBERS);
+  const [initialNumbers, setInitialNumbers] = useState(restored.numbers ?? DEFAULT_NUMBERS);
+  const query = sortingQuery({ algorithm, numbers: initialNumbers });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   const run = useVisualizationRun();
   const playback = useLearningPlayback<AlgorithmStep>(speed, algorithm);
   const displayedNumbers = playback.currentStep?.array ?? initialNumbers;

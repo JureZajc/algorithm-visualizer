@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
 import { LearningPanel } from "@/components/learning-panel";
@@ -14,6 +14,7 @@ import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchSearchingSteps, generateRandomNumbers } from "@/lib/api";
 import { SEARCHING_PRESETS } from "@/lib/array-presets";
 import { validateCountDraft, validateTarget } from "@/lib/searching-input";
+import { parseSearchingQuery, searchingQuery, type QueryStateProps } from "@/lib/url-state";
 import type { ArrayAlgorithmStep, MetadataSourceProps } from "@/types/algorithm";
 import { SEARCHING_ALGORITHM_LABELS, type SearchingAlgorithm } from "@/types/searching";
 
@@ -25,14 +26,19 @@ const LEGEND: LegendItem[] = [
   { label: "Found", tone: "emerald" },
 ];
 
-export function SearchingVisualizer(props: MetadataSourceProps) {
-  const [algorithm, setAlgorithm] = useState<SearchingAlgorithm>("linear_search");
-  const [count, setCount] = useState(DEFAULT_NUMBERS.length);
-  const [countDraft, setCountDraft] = useState(String(DEFAULT_NUMBERS.length));
+export function SearchingVisualizer({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseSearchingQuery(initialQuery));
+  const [algorithm, setAlgorithm] = useState<SearchingAlgorithm>(restored.algorithm ?? "linear_search");
+  const [count, setCount] = useState((restored.numbers ?? DEFAULT_NUMBERS).length);
+  const [countDraft, setCountDraft] = useState(String(count));
   const [presetId, setPresetId] = useState("");
-  const [targetInput, setTargetInput] = useState("67");
-  const [numbers, setNumbers] = useState(DEFAULT_NUMBERS);
+  const [targetInput, setTargetInput] = useState(restored.target ?? "67");
+  const [numbers, setNumbers] = useState(restored.numbers ?? DEFAULT_NUMBERS);
   const [speed, setSpeed] = useState(420);
+  const query = searchingQuery({ algorithm, numbers, target: targetInput });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   const run = useVisualizationRun();
   const playback = useLearningPlayback<ArrayAlgorithmStep>(speed, algorithm);
   const isLoading = run.isLoading;

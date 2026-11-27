@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { HashTableView } from "@/components/hash-table-view";
 import { StepControls } from "@/components/step-controls";
@@ -17,6 +17,7 @@ import {
   validateTableSize,
   validateTarget,
 } from "@/lib/hash-tables-input";
+import { hashTablesQuery, parseHashTablesQuery, type QueryStateProps } from "@/lib/url-state";
 import type { MetadataSourceProps } from "@/types/algorithm";
 import {
   HASH_TABLE_ALGORITHM_LABELS,
@@ -48,17 +49,22 @@ const LEGENDS: Record<HashTableAlgorithm, LegendItem[]> = {
   hash_search_linear_probing: [HASH, CHECKED, PROBE, COMPARE, FOUND, NOT_FOUND],
 };
 
-export function HashTablesVisualizer(props: MetadataSourceProps) {
-  const [algorithm, setAlgorithm] = useState<HashTableAlgorithm>("hash_insert_chaining");
-  const [valuesInput, setValuesInput] = useState(DEFAULT_VALUES);
-  const [tableSizeInput, setTableSizeInput] = useState(DEFAULT_TABLE_SIZE);
-  const [targetInput, setTargetInput] = useState(DEFAULT_TARGET);
+export function HashTablesVisualizer({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseHashTablesQuery(initialQuery));
+  const [algorithm, setAlgorithm] = useState<HashTableAlgorithm>(restored.algorithm ?? "hash_insert_chaining");
+  const [valuesInput, setValuesInput] = useState(restored.values ?? DEFAULT_VALUES);
+  const [tableSizeInput, setTableSizeInput] = useState(restored.tableSize ?? DEFAULT_TABLE_SIZE);
+  const [targetInput, setTargetInput] = useState(restored.target ?? DEFAULT_TARGET);
   const [speed, setSpeed] = useState(520);
   const run = useVisualizationRun();
   const playback = useStepPlayback<HashTableStep>(speed);
   const isLoading = run.isLoading;
   const currentStep = playback.currentStep;
   const isSearch = isSearchAlgorithm(algorithm);
+  const query = hashTablesQuery({ algorithm, values: valuesInput, tableSize: tableSizeInput, target: isSearch ? targetInput : undefined });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   const strategy = strategyForAlgorithm(algorithm);
   const valuesValidation = validateHashValues(valuesInput);
   const tableSizeValidation = validateTableSize(tableSizeInput);
