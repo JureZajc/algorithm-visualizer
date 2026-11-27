@@ -417,7 +417,7 @@ def run_steps(steps: tuple[Step, ...]) -> int:
                 shutil.which(step.command[0]) or step.command[0],
                 *step.command[1:],
             )
-            result = subprocess.run(command, cwd=step.working_directory)
+            result = subprocess.run(command, check=False, cwd=step.working_directory)
         except OSError as error:
             print(f"Error: could not run {step.command[0]}: {error}", file=sys.stderr)
             return 1
