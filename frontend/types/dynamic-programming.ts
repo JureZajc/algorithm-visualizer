@@ -1,61 +1,35 @@
-export type DynamicProgrammingAlgorithm =
-  | "fibonacci"
-  | "coin_change"
-  | "knapsack"
-  | "lcs"
-  | "edit_distance"
-  | "unique_paths";
+import type { components } from "@/types/generated/api";
+import { CATALOG_LABELS } from "@/types/generated/catalog";
 
-export type DynamicProgrammingStepType =
-  | "initialize"
-  | "compare"
-  | "update"
-  | "choose"
-  | "skip"
-  | "done";
+type Schemas = components["schemas"];
 
-export type DynamicProgrammingCell = number | string;
-export type TablePosition = [number, number];
+/** A request model's fields other than `algorithm`, each optional. */
+type OptionalFields<Model> = Partial<Omit<Model, "algorithm">>;
 
-export interface DynamicProgrammingStep {
-  type: DynamicProgrammingStepType;
-  table: DynamicProgrammingCell[][];
-  active_cell: TablePosition | null;
-  related_cells: TablePosition[];
-  description: string;
-  pseudocode_line: number | null;
-  result: number | string | null;
-}
+export type DynamicProgrammingResponse = Schemas["DynamicProgrammingResponse"];
+export type DynamicProgrammingStep = Schemas["DynamicProgrammingStep"];
 
-export interface DynamicProgrammingRequest {
+export type DynamicProgrammingAlgorithm = DynamicProgrammingResponse["algorithm"];
+export type DynamicProgrammingStepType = DynamicProgrammingStep["type"];
+export type DynamicProgrammingCell =
+  DynamicProgrammingStep["table"][number][number];
+export type TablePosition = DynamicProgrammingStep["related_cells"][number];
+
+/**
+ * The API has one request model per algorithm and reads only the fields of the
+ * selected one. The forms and presets build every algorithm's request through
+ * this single type, so it has the fields of all the models.
+ */
+export type DynamicProgrammingRequest = {
   algorithm: DynamicProgrammingAlgorithm;
-  n?: number;
-  coins?: number[];
-  amount?: number;
-  weights?: number[];
-  values?: number[];
-  capacity?: number;
-  text_a?: string;
-  text_b?: string;
-  rows?: number;
-  cols?: number;
-}
-
-export interface DynamicProgrammingResponse {
-  algorithm: DynamicProgrammingAlgorithm;
-  input: Record<string, unknown>;
-  steps: DynamicProgrammingStep[];
-  step_count: number;
-}
+} & OptionalFields<Schemas["FibonacciRequest"]> &
+  OptionalFields<Schemas["CoinChangeRequest"]> &
+  OptionalFields<Schemas["KnapsackRequest"]> &
+  OptionalFields<Schemas["LongestCommonSubsequenceRequest"]> &
+  OptionalFields<Schemas["EditDistanceRequest"]> &
+  OptionalFields<Schemas["UniquePathsRequest"]>;
 
 export const DYNAMIC_PROGRAMMING_ALGORITHM_LABELS: Record<
   DynamicProgrammingAlgorithm,
   string
-> = {
-  fibonacci: "Fibonacci DP",
-  coin_change: "Coin Change",
-  knapsack: "0/1 Knapsack",
-  lcs: "Longest Common Subsequence",
-  edit_distance: "Edit Distance",
-  unique_paths: "Grid Unique Paths",
-};
+> = CATALOG_LABELS.dynamic_programming;

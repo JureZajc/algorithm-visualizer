@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "generate:api": "uv run --directory ../backend python export_api.py && openapi-typescript types/generated/openapi.json --output types/generated/api.ts --default-non-nullable false"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -31,6 +32,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "jsdom": "^29.1.1",
+    "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.11"

@@ -1,0 +1,4214 @@
+{
+  "components": {
+    "schemas": {
+      "AlgorithmMetadata": {
+        "properties": {
+          "category": {
+            "enum": [
+              "sorting",
+              "searching",
+              "graph",
+              "dynamic_programming",
+              "backtracking",
+              "trees",
+              "hash_tables"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "limits": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/InputLimit"
+            },
+            "title": "Limits",
+            "type": "object"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "pseudocode": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Pseudocode",
+            "type": "array"
+          },
+          "space_complexity": {
+            "title": "Space Complexity",
+            "type": "string"
+          },
+          "time_complexity": {
+            "$ref": "#/components/schemas/TimeComplexity"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "name",
+          "category",
+          "description",
+          "time_complexity",
+          "space_complexity",
+          "notes",
+          "pseudocode",
+          "limits"
+        ],
+        "title": "AlgorithmMetadata",
+        "type": "object"
+      },
+      "AlgorithmStep": {
+        "description": "A single visual state produced while an algorithm runs.",
+        "properties": {
+          "array": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Array",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "indices": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Indices",
+            "type": "array"
+          },
+          "pseudocode_line": {
+            "title": "Pseudocode Line",
+            "type": "integer"
+          },
+          "type": {
+            "enum": [
+              "compare",
+              "swap",
+              "overwrite",
+              "partition",
+              "merge",
+              "heapify",
+              "found",
+              "not_found",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "indices",
+          "array",
+          "description"
+        ],
+        "title": "AlgorithmStep",
+        "type": "object"
+      },
+      "AlgorithmsResponse": {
+        "properties": {
+          "backtracking": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmMetadata"
+            },
+            "title": "Backtracking",
+            "type": "array"
+          },
+          "dynamic_programming": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmMetadata"
+            },
+            "title": "Dynamic Programming",
+            "type": "array"
+          },
+          "graph": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmMetadata"
+            },
+            "title": "Graph",
+            "type": "array"
+          },
+          "hash_tables": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmMetadata"
+            },
+            "title": "Hash Tables",
+            "type": "array"
+          },
+          "searching": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmMetadata"
+            },
+            "title": "Searching",
+            "type": "array"
+          },
+          "sorting": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmMetadata"
+            },
+            "title": "Sorting",
+            "type": "array"
+          },
+          "trees": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmMetadata"
+            },
+            "title": "Trees",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sorting",
+          "searching",
+          "graph",
+          "dynamic_programming",
+          "backtracking",
+          "trees",
+          "hash_tables"
+        ],
+        "title": "AlgorithmsResponse",
+        "type": "object"
+      },
+      "AvlInsertResult": {
+        "additionalProperties": false,
+        "description": "Result of an AVL insert run, with the final height and balance check.",
+        "properties": {
+          "balanced": {
+            "title": "Balanced",
+            "type": "boolean"
+          },
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "inorder": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Inorder",
+            "type": "array"
+          },
+          "root": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TreeNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "values": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "root",
+          "values",
+          "inorder",
+          "height",
+          "balanced"
+        ],
+        "title": "AvlInsertResult",
+        "type": "object"
+      },
+      "BstInsertResult": {
+        "additionalProperties": false,
+        "description": "Result of a BST insert run: the final tree and its inorder values.",
+        "properties": {
+          "inorder": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Inorder",
+            "type": "array"
+          },
+          "root": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TreeNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "values": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "root",
+          "values",
+          "inorder"
+        ],
+        "title": "BstInsertResult",
+        "type": "object"
+      },
+      "BstSearchResult": {
+        "additionalProperties": false,
+        "description": "Result of a BST search: whether the target was found and the path.",
+        "properties": {
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "path": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "found",
+          "target",
+          "path"
+        ],
+        "title": "BstSearchResult",
+        "type": "object"
+      },
+      "CoinChangeInput": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "coins": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Coins",
+            "type": "array"
+          }
+        },
+        "required": [
+          "coins",
+          "amount"
+        ],
+        "title": "CoinChangeInput",
+        "type": "object"
+      },
+      "CoinChangeRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "coin_change",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "amount": {
+            "default": 6,
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Amount",
+            "type": "integer"
+          },
+          "coins": {
+            "default": [
+              1,
+              3,
+              4
+            ],
+            "items": {
+              "minimum": 1.0,
+              "type": "integer"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Coins",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "CoinChangeRequest",
+        "type": "object"
+      },
+      "DynamicProgrammingResponse": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "fibonacci",
+              "coin_change",
+              "knapsack",
+              "lcs",
+              "edit_distance",
+              "unique_paths"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FibonacciInput"
+              },
+              {
+                "$ref": "#/components/schemas/CoinChangeInput"
+              },
+              {
+                "$ref": "#/components/schemas/KnapsackInput"
+              },
+              {
+                "$ref": "#/components/schemas/TextPairInput"
+              },
+              {
+                "$ref": "#/components/schemas/GridSizeInput"
+              }
+            ],
+            "title": "Input"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/DynamicProgrammingStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count"
+        ],
+        "title": "DynamicProgrammingResponse",
+        "type": "object"
+      },
+      "DynamicProgrammingStep": {
+        "description": "A single visual state produced by a dynamic programming algorithm.",
+        "properties": {
+          "active_cell": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Cell"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "related_cells": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Related Cells",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "table": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Table",
+            "type": "array"
+          },
+          "type": {
+            "enum": [
+              "initialize",
+              "compare",
+              "update",
+              "choose",
+              "skip",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "table",
+          "active_cell",
+          "related_cells",
+          "description",
+          "pseudocode_line",
+          "result"
+        ],
+        "title": "DynamicProgrammingStep",
+        "type": "object"
+      },
+      "EditDistanceRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "edit_distance",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "text_a": {
+            "default": "kitten",
+            "maxLength": 12,
+            "title": "Text A",
+            "type": "string"
+          },
+          "text_b": {
+            "default": "sitting",
+            "maxLength": 12,
+            "title": "Text B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "EditDistanceRequest",
+        "type": "object"
+      },
+      "FibonacciInput": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "title": "N",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "title": "FibonacciInput",
+        "type": "object"
+      },
+      "FibonacciRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "fibonacci",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "n": {
+            "default": 8,
+            "maximum": 40.0,
+            "minimum": 0.0,
+            "title": "N",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "FibonacciRequest",
+        "type": "object"
+      },
+      "GenerateRequest": {
+        "properties": {
+          "max_value": {
+            "default": 100,
+            "maximum": 1000000.0,
+            "minimum": -1000000.0,
+            "title": "Max Value",
+            "type": "integer"
+          },
+          "min_value": {
+            "default": 1,
+            "maximum": 1000000.0,
+            "minimum": -1000000.0,
+            "title": "Min Value",
+            "type": "integer"
+          },
+          "size": {
+            "default": 20,
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Size",
+            "type": "integer"
+          }
+        },
+        "title": "GenerateRequest",
+        "type": "object"
+      },
+      "GraphEdge": {
+        "description": "A weighted edge between two graph nodes.",
+        "properties": {
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "weight"
+        ],
+        "title": "GraphEdge",
+        "type": "object"
+      },
+      "GraphEdgeModel": {
+        "properties": {
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "default": 1,
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "source",
+          "target"
+        ],
+        "title": "GraphEdgeModel",
+        "type": "object"
+      },
+      "GraphRequest": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "bfs",
+              "dfs",
+              "dijkstra",
+              "a_star",
+              "topological_sort",
+              "kruskal",
+              "prim"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "directed": {
+            "default": false,
+            "title": "Directed",
+            "type": "boolean"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdgeModel"
+            },
+            "maxItems": 200,
+            "title": "Edges",
+            "type": "array"
+          },
+          "heuristics": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heuristics"
+          },
+          "nodes": {
+            "items": {
+              "maxLength": 20,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodes",
+          "edges",
+          "start",
+          "target",
+          "algorithm"
+        ],
+        "title": "GraphRequest",
+        "type": "object"
+      },
+      "GraphResponse": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "bfs",
+              "dfs",
+              "dijkstra",
+              "a_star",
+              "topological_sort",
+              "kruskal",
+              "prim"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "directed": {
+            "title": "Directed",
+            "type": "boolean"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdgeModel"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "heuristics": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heuristics"
+          },
+          "nodes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/GraphStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "algorithm",
+          "nodes",
+          "edges",
+          "start",
+          "target",
+          "directed",
+          "heuristics",
+          "steps",
+          "step_count"
+        ],
+        "title": "GraphResponse",
+        "type": "object"
+      },
+      "GraphStep": {
+        "description": "A single visual state produced while a graph algorithm runs.",
+        "properties": {
+          "current": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "distances": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distances"
+          },
+          "edge": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GraphEdge"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "frontier": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Frontier",
+            "type": "array"
+          },
+          "frontier_edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "title": "Frontier Edges",
+            "type": "array"
+          },
+          "mst_edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "title": "Mst Edges",
+            "type": "array"
+          },
+          "neighbor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Neighbor"
+          },
+          "path": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "pseudocode_line": {
+            "title": "Pseudocode Line",
+            "type": "integer"
+          },
+          "result": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Result",
+            "type": "array"
+          },
+          "total_weight": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Weight"
+          },
+          "type": {
+            "enum": [
+              "visit",
+              "inspect_edge",
+              "enqueue",
+              "dequeue",
+              "push",
+              "pop",
+              "relax",
+              "path_found",
+              "not_found",
+              "cycle_detected",
+              "accept_edge",
+              "reject_edge",
+              "add_to_result",
+              "update_frontier",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "visited": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Visited",
+            "type": "array"
+          }
+        },
+        "required": [
+          "type",
+          "current",
+          "neighbor",
+          "edge",
+          "visited",
+          "frontier",
+          "distances",
+          "previous",
+          "path",
+          "result",
+          "frontier_edges",
+          "mst_edges",
+          "total_weight",
+          "description"
+        ],
+        "title": "GraphStep",
+        "type": "object"
+      },
+      "GridSizeInput": {
+        "additionalProperties": false,
+        "properties": {
+          "cols": {
+            "title": "Cols",
+            "type": "integer"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rows",
+          "cols"
+        ],
+        "title": "GridSizeInput",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HashInsertResult": {
+        "additionalProperties": false,
+        "description": "Result of an insert run: the table's size and final load factor.",
+        "properties": {
+          "load_factor": {
+            "title": "Load Factor",
+            "type": "number"
+          },
+          "strategy": {
+            "enum": [
+              "separate_chaining",
+              "linear_probing"
+            ],
+            "title": "Strategy",
+            "type": "string"
+          },
+          "table_size": {
+            "title": "Table Size",
+            "type": "integer"
+          },
+          "values": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "strategy",
+          "table_size",
+          "values",
+          "load_factor"
+        ],
+        "title": "HashInsertResult",
+        "type": "object"
+      },
+      "HashSearchResult": {
+        "additionalProperties": false,
+        "description": "Result of a search: where the target was found or the search stopped.",
+        "properties": {
+          "bucket": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bucket"
+          },
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Target"
+          },
+          "visited_buckets": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Visited Buckets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "found",
+          "target",
+          "bucket",
+          "visited_buckets"
+        ],
+        "title": "HashSearchResult",
+        "type": "object"
+      },
+      "HashTableBucket": {
+        "properties": {
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "index",
+          "items"
+        ],
+        "title": "HashTableBucket",
+        "type": "object"
+      },
+      "HashTableInput": {
+        "additionalProperties": false,
+        "properties": {
+          "table_size": {
+            "title": "Table Size",
+            "type": "integer"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Target"
+          },
+          "values": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values",
+          "table_size"
+        ],
+        "title": "HashTableInput",
+        "type": "object"
+      },
+      "HashTableRequest": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "hash_insert_chaining",
+              "hash_search_chaining",
+              "hash_insert_linear_probing",
+              "hash_search_linear_probing"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "table_size": {
+            "default": 10,
+            "maximum": 31.0,
+            "minimum": 2.0,
+            "title": "Table Size",
+            "type": "integer"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "maxLength": 32,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "values": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "maxLength": 32,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              ]
+            },
+            "maxItems": 31,
+            "minItems": 1,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "values"
+        ],
+        "title": "HashTableRequest",
+        "type": "object"
+      },
+      "HashTableResponse": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "hash_insert_chaining",
+              "hash_search_chaining",
+              "hash_insert_linear_probing",
+              "hash_search_linear_probing"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/HashTableInput"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/HashTableStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count"
+        ],
+        "title": "HashTableResponse",
+        "type": "object"
+      },
+      "HashTableSnapshot": {
+        "properties": {
+          "buckets": {
+            "items": {
+              "$ref": "#/components/schemas/HashTableBucket"
+            },
+            "title": "Buckets",
+            "type": "array"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "strategy": {
+            "enum": [
+              "separate_chaining",
+              "linear_probing"
+            ],
+            "title": "Strategy",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy",
+          "size",
+          "buckets"
+        ],
+        "title": "HashTableSnapshot",
+        "type": "object"
+      },
+      "HashTableStep": {
+        "description": "A single visual state produced by a hash table operation.",
+        "properties": {
+          "active_bucket": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Bucket"
+          },
+          "active_item": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Item"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "hash_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash Index"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Key"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HashInsertResult"
+              },
+              {
+                "$ref": "#/components/schemas/HashSearchResult"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "table": {
+            "$ref": "#/components/schemas/HashTableSnapshot"
+          },
+          "type": {
+            "enum": [
+              "hash",
+              "inspect_bucket",
+              "compare",
+              "insert",
+              "collision",
+              "probe",
+              "found",
+              "not_found",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "visited_buckets": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Visited Buckets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "type",
+          "table",
+          "key",
+          "hash_index",
+          "active_bucket",
+          "active_item",
+          "visited_buckets",
+          "result",
+          "description",
+          "pseudocode_line"
+        ],
+        "title": "HashTableStep",
+        "type": "object"
+      },
+      "InputLimit": {
+        "description": "Bounds on one request field. A null bound does not apply.",
+        "properties": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InputLimit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Items"
+          },
+          "max_length": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Length"
+          },
+          "maximum": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maximum"
+          },
+          "min_items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Items"
+          },
+          "min_length": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Length"
+          },
+          "minimum": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minimum"
+          }
+        },
+        "title": "InputLimit",
+        "type": "object"
+      },
+      "KnapsackInput": {
+        "additionalProperties": false,
+        "properties": {
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "values": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Values",
+            "type": "array"
+          },
+          "weights": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "weights",
+          "values",
+          "capacity"
+        ],
+        "title": "KnapsackInput",
+        "type": "object"
+      },
+      "KnapsackRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "knapsack",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "capacity": {
+            "default": 5,
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "values": {
+            "default": [
+              3,
+              4,
+              5,
+              6
+            ],
+            "items": {
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Values",
+            "type": "array"
+          },
+          "weights": {
+            "default": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "items": {
+              "minimum": 1.0,
+              "type": "integer"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "KnapsackRequest",
+        "type": "object"
+      },
+      "ListBacktrackingState": {
+        "additionalProperties": false,
+        "description": "Search state of a permutations or subsets step before the final one.",
+        "properties": {
+          "active_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Index"
+          },
+          "active_item": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Item"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "depth": {
+            "title": "Depth",
+            "type": "integer"
+          },
+          "generated_count": {
+            "title": "Generated Count",
+            "type": "integer"
+          },
+          "generated_item": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Generated Item",
+            "type": "array"
+          },
+          "partial": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Partial",
+            "type": "array"
+          },
+          "used": {
+            "items": {
+              "type": "boolean"
+            },
+            "title": "Used",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values",
+          "partial",
+          "active_item",
+          "active_index",
+          "depth",
+          "generated_count"
+        ],
+        "title": "ListBacktrackingState",
+        "type": "object"
+      },
+      "ListValuesInput": {
+        "additionalProperties": false,
+        "properties": {
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values"
+        ],
+        "title": "ListValuesInput",
+        "type": "object"
+      },
+      "LongestCommonSubsequenceRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "lcs",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "text_a": {
+            "default": "ABCDEF",
+            "maxLength": 12,
+            "title": "Text A",
+            "type": "string"
+          },
+          "text_b": {
+            "default": "ACE",
+            "maxLength": 12,
+            "title": "Text B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "LongestCommonSubsequenceRequest",
+        "type": "object"
+      },
+      "MazeSolverInput": {
+        "additionalProperties": false,
+        "properties": {
+          "cols": {
+            "title": "Cols",
+            "type": "integer"
+          },
+          "grid": {
+            "items": {
+              "items": {
+                "enum": [
+                  "empty",
+                  "wall",
+                  "start",
+                  "end",
+                  "visited",
+                  "path",
+                  "backtracked",
+                  "solution"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Grid",
+            "type": "array"
+          },
+          "preset": {
+            "enum": [
+              "classic",
+              "open",
+              "rooms"
+            ],
+            "title": "Preset",
+            "type": "string"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "start": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Start",
+            "type": "array"
+          },
+          "target": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Target",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows",
+          "cols",
+          "preset"
+        ],
+        "title": "MazeSolverInput",
+        "type": "object"
+      },
+      "MazeSolverRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "maze_solver",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "cols": {
+            "default": 7,
+            "maximum": 15.0,
+            "minimum": 2.0,
+            "title": "Cols",
+            "type": "integer"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "grid": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "enum": [
+                      "empty",
+                      "wall",
+                      "start",
+                      "end",
+                      "visited",
+                      "path",
+                      "backtracked",
+                      "solution"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grid"
+          },
+          "preset": {
+            "default": "classic",
+            "enum": [
+              "classic",
+              "open",
+              "rooms"
+            ],
+            "title": "Preset",
+            "type": "string"
+          },
+          "rows": {
+            "default": 7,
+            "maximum": 15.0,
+            "minimum": 2.0,
+            "title": "Rows",
+            "type": "integer"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "MazeSolverRequest",
+        "type": "object"
+      },
+      "MazeSolverResponse": {
+        "properties": {
+          "algorithm": {
+            "const": "maze_solver",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "fixed_cells": {
+            "title": "Fixed Cells",
+            "type": "null"
+          },
+          "initial_board": {
+            "title": "Initial Board",
+            "type": "null"
+          },
+          "input": {
+            "$ref": "#/components/schemas/MazeSolverInput"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/MazeSolverStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count"
+        ],
+        "title": "MazeSolverResponse",
+        "type": "object"
+      },
+      "MazeSolverResult": {
+        "additionalProperties": false,
+        "description": "Result of a maze step: the path once the end is reached.",
+        "properties": {
+          "cols": {
+            "title": "Cols",
+            "type": "integer"
+          },
+          "path": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "preset": {
+            "enum": [
+              "classic",
+              "open",
+              "rooms"
+            ],
+            "title": "Preset",
+            "type": "string"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "solved": {
+            "title": "Solved",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "solved",
+          "rows",
+          "cols",
+          "preset",
+          "path"
+        ],
+        "title": "MazeSolverResult",
+        "type": "object"
+      },
+      "MazeSolverStep": {
+        "properties": {
+          "active_cell": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Cell"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "grid": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Grid",
+            "type": "array"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "related_cells": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Related Cells",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MazeSolverResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "enum": [
+              "try",
+              "choose",
+              "unchoose",
+              "place",
+              "remove",
+              "move",
+              "dead_end",
+              "solution_found",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "grid",
+          "active_cell",
+          "related_cells",
+          "description",
+          "pseudocode_line",
+          "result"
+        ],
+        "title": "MazeSolverStep",
+        "type": "object"
+      },
+      "NQueensInput": {
+        "additionalProperties": false,
+        "properties": {
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "size"
+        ],
+        "title": "NQueensInput",
+        "type": "object"
+      },
+      "NQueensRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "n_queens",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "size": {
+            "default": 4,
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "NQueensRequest",
+        "type": "object"
+      },
+      "NQueensResponse": {
+        "properties": {
+          "algorithm": {
+            "const": "n_queens",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "fixed_cells": {
+            "title": "Fixed Cells",
+            "type": "null"
+          },
+          "initial_board": {
+            "title": "Initial Board",
+            "type": "null"
+          },
+          "input": {
+            "$ref": "#/components/schemas/NQueensInput"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/NQueensStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count"
+        ],
+        "title": "NQueensResponse",
+        "type": "object"
+      },
+      "NQueensResult": {
+        "additionalProperties": false,
+        "description": "Result of an N-Queens step: the placement once a solution is found.",
+        "properties": {
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "solution": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Solution",
+            "type": "array"
+          },
+          "solved": {
+            "title": "Solved",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "solved",
+          "size",
+          "solution"
+        ],
+        "title": "NQueensResult",
+        "type": "object"
+      },
+      "NQueensStep": {
+        "properties": {
+          "active_cell": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Cell"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "grid": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Grid",
+            "type": "array"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "related_cells": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Related Cells",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NQueensResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "enum": [
+              "try",
+              "choose",
+              "unchoose",
+              "place",
+              "remove",
+              "move",
+              "dead_end",
+              "solution_found",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "grid",
+          "active_cell",
+          "related_cells",
+          "description",
+          "pseudocode_line",
+          "result"
+        ],
+        "title": "NQueensStep",
+        "type": "object"
+      },
+      "PermutationsRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "permutations",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "values": {
+            "default": [
+              "A",
+              "B",
+              "C"
+            ],
+            "items": {
+              "maxLength": 12,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "PermutationsRequest",
+        "type": "object"
+      },
+      "PermutationsResponse": {
+        "properties": {
+          "algorithm": {
+            "const": "permutations",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "fixed_cells": {
+            "title": "Fixed Cells",
+            "type": "null"
+          },
+          "initial_board": {
+            "title": "Initial Board",
+            "type": "null"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ListValuesInput"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/PermutationsStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count"
+        ],
+        "title": "PermutationsResponse",
+        "type": "object"
+      },
+      "PermutationsResult": {
+        "additionalProperties": false,
+        "description": "Result of the final permutations step: every ordering found.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "permutations": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Permutations",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values",
+          "permutations",
+          "count"
+        ],
+        "title": "PermutationsResult",
+        "type": "object"
+      },
+      "PermutationsStep": {
+        "properties": {
+          "active_cell": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Cell"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "grid": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Grid",
+            "type": "array"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "related_cells": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Related Cells",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ListBacktrackingState"
+              },
+              {
+                "$ref": "#/components/schemas/PermutationsResult"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "type": {
+            "enum": [
+              "try",
+              "choose",
+              "unchoose",
+              "place",
+              "remove",
+              "move",
+              "dead_end",
+              "solution_found",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "grid",
+          "active_cell",
+          "related_cells",
+          "description",
+          "pseudocode_line",
+          "result"
+        ],
+        "title": "PermutationsStep",
+        "type": "object"
+      },
+      "RandomNumbersResponse": {
+        "properties": {
+          "numbers": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Numbers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "numbers"
+        ],
+        "title": "RandomNumbersResponse",
+        "type": "object"
+      },
+      "SearchRequest": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "linear_search",
+              "binary_search"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "numbers": {
+            "items": {
+              "maximum": 1000000.0,
+              "minimum": -1000000.0,
+              "type": "integer"
+            },
+            "maxItems": 50,
+            "title": "Numbers",
+            "type": "array"
+          },
+          "target": {
+            "maximum": 1000000.0,
+            "minimum": -1000000.0,
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "numbers",
+          "algorithm",
+          "target"
+        ],
+        "title": "SearchRequest",
+        "type": "object"
+      },
+      "SearchResponse": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "linear_search",
+              "binary_search"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "initial": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Initial",
+            "type": "array"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "algorithm",
+          "target",
+          "initial",
+          "steps",
+          "step_count"
+        ],
+        "title": "SearchResponse",
+        "type": "object"
+      },
+      "SortRequest": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "bubble_sort",
+              "selection_sort",
+              "insertion_sort",
+              "merge_sort",
+              "quick_sort",
+              "heap_sort",
+              "shell_sort",
+              "cocktail_shaker_sort",
+              "gnome_sort",
+              "comb_sort",
+              "counting_sort"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "numbers": {
+            "items": {
+              "maximum": 1000000.0,
+              "minimum": -1000000.0,
+              "type": "integer"
+            },
+            "maxItems": 50,
+            "title": "Numbers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "numbers",
+          "algorithm"
+        ],
+        "title": "SortRequest",
+        "type": "object"
+      },
+      "SortResponse": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "bubble_sort",
+              "selection_sort",
+              "insertion_sort",
+              "merge_sort",
+              "quick_sort",
+              "heap_sort",
+              "shell_sort",
+              "cocktail_shaker_sort",
+              "gnome_sort",
+              "comb_sort",
+              "counting_sort"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "initial": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Initial",
+            "type": "array"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/AlgorithmStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "initial",
+          "steps",
+          "step_count"
+        ],
+        "title": "SortResponse",
+        "type": "object"
+      },
+      "SubsetsRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "subsets",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "values": {
+            "default": [
+              "A",
+              "B",
+              "C"
+            ],
+            "items": {
+              "maxLength": 12,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "SubsetsRequest",
+        "type": "object"
+      },
+      "SubsetsResponse": {
+        "properties": {
+          "algorithm": {
+            "const": "subsets",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "fixed_cells": {
+            "title": "Fixed Cells",
+            "type": "null"
+          },
+          "initial_board": {
+            "title": "Initial Board",
+            "type": "null"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ListValuesInput"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/SubsetsStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count"
+        ],
+        "title": "SubsetsResponse",
+        "type": "object"
+      },
+      "SubsetsResult": {
+        "additionalProperties": false,
+        "description": "Result of the final subsets step: every subset found.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "subsets": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Subsets",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values",
+          "subsets",
+          "count"
+        ],
+        "title": "SubsetsResult",
+        "type": "object"
+      },
+      "SubsetsStep": {
+        "properties": {
+          "active_cell": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Cell"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "grid": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Grid",
+            "type": "array"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "related_cells": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Related Cells",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ListBacktrackingState"
+              },
+              {
+                "$ref": "#/components/schemas/SubsetsResult"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "type": {
+            "enum": [
+              "try",
+              "choose",
+              "unchoose",
+              "place",
+              "remove",
+              "move",
+              "dead_end",
+              "solution_found",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "grid",
+          "active_cell",
+          "related_cells",
+          "description",
+          "pseudocode_line",
+          "result"
+        ],
+        "title": "SubsetsStep",
+        "type": "object"
+      },
+      "SudokuInput": {
+        "additionalProperties": false,
+        "properties": {
+          "board": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Board",
+            "type": "array"
+          }
+        },
+        "required": [
+          "board"
+        ],
+        "title": "SudokuInput",
+        "type": "object"
+      },
+      "SudokuResult": {
+        "additionalProperties": false,
+        "description": "Result of a Sudoku step. The step's grid holds the current board.",
+        "properties": {
+          "conflicts": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "solution": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Solution",
+            "type": "array"
+          },
+          "solved": {
+            "title": "Solved",
+            "type": "boolean"
+          },
+          "tried_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tried Value"
+          }
+        },
+        "required": [
+          "solved",
+          "solution",
+          "tried_value",
+          "conflicts"
+        ],
+        "title": "SudokuResult",
+        "type": "object"
+      },
+      "SudokuSolverRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "sudoku_solver",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "board": {
+            "default": [
+              [
+                "5",
+                "3",
+                ".",
+                ".",
+                "7",
+                ".",
+                ".",
+                "1",
+                "."
+              ],
+              [
+                "6",
+                ".",
+                ".",
+                "1",
+                "9",
+                "5",
+                ".",
+                "4",
+                "."
+              ],
+              [
+                ".",
+                "9",
+                "8",
+                ".",
+                ".",
+                ".",
+                ".",
+                "6",
+                "."
+              ],
+              [
+                "8",
+                ".",
+                ".",
+                ".",
+                "6",
+                "1",
+                ".",
+                ".",
+                "3"
+              ],
+              [
+                "4",
+                "2",
+                ".",
+                "8",
+                ".",
+                "3",
+                ".",
+                ".",
+                "1"
+              ],
+              [
+                "7",
+                ".",
+                ".",
+                ".",
+                "2",
+                ".",
+                ".",
+                ".",
+                "6"
+              ],
+              [
+                ".",
+                "6",
+                ".",
+                ".",
+                ".",
+                ".",
+                "2",
+                "8",
+                "."
+              ],
+              [
+                ".",
+                ".",
+                ".",
+                "4",
+                "1",
+                "9",
+                ".",
+                ".",
+                "5"
+              ],
+              [
+                ".",
+                ".",
+                ".",
+                ".",
+                "8",
+                ".",
+                ".",
+                "7",
+                "9"
+              ]
+            ],
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "maxItems": 9,
+              "minItems": 9,
+              "type": "array"
+            },
+            "maxItems": 9,
+            "minItems": 9,
+            "title": "Board",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "SudokuSolverRequest",
+        "type": "object"
+      },
+      "SudokuSolverResponse": {
+        "properties": {
+          "algorithm": {
+            "const": "sudoku_solver",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "fixed_cells": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Fixed Cells",
+            "type": "array"
+          },
+          "initial_board": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Initial Board",
+            "type": "array"
+          },
+          "input": {
+            "$ref": "#/components/schemas/SudokuInput"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/SudokuStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count",
+          "initial_board",
+          "fixed_cells"
+        ],
+        "title": "SudokuSolverResponse",
+        "type": "object"
+      },
+      "SudokuStep": {
+        "properties": {
+          "active_cell": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Cell"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "grid": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Grid",
+            "type": "array"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "related_cells": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Related Cells",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SudokuResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "enum": [
+              "try",
+              "choose",
+              "unchoose",
+              "place",
+              "remove",
+              "move",
+              "dead_end",
+              "solution_found",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "grid",
+          "active_cell",
+          "related_cells",
+          "description",
+          "pseudocode_line",
+          "result"
+        ],
+        "title": "SudokuStep",
+        "type": "object"
+      },
+      "TextPairInput": {
+        "additionalProperties": false,
+        "properties": {
+          "text_a": {
+            "title": "Text A",
+            "type": "string"
+          },
+          "text_b": {
+            "title": "Text B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text_a",
+          "text_b"
+        ],
+        "title": "TextPairInput",
+        "type": "object"
+      },
+      "TimeComplexity": {
+        "properties": {
+          "average": {
+            "title": "Average",
+            "type": "string"
+          },
+          "best": {
+            "title": "Best",
+            "type": "string"
+          },
+          "worst": {
+            "title": "Worst",
+            "type": "string"
+          }
+        },
+        "required": [
+          "best",
+          "average",
+          "worst"
+        ],
+        "title": "TimeComplexity",
+        "type": "object"
+      },
+      "TraversalResult": {
+        "additionalProperties": false,
+        "description": "Result of an inorder, preorder, or postorder traversal.",
+        "properties": {
+          "order": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Order",
+            "type": "array"
+          }
+        },
+        "required": [
+          "order"
+        ],
+        "title": "TraversalResult",
+        "type": "object"
+      },
+      "TreeInput": {
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          },
+          "values": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values"
+        ],
+        "title": "TreeInput",
+        "type": "object"
+      },
+      "TreeNode": {
+        "description": "A binary tree node snapshot.",
+        "properties": {
+          "balance_factor": {
+            "title": "Balance Factor",
+            "type": "integer"
+          },
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "left": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TreeNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "right": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TreeNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "left",
+          "right"
+        ],
+        "title": "TreeNode",
+        "type": "object"
+      },
+      "TreeRequest": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "bst_insert",
+              "avl_insert",
+              "bst_search",
+              "inorder_traversal",
+              "preorder_traversal",
+              "postorder_traversal"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "values": {
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 31,
+            "minItems": 1,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "values"
+        ],
+        "title": "TreeRequest",
+        "type": "object"
+      },
+      "TreeResponse": {
+        "properties": {
+          "algorithm": {
+            "enum": [
+              "bst_insert",
+              "avl_insert",
+              "bst_search",
+              "inorder_traversal",
+              "preorder_traversal",
+              "postorder_traversal"
+            ],
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/TreeInput"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/TreeStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "algorithm",
+          "input",
+          "steps",
+          "step_count"
+        ],
+        "title": "TreeResponse",
+        "type": "object"
+      },
+      "TreeStep": {
+        "description": "A single visual state produced by a tree algorithm.",
+        "properties": {
+          "current_node": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Node"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "imbalanced_node": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Imbalanced Node"
+          },
+          "path": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "pseudocode_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudocode Line"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BstInsertResult"
+              },
+              {
+                "$ref": "#/components/schemas/AvlInsertResult"
+              },
+              {
+                "$ref": "#/components/schemas/BstSearchResult"
+              },
+              {
+                "$ref": "#/components/schemas/TraversalResult"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "rotation_nodes": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Rotation Nodes",
+            "type": "array"
+          },
+          "rotation_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "left",
+                  "right",
+                  "left_right",
+                  "right_left"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rotation Type"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "tree": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TreeNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "enum": [
+              "compare",
+              "insert",
+              "visit",
+              "found",
+              "not_found",
+              "traverse",
+              "balance_check",
+              "imbalance",
+              "rotate",
+              "done"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "visited": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Visited",
+            "type": "array"
+          }
+        },
+        "required": [
+          "type",
+          "tree",
+          "current_node",
+          "target",
+          "visited",
+          "path",
+          "result",
+          "description",
+          "pseudocode_line"
+        ],
+        "title": "TreeStep",
+        "type": "object"
+      },
+      "UniquePathsRequest": {
+        "properties": {
+          "algorithm": {
+            "const": "unique_paths",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "cols": {
+            "default": 7,
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Cols",
+            "type": "integer"
+          },
+          "rows": {
+            "default": 3,
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "algorithm"
+        ],
+        "title": "UniquePathsRequest",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Algorithm Visualizer API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Root  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Root"
+      }
+    },
+    "/algorithms": {
+      "get": {
+        "operationId": "algorithms_algorithms_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlgorithmsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Algorithms"
+      }
+    },
+    "/backtracking/steps": {
+      "post": {
+        "operationId": "backtracking_steps_backtracking_steps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "mapping": {
+                    "maze_solver": "#/components/schemas/MazeSolverRequest",
+                    "n_queens": "#/components/schemas/NQueensRequest",
+                    "permutations": "#/components/schemas/PermutationsRequest",
+                    "subsets": "#/components/schemas/SubsetsRequest",
+                    "sudoku_solver": "#/components/schemas/SudokuSolverRequest"
+                  },
+                  "propertyName": "algorithm"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/NQueensRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/MazeSolverRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PermutationsRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SubsetsRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SudokuSolverRequest"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "discriminator": {
+                    "mapping": {
+                      "maze_solver": "#/components/schemas/MazeSolverResponse",
+                      "n_queens": "#/components/schemas/NQueensResponse",
+                      "permutations": "#/components/schemas/PermutationsResponse",
+                      "subsets": "#/components/schemas/SubsetsResponse",
+                      "sudoku_solver": "#/components/schemas/SudokuSolverResponse"
+                    },
+                    "propertyName": "algorithm"
+                  },
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/NQueensResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MazeSolverResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/PermutationsResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SubsetsResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SudokuSolverResponse"
+                    }
+                  ],
+                  "title": "Response Backtracking Steps Backtracking Steps Post"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Backtracking Steps"
+      }
+    },
+    "/dynamic-programming/steps": {
+      "post": {
+        "operationId": "dynamic_programming_steps_dynamic_programming_steps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "mapping": {
+                    "coin_change": "#/components/schemas/CoinChangeRequest",
+                    "edit_distance": "#/components/schemas/EditDistanceRequest",
+                    "fibonacci": "#/components/schemas/FibonacciRequest",
+                    "knapsack": "#/components/schemas/KnapsackRequest",
+                    "lcs": "#/components/schemas/LongestCommonSubsequenceRequest",
+                    "unique_paths": "#/components/schemas/UniquePathsRequest"
+                  },
+                  "propertyName": "algorithm"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/FibonacciRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CoinChangeRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/KnapsackRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/LongestCommonSubsequenceRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/EditDistanceRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/UniquePathsRequest"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicProgrammingResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Dynamic Programming Steps"
+      }
+    },
+    "/graph/steps": {
+      "post": {
+        "operationId": "graph_steps_graph_steps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraphRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Graph Steps"
+      }
+    },
+    "/hash-tables/steps": {
+      "post": {
+        "operationId": "hash_table_steps_hash_tables_steps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HashTableRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HashTableResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Hash Table Steps"
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Report that the service is up, for container and platform health checks.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/numbers/random": {
+      "post": {
+        "operationId": "random_numbers_numbers_random_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RandomNumbersResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Random Numbers"
+      }
+    },
+    "/searching/steps": {
+      "post": {
+        "operationId": "searching_steps_searching_steps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Searching Steps"
+      }
+    },
+    "/sorting/steps": {
+      "post": {
+        "operationId": "sorting_steps_sorting_steps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SortResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sorting Steps"
+      }
+    },
+    "/trees/steps": {
+      "post": {
+        "operationId": "tree_steps_trees_steps_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TreeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Tree Steps"
+      }
+    }
+  }
+}

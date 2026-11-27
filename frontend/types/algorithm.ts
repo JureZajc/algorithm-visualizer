@@ -1,61 +1,21 @@
-export type ArrayStepType =
-  | "compare"
-  | "swap"
-  | "overwrite"
-  | "partition"
-  | "merge"
-  | "heapify"
-  | "found"
-  | "not_found"
-  | "done";
+import type { components } from "@/types/generated/api";
 
-export interface ArrayAlgorithmStep {
-  type: ArrayStepType;
-  indices: number[];
-  array: number[];
-  description: string;
-  pseudocode_line?: number;
-}
+type Schemas = components["schemas"];
 
-export type VisualizerMode =
-  | "sorting"
-  | "compare"
-  | "searching"
-  | "graph"
-  | "dynamic_programming"
-  | "backtracking"
-  | "trees"
-  | "hash_tables";
+export type ArrayAlgorithmStep = Schemas["AlgorithmStep"];
+export type ArrayStepType = ArrayAlgorithmStep["type"];
 
-export type AlgorithmCategory = Exclude<VisualizerMode, "compare">;
+/**
+ * An algorithm's catalog entry. The forms take input limits from the generated
+ * catalog at build time, so the entries that the panels use leave them out.
+ */
+export type AlgorithmMetadata = Omit<Schemas["AlgorithmMetadata"], "limits">;
+export type AlgorithmCategory = AlgorithmMetadata["category"];
+export type TimeComplexity = Schemas["TimeComplexity"];
+export type AlgorithmsResponse = Schemas["AlgorithmsResponse"];
 
-export interface TimeComplexity {
-  best: string;
-  average: string;
-  worst: string;
-}
-
-export interface AlgorithmMetadata {
-  id: string;
-  label: string;
-  name: string;
-  category: AlgorithmCategory;
-  description: string;
-  time_complexity: TimeComplexity;
-  space_complexity: string;
-  notes: string[];
-  pseudocode: string[];
-}
-
-export interface AlgorithmsResponse {
-  sorting: AlgorithmMetadata[];
-  searching: AlgorithmMetadata[];
-  graph: AlgorithmMetadata[];
-  dynamic_programming: AlgorithmMetadata[];
-  backtracking: AlgorithmMetadata[];
-  trees: AlgorithmMetadata[];
-  hash_tables: AlgorithmMetadata[];
-}
+/** A view in the app: one per category, plus the sorting comparison. */
+export type VisualizerMode = AlgorithmCategory | "compare";
 
 export interface MetadataSourceProps {
   algorithms: AlgorithmMetadata[];

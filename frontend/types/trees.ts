@@ -1,70 +1,24 @@
-export type TreeAlgorithm =
-  | "bst_insert"
-  | "avl_insert"
-  | "bst_search"
-  | "inorder_traversal"
-  | "preorder_traversal"
-  | "postorder_traversal";
+import type { components } from "@/types/generated/api";
+import { CATALOG_LABELS } from "@/types/generated/catalog";
 
-export type TreeStepType =
-  | "compare"
-  | "insert"
-  | "visit"
-  | "found"
-  | "not_found"
-  | "traverse"
-  | "balance_check"
-  | "imbalance"
-  | "rotate"
-  | "done";
+type Schemas = components["schemas"];
 
-export type TreeRotationType =
-  | "left"
-  | "right"
-  | "left_right"
-  | "right_left";
-
-export interface TreeNode {
-  value: number;
-  left: TreeNode | null;
-  right: TreeNode | null;
-  height?: number;
-  balance_factor?: number;
-}
-
-export interface TreeStep {
-  type: TreeStepType;
-  tree: TreeNode | null;
-  current_node: number | null;
-  target: number | null;
-  visited: number[];
-  path: number[];
+export type TreeRequest = Schemas["TreeRequest"];
+export type TreeResponse = Schemas["TreeResponse"];
+/** The result of a step, typed per operation. */
+export type TreeStepResult = NonNullable<Schemas["TreeStep"]["result"]>;
+/**
+ * A step of a tree algorithm. The tree view reads `result` as a plain record,
+ * so it stays one here until the view narrows it to `TreeStepResult`.
+ */
+export type TreeStep = Omit<Schemas["TreeStep"], "result"> & {
   result: Record<string, unknown> | null;
-  description: string;
-  pseudocode_line: number | null;
-  imbalanced_node?: number | null;
-  rotation_type?: TreeRotationType | null;
-  rotation_nodes?: number[];
-}
-
-export interface TreeRequest {
-  algorithm: TreeAlgorithm;
-  values: number[];
-  target?: number | null;
-}
-
-export interface TreeResponse {
-  algorithm: TreeAlgorithm;
-  input: Record<string, unknown>;
-  steps: TreeStep[];
-  step_count: number;
-}
-
-export const TREE_ALGORITHM_LABELS: Record<TreeAlgorithm, string> = {
-  bst_insert: "BST Insert",
-  avl_insert: "AVL Tree Insert",
-  bst_search: "BST Search",
-  inorder_traversal: "Inorder Traversal",
-  preorder_traversal: "Preorder Traversal",
-  postorder_traversal: "Postorder Traversal",
 };
+export type TreeNode = Schemas["TreeNode"];
+
+export type TreeAlgorithm = TreeRequest["algorithm"];
+export type TreeStepType = TreeStep["type"];
+export type TreeRotationType = NonNullable<TreeStep["rotation_type"]>;
+
+export const TREE_ALGORITHM_LABELS: Record<TreeAlgorithm, string> =
+  CATALOG_LABELS.trees;

@@ -1,4 +1,8 @@
+import { CATALOG_LIMITS } from "@/types/generated/catalog";
 import type { HashKey, HashTableStrategy } from "@/types/hash-tables";
+
+// Every hash table operation takes the same request, so any one's limits apply.
+const LIMITS = CATALOG_LIMITS.hash_tables.hash_insert_chaining;
 
 export type ParsedValues =
   | { ok: true; values: HashKey[] }
@@ -15,15 +19,15 @@ export type ParsedTarget =
 export function validateHashValues(raw: string): ParsedValues {
   const trimmed = raw.trim();
   if (trimmed.length === 0) {
-    return { ok: false, error: "Enter 1 to 31 comma-separated keys." };
+    return { ok: false, error: `Enter ${LIMITS.values.min_items} to ${LIMITS.values.max_items} comma-separated keys.` };
   }
 
   const parts = raw.split(",").map((part) => part.trim());
   if (parts.some((part) => part.length === 0)) {
     return { ok: false, error: "Use commas between keys without empty entries." };
   }
-  if (parts.length < 1 || parts.length > 31) {
-    return { ok: false, error: "Enter 1 to 31 keys." };
+  if (parts.length < LIMITS.values.min_items || parts.length > LIMITS.values.max_items) {
+    return { ok: false, error: `Enter ${LIMITS.values.min_items} to ${LIMITS.values.max_items} keys.` };
   }
 
   try {
@@ -41,8 +45,8 @@ export function validateTableSize(raw: string): ParsedTableSize {
   if (!Number.isInteger(tableSize)) {
     return { ok: false, error: "Enter a whole number table size." };
   }
-  if (tableSize < 2 || tableSize > 31) {
-    return { ok: false, error: "Table size must be between 2 and 31." };
+  if (tableSize < LIMITS.table_size.minimum || tableSize > LIMITS.table_size.maximum) {
+    return { ok: false, error: `Table size must be between ${LIMITS.table_size.minimum} and ${LIMITS.table_size.maximum}.` };
   }
   return { ok: true, tableSize };
 }
