@@ -1,14 +1,24 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ComponentType } from "react";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
+import { SearchingVisualizer } from "@/components/searching-visualizer";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
 import { RUN_TIMEOUT_MS, runTimeoutMessage } from "@/hooks/use-visualization-run";
 import * as api from "@/lib/api";
+import type { MetadataSourceProps } from "@/types/algorithm";
 
 vi.mock("@/lib/api", () => ({
+  fetchSearchingSteps: vi.fn(),
   fetchSortingSteps: vi.fn(),
   generateRandomNumbers: vi.fn(),
 }));
+
+/** Each category's request function, started by its "Start visualization" button. */
+const CATEGORIES: { name: string; component: ComponentType<MetadataSourceProps>; request: () => Mock }[] = [
+  { name: "Sorting", component: SortingVisualizer, request: () => vi.mocked(api.fetchSortingSteps) },
+  { name: "Searching", component: SearchingVisualizer, request: () => vi.mocked(api.fetchSearchingSteps) },
+];
 
 const props = { algorithms: [], isMetadataLoading: false, metadataError: null };
 
@@ -35,8 +45,7 @@ function startButton() {
 }
 
 beforeEach(() => {
-  vi.mocked(api.fetchSortingSteps).mockReset();
-  vi.mocked(api.generateRandomNumbers).mockReset();
+  for (const mock of Object.values(api)) vi.mocked(mock).mockReset();
 });
 
 describe("category runs", () => {
@@ -58,15 +67,29 @@ describe("category runs", () => {
     expect(stalled.signals[0].aborted).toBe(true);
   });
 
-  it("Sorting cancels its request when the category unmounts", () => {
+  it.each(CATEGORIES)("$name cancels its request when the category unmounts", ({ component: Component, request }) => {
     const stalled = stalledRequest();
-    vi.mocked(api.fetchSortingSteps).mockImplementation(stalled.request);
-    const { unmount } = render(<SortingVisualizer {...props} />);
+    request().mockImplementation(stalled.request);
+    const { unmount } = render(<Component {...props} />);
 
     fireEvent.click(startButton());
+    expect(request()).toHaveBeenCalledTimes(1);
     expect(stalled.signals[0].aborted).toBe(false);
     unmount();
     expect(stalled.signals[0].aborted).toBe(true);
+  });
+
+  it.each(CATEGORIES)("$name shows the backend's error and clears it on the next run", async ({ component: Component, request }) => {
+    request().mockRejectedValueOnce(new Error("The backend returned status 503."));
+    request().mockImplementationOnce(stalledRequest().request);
+    render(<Component {...props} />);
+
+    fireEvent.click(startButton());
+    await waitFor(() => expect(runError()).toBe("The backend returned status 503."));
+    expect(screen.getAllByText("Error").length).toBeGreaterThan(0);
+
+    fireEvent.click(startButton());
+    expect(runError()).toBeNull();
   });
 
   it("Sorting keeps the generated values when the steps request fails", async () => {
