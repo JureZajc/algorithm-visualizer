@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test as base, type Page } from "@playwright/test";
 
 // Fails a test on any uncaught exception or console error, such as a CORS
@@ -17,11 +18,36 @@ const test = base.extend<{ pageErrors: string[] }>({
   ],
 });
 
+/**
+ * Runs axe on the whole page and fails on serious and critical violations. Minor and moderate
+ * findings are left to review, so the scan guards against regressions without blocking on them.
+ */
+async function expectNoSeriousViolations(page: Page, state: string) {
+  // Cells and bars fade between colors when a step changes. Sampled mid-fade, their colors are a
+  // blend that fails contrast although neither end state does, so scan the settled page.
+  await page.evaluate(() =>
+    Promise.all(
+      document.getAnimations().filter((animation) => animation instanceof CSSTransition).map((animation) => animation.finished),
+    ),
+  );
+  const { violations } = await new AxeBuilder({ page }).analyze();
+  const blocking = violations
+    .filter((violation) => violation.impact === "serious" || violation.impact === "critical")
+    .map((violation) => {
+      const targets = violation.nodes.slice(0, 5).map((node) => node.target.join(" "));
+      return `${violation.id} (${violation.impact}): ${violation.help} at ${targets.join(", ")}`;
+    });
+  expect(blocking, `axe found serious or critical violations ${state}`).toEqual([]);
+}
+
 async function openCategory(page: Page, name: string) {
   await page.goto("/");
   const tab = page.getByRole("navigation", { name: "Visualizer mode" }).getByRole("button", { name, exact: true });
   await tab.click();
   await expect(tab).toHaveAttribute("aria-current", "page");
+  // The overview comes from GET /algorithms; scan once the page has settled.
+  await expect(page.getByRole("heading", { name: "Algorithm overview" }).or(page.getByRole("heading", { name: "Ready to compare" }))).toBeVisible();
+  await expectNoSeriousViolations(page, `before a ${name} run`);
 }
 
 /** Starts the default input, jumps to the last step, and checks the result. */
@@ -38,6 +64,7 @@ async function runToEnd(page: Page, resultLabel: string, result: string) {
   await expect(stats.getByText(result, { exact: true })).toBeVisible();
   // The overview comes from GET /algorithms.
   await expect(page.getByRole("heading", { name: "Algorithm overview" })).toBeVisible();
+  await expectNoSeriousViolations(page, "after the run");
 }
 
 test.describe("smoke", () => {
@@ -67,6 +94,7 @@ test.describe("smoke", () => {
       const badge = cards.filter({ has: page.getByRole("heading", { name, exact: true }) }).getByText("Fewest steps");
       await expect(badge).toHaveCount(total === fewest ? 1 : 0);
     }
+    await expectNoSeriousViolations(page, "after the comparison");
   });
 
   test("Searching finds the sample target", async ({ page }) => {
@@ -98,4 +126,19 @@ test.describe("smoke", () => {
     await openCategory(page, "Hash Tables");
     await runToEnd(page, "Insert result", "4 keys inserted");
   });
+});
+
+test("the speed slider is a 44px target that moves with the arrow keys", async ({ page }) => {
+  await page.goto("/");
+  const slider = page.getByRole("slider", { name: /Animation speed/ });
+  const box = await slider.boundingBox();
+  expect(box?.height).toBeGreaterThanOrEqual(44);
+
+  await slider.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(slider).toHaveValue("340");
+  await expect(slider).toHaveAttribute("aria-valuetext", "340 milliseconds per step");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowLeft");
+  await expect(slider).toHaveValue("300");
 });

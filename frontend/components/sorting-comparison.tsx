@@ -325,7 +325,7 @@ function ComparisonCard({
       <div className="mb-4 flex items-start justify-between gap-3">
         <h3 className="m-0 text-base font-extrabold tracking-normal text-slate-950">{result.algorithmName}</h3>
         {isWinner ? (
-          <span className="shrink-0 rounded-full bg-emerald-600 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.08em] text-white">
+          <span className="shrink-0 rounded-full bg-emerald-700 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.08em] text-white">
             Fewest steps
           </span>
         ) : null}
@@ -335,17 +335,16 @@ function ComparisonCard({
         <Metric label="Comparisons" value={String(result.comparisons)} />
         <Metric label="Swaps" value={String(result.swaps)} />
         <Metric label="Overwrites" value={String(result.overwrites)} />
-        <div className="col-span-2">
-          <Metric label="Avg. time" value={result.timeComplexity} />
-        </div>
+        <Metric className="col-span-2" label="Avg. time" value={result.timeComplexity} />
       </dl>
     </article>
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+// A <dl> may group each <dt> and <dd> in one <div>, but no deeper.
+function Metric({ className, label, value }: { className?: string; label: string; value: string }) {
   return (
-    <div>
+    <div className={className}>
       <dt className="mb-1 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-slate-500">{label}</dt>
       <dd className="m-0 font-mono text-sm font-bold text-slate-950">{value}</dd>
     </div>
