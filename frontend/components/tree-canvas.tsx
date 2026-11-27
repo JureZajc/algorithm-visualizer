@@ -1,3 +1,4 @@
+import { OverflowFrame } from "@/components/overflow-frame";
 import type { TreeNode, TreeStep, TreeStepType } from "@/types/trees";
 
 interface TreeCanvasProps {
@@ -121,9 +122,14 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
   );
 
   return (
-    <div className="overflow-auto rounded-2xl border border-slate-200 bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.10),transparent_64%)] shadow-inner">
+    <OverflowFrame
+      className="max-h-[min(75vh,720px)] rounded-2xl border border-slate-200 bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.10),transparent_64%)] shadow-inner"
+      label="Binary search tree"
+    >
+      {/* Never narrower than the layout, so large trees scroll instead of shrinking their nodes. */}
       <svg
-        className="h-auto min-h-[360px] min-w-[650px] w-full"
+        className="block h-auto w-full"
+        style={{ minWidth: layout.width }}
         viewBox={`0 0 ${layout.width} ${layout.height}`}
         role="img"
         aria-label="Binary search tree visualization"
@@ -258,7 +264,7 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
           </text>
         ) : null}
       </svg>
-    </div>
+    </OverflowFrame>
   );
 }
 

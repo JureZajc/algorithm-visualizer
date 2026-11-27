@@ -1,3 +1,4 @@
+import { OverflowFrame } from "@/components/overflow-frame";
 import type {
   DynamicProgrammingCell,
   DynamicProgrammingStep,
@@ -74,7 +75,10 @@ export function DynamicProgrammingTable({
   }
 
   return (
-    <div className="max-h-[520px] overflow-auto rounded-2xl border border-slate-200 bg-slate-50 p-3">
+    <OverflowFrame
+      className="max-h-[520px] rounded-2xl border border-slate-200 bg-slate-50 p-3"
+      label="Dynamic programming table"
+    >
       <table className="min-w-full border-separate border-spacing-1 text-center">
         <thead>
           <tr>
@@ -121,6 +125,6 @@ export function DynamicProgrammingTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </OverflowFrame>
   );
 }

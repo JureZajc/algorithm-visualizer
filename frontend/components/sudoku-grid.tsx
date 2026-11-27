@@ -1,3 +1,5 @@
+import { gridTrackStyle, useRovingGridFocus } from "@/components/backtracking-grid";
+import { OverflowFrame } from "@/components/overflow-frame";
 import type {
   BacktrackingStep,
   GridPosition,
@@ -25,6 +27,9 @@ const cellStateClasses = {
   removed: "bg-violet-100 text-violet-800 ring-2 ring-violet-300 ring-offset-1",
   solved: "bg-emerald-50 text-emerald-800",
 };
+
+/** 44px editable cells; the board's 2px left border sits beside the tracks. */
+const SUDOKU_TRACKS = gridTrackStyle(9, "2.75rem", "0px", "2px");
 
 function positionKey(position: GridPosition) {
   return `${position[0]}:${position[1]}`;
@@ -89,62 +94,78 @@ export function SudokuGrid({
   );
   const isSolvedStep =
     step?.type === "solution_found" || (step?.type === "done" && result?.solved);
+  const roving = useRovingGridFocus(9, 9);
 
   return (
-    <div className="overflow-auto rounded-2xl border border-slate-200 bg-slate-50 p-3">
-      <div className="mx-auto grid min-w-[306px] max-w-[612px] grid-cols-9 border-l-2 border-t-2 border-slate-900 bg-slate-900">
-        {displayBoard.map((row, rowIndex) =>
-          row.map((cell, columnIndex) => {
-            const key = `${rowIndex}:${columnIndex}`;
-            const isActive = activeKey === key;
-            const isFixed = fixedKeys.has(key);
-            const isConflict = conflictKeys.has(key);
-            const isRelated = relatedKeys.has(key);
-            const shownValue =
-              isActive &&
-              result?.tried_value &&
-              (step?.type === "try" ||
-                step?.type === "dead_end" ||
-                step?.type === "remove")
-                ? result.tried_value
-                : cell;
-            const stateClass = isConflict
-              ? cellStateClasses.conflict
-              : isActive && step?.type === "remove"
-                ? cellStateClasses.removed
-                : isActive
-                  ? cellStateClasses.active
-                  : isSolvedStep && cell !== "."
-                    ? cellStateClasses.solved
-                    : isFixed
-                      ? cellStateClasses.fixed
-                      : isRelated
-                        ? cellStateClasses.related
-                        : cellStateClasses.editable;
+    <OverflowFrame
+      className="rounded-2xl border border-slate-200 bg-slate-50 p-3"
+      focusable={editingDisabled}
+      label="Sudoku board"
+    >
+      <div
+        aria-label="Sudoku board"
+        className="mx-auto grid w-full max-w-[612px] border-l-2 border-t-2 border-slate-900 bg-slate-900"
+        role={editingDisabled ? "table" : "grid"}
+        style={SUDOKU_TRACKS}
+        onKeyDown={editingDisabled ? undefined : roving.onKeyDown}
+      >
+        {displayBoard.map((row, rowIndex) => (
+          <div className="col-span-full grid grid-cols-subgrid" key={rowIndex} role="row">
+            {row.map((cell, columnIndex) => {
+              const key = `${rowIndex}:${columnIndex}`;
+              const isActive = activeKey === key;
+              const isFixed = fixedKeys.has(key);
+              const isConflict = conflictKeys.has(key);
+              const isRelated = relatedKeys.has(key);
+              const shownValue =
+                isActive &&
+                result?.tried_value &&
+                (step?.type === "try" ||
+                  step?.type === "dead_end" ||
+                  step?.type === "remove")
+                  ? result.tried_value
+                  : cell;
+              const stateClass = isConflict
+                ? cellStateClasses.conflict
+                : isActive && step?.type === "remove"
+                  ? cellStateClasses.removed
+                  : isActive
+                    ? cellStateClasses.active
+                    : isSolvedStep && cell !== "."
+                      ? cellStateClasses.solved
+                      : isFixed
+                        ? cellStateClasses.fixed
+                        : isRelated
+                          ? cellStateClasses.related
+                          : cellStateClasses.editable;
 
-            return (
-              <input
-                aria-label={`Sudoku row ${rowIndex + 1}, column ${columnIndex + 1}`}
-                className={`aspect-square min-h-8 min-w-8 border-slate-300 text-center font-mono text-lg font-black leading-none transition focus:z-10 focus:outline-none sm:min-h-12 sm:min-w-12 ${borderClass(rowIndex, columnIndex)} ${stateClass} ${editingDisabled ? "cursor-default" : "cursor-text"}`}
-                disabled={editingDisabled}
-                inputMode="numeric"
-                key={key}
-                maxLength={1}
-                title={`Row ${rowIndex + 1}, column ${columnIndex + 1}`}
-                type="text"
-                value={shownValue === "." ? "" : shownValue}
-                onChange={(event) =>
-                  onCellChange(
-                    rowIndex,
-                    columnIndex,
-                    normalizeSudokuInput(event.target.value),
-                  )
-                }
-              />
-            );
-          }),
-        )}
+              return (
+                <div className="min-w-0" key={key} role={editingDisabled ? "cell" : "gridcell"}>
+                  <input
+                    {...(editingDisabled ? {} : roving.cellProps(rowIndex, columnIndex))}
+                    aria-label={`Sudoku row ${rowIndex + 1}, column ${columnIndex + 1}`}
+                    className={`relative block aspect-square w-full min-w-0 border-slate-300 text-center font-mono text-lg font-black leading-none transition focus:z-10 focus:outline-none ${borderClass(rowIndex, columnIndex)} ${stateClass} ${editingDisabled ? "cursor-default" : "cursor-text"}`}
+                    disabled={editingDisabled}
+                    inputMode="numeric"
+                    maxLength={1}
+                    size={1}
+                    title={`Row ${rowIndex + 1}, column ${columnIndex + 1}`}
+                    type="text"
+                    value={shownValue === "." ? "" : shownValue}
+                    onChange={(event) =>
+                      onCellChange(
+                        rowIndex,
+                        columnIndex,
+                        normalizeSudokuInput(event.target.value),
+                      )
+                    }
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
-    </div>
+    </OverflowFrame>
   );
 }
