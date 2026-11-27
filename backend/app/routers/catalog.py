@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
 from app.algorithms.metadata import (
-    AlgorithmsResponse,
     BACKTRACKING_ALGORITHM_METADATA,
     DYNAMIC_PROGRAMMING_ALGORITHM_METADATA,
     GRAPH_ALGORITHM_METADATA,
@@ -9,6 +8,7 @@ from app.algorithms.metadata import (
     SEARCHING_ALGORITHM_METADATA,
     SORTING_ALGORITHM_METADATA,
     TREES_ALGORITHM_METADATA,
+    AlgorithmsResponse,
 )
 
 

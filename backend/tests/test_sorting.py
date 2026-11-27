@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 import pytest
 
+from app.algorithms.metadata import ALGORITHM_METADATA
 from app.algorithms.sorting import (
     bubble_sort_steps,
     cocktail_shaker_sort_steps,
@@ -15,7 +16,6 @@ from app.algorithms.sorting import (
     selection_sort_steps,
     shell_sort_steps,
 )
-from app.algorithms.metadata import ALGORITHM_METADATA
 from app.algorithms.types import AlgorithmStep, create_step
 
 

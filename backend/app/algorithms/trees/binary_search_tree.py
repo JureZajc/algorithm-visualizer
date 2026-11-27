@@ -127,10 +127,7 @@ def bst_search_steps(values: list[int], target: int) -> list[TreeStep]:
             )
             break
 
-        if target < current["value"]:
-            current = current["left"]
-        else:
-            current = current["right"]
+        current = current["left"] if target < current["value"] else current["right"]
     else:
         result = {"found": False, "target": target, "path": path.copy()}
         steps.append(
