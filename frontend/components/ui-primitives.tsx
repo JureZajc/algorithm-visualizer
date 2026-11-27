@@ -145,19 +145,133 @@ export function Button({
   );
 }
 
+/**
+ * A card. It renders a `section`, which is a landmark, only when it has an accessible name
+ * (`aria-label` or `aria-labelledby`); an unnamed panel is a plain `div`. Pass `as` to choose.
+ */
 export function Panel({
+  as,
   children,
   className,
   variant = "default",
   ...props
 }: HTMLAttributes<HTMLElement> & {
+  as?: "section" | "div" | "aside";
   children: ReactNode;
   variant?: PanelVariant;
 }) {
+  const isNamed = Boolean(props["aria-label"] || props["aria-labelledby"]);
+  const Element = as ?? (isNamed ? "section" : "div");
   return (
-    <section className={panelClassName(variant, className)} {...props}>
+    <Element className={panelClassName(variant, className)} {...props}>
       {children}
-    </section>
+    </Element>
+  );
+}
+
+/** The control panel of a category: a named region that lays its fields out on a grid. */
+export function ControlPanel({
+  children,
+  className,
+  label,
+}: {
+  children: ReactNode;
+  /** Grid columns and other layout classes, added to the shared padding and gap. */
+  className?: string;
+  /** Accessible name of the region, such as "Searching controls". */
+  label: string;
+}) {
+  return (
+    <Panel aria-label={label} className={joinClasses("mb-5 grid gap-4 p-5", className)} variant="control">
+      {children}
+    </Panel>
+  );
+}
+
+/** A wrapping row of buttons. */
+export function ActionRow({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={joinClasses("flex flex-wrap items-center gap-2", className)}>{children}</div>;
+}
+
+/**
+ * A labelled slider that shows its value. The input box is 44px tall, so the whole row is a
+ * pointer target, not only the 16px track. The arrow keys move it by `step`.
+ */
+export function RangeField({
+  className,
+  disabled,
+  label,
+  max,
+  min,
+  onChange,
+  step,
+  unit,
+  value,
+  valueText,
+}: {
+  className?: string;
+  disabled?: boolean;
+  label: string;
+  max: number;
+  min: number;
+  onChange: (value: number) => void;
+  step: number;
+  /** Shown after the value, such as "ms". */
+  unit?: string;
+  value: number;
+  /** What a screen reader announces for the value; defaults to the visible value. */
+  valueText?: string;
+}) {
+  const shownValue = unit ? `${value} ${unit}` : String(value);
+  return (
+    <label className={joinClasses("flex flex-col gap-1 text-xs font-bold text-slate-700", className)}>
+      <span className="flex justify-between gap-3">
+        <span>{label}</span>
+        <span className="font-mono text-indigo-600">{shownValue}</span>
+      </span>
+      <input
+        aria-valuetext={valueText ?? shownValue}
+        className="h-11 w-full cursor-pointer accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-45"
+        disabled={disabled}
+        max={max}
+        min={min}
+        step={step}
+        type="range"
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+    </label>
+  );
+}
+
+/** The animation speed slider: the delay between autoplay steps, in milliseconds. */
+export function SpeedField({
+  className,
+  max,
+  min,
+  onChange,
+  step,
+  value,
+}: {
+  className?: string;
+  max: number;
+  min: number;
+  onChange: (value: number) => void;
+  step: number;
+  value: number;
+}) {
+  return (
+    <RangeField
+      className={className}
+      label="Animation speed"
+      max={max}
+      min={min}
+      step={step}
+      unit="ms"
+      value={value}
+      valueText={`${value} milliseconds per step`}
+      onChange={onChange}
+    />
   );
 }
 
@@ -263,6 +377,53 @@ export function EmptyState({
       <h2 className="mb-2 text-lg font-extrabold tracking-normal text-slate-950">{title}</h2>
       <p className="m-0 text-sm leading-6 text-slate-600">{description}</p>
     </section>
+  );
+}
+
+/** The placeholder inside a visualization panel before there is anything to draw. */
+export function VisualizationEmptyState({
+  description,
+  title,
+}: {
+  description: string;
+  title: string;
+}) {
+  return (
+    <div className="grid min-h-48 place-content-center gap-1 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+      <p className="m-0 text-sm font-extrabold text-slate-800">{title}</p>
+      <p className="m-0 max-w-md text-sm leading-6 text-slate-600">{description}</p>
+    </div>
+  );
+}
+
+/** An eyebrow, a heading, and an optional description at the top of a panel. */
+export function SectionHeader({
+  description,
+  eyebrow,
+  title,
+  titleId,
+}: {
+  description?: ReactNode;
+  eyebrow: string;
+  title: string;
+  /** Lets the panel name itself after the heading through `aria-labelledby`. */
+  titleId?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-black uppercase tracking-[0.14em] text-indigo-600">{eyebrow}</span>
+      <h2 className="m-0 text-xl font-extrabold tracking-normal text-slate-950" id={titleId}>{title}</h2>
+      {description ? <p className="m-0 max-w-3xl text-sm leading-6 text-slate-600">{description}</p> : null}
+    </div>
+  );
+}
+
+/** The outcome of a finished run. Long values wrap instead of widening the panel. */
+export function ResultSummary({ children }: { children: ReactNode }) {
+  return (
+    <div className="mt-3 break-words rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-800" aria-live="polite">
+      {children}
+    </div>
   );
 }
 
