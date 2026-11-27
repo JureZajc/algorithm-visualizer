@@ -7,6 +7,7 @@ import { DynamicProgrammingVisualizer } from "@/components/dynamic-programming-v
 import { GraphVisualizer } from "@/components/graph-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
+import { TreesVisualizer } from "@/components/trees-visualizer";
 import { RUN_TIMEOUT_MS, runTimeoutMessage } from "@/hooks/use-visualization-run";
 import * as api from "@/lib/api";
 import type { MetadataSourceProps } from "@/types/algorithm";
@@ -17,6 +18,7 @@ vi.mock("@/lib/api", () => ({
   fetchGraphSteps: vi.fn(),
   fetchSearchingSteps: vi.fn(),
   fetchSortingSteps: vi.fn(),
+  fetchTreeSteps: vi.fn(),
   generateRandomNumbers: vi.fn(),
 }));
 
@@ -27,6 +29,7 @@ const CATEGORIES: { name: string; component: ComponentType<MetadataSourceProps>;
   { name: "Graph", component: GraphVisualizer, request: () => vi.mocked(api.fetchGraphSteps) },
   { name: "Dynamic Programming", component: DynamicProgrammingVisualizer, request: () => vi.mocked(api.fetchDynamicProgrammingSteps) },
   { name: "Backtracking", component: BacktrackingVisualizer, request: () => vi.mocked(api.fetchBacktrackingSteps) },
+  { name: "Trees", component: TreesVisualizer, request: () => vi.mocked(api.fetchTreeSteps) },
 ];
 
 const props = { algorithms: [], isMetadataLoading: false, metadataError: null };
@@ -133,6 +136,24 @@ describe("category controls", () => {
     expect(sliders).toHaveLength(1);
     expect(sliders[0].className.split(" ")).toContain("h-11");
     expect(sliders[0].getAttribute("aria-valuetext")).toMatch(/^\d+ milliseconds per step$/);
+  });
+
+  it("Trees shows an empty state until a run draws the tree", async () => {
+    const tree = { value: 8, left: null, right: null };
+    vi.mocked(api.fetchTreeSteps).mockResolvedValue({
+      algorithm: "bst_insert",
+      input: { values: [8] },
+      steps: [{ type: "done", tree, current_node: 8, visited: [], path: [], description: "Tree complete.", pseudocode_line: null, result: null }],
+      step_count: 1,
+    } as unknown as Awaited<ReturnType<typeof api.fetchTreeSteps>>);
+    render(<TreesVisualizer {...props} />);
+
+    expect(screen.getByText("No tree yet")).toBeTruthy();
+    expect(screen.queryByRole("img", { name: "Binary search tree visualization" })).toBeNull();
+
+    fireEvent.click(startButton());
+    await waitFor(() => expect(screen.getByRole("img", { name: "Binary search tree visualization" })).toBeTruthy());
+    expect(screen.queryByText("No tree yet")).toBeNull();
   });
 
   it("Backtracking marks the selected maze tool as pressed", () => {
