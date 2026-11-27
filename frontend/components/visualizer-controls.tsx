@@ -3,6 +3,7 @@ import { useState } from "react";
 import { StepControls } from "@/components/step-controls";
 import { Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
 import type { SortingPreset } from "@/lib/array-presets";
+import { validateCountDraft } from "@/lib/sorting-input";
 import { ALGORITHM_LABELS, type SortingAlgorithm } from "@/types/sorting";
 
 interface VisualizerControlsProps {
@@ -145,15 +146,4 @@ export function VisualizerControls(props: VisualizerControlsProps) {
       </div>
     </Panel>
   );
-}
-
-function validateCountDraft(rawValue: string) {
-  const value = Number(rawValue.trim());
-  if (!Number.isInteger(value)) {
-    return { error: "Enter a whole number from 5 to 50.", value: null };
-  }
-  if (value < 5 || value > 50) {
-    return { error: "Random values must be between 5 and 50.", value: null };
-  }
-  return { error: null, value };
 }
