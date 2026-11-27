@@ -6,7 +6,13 @@
 
 - Audit completed on 2026-07-10.
 - Phase 1 is in progress. The checkboxes below record which items have shipped.
-- Reviewed against the code on 2026-11-17: items 1, 2, and 5 have shipped. Item 4 is partly done: playback reset is labelled “Reset run,” and its other points remain. Items 3, 6, 7, 8, and 9 are open. [improvement.md](improvement.md#3-finish-ux-audit-phase-1) lists what remains for each item.
+- Reviewed against the code on 2026-11-27: items 1, 2, 5, 6, and 8 have shipped. Items 3, 4, 7, and 9 are partly done:
+  - Item 3 has `OverflowFrame`; the other primitives remain.
+  - Item 4 has the “Reset run” label, form message rows that render only when there is a message, and 44px graph remove buttons. The 44px slider hit area and the danger variant for clear and remove actions remain.
+  - Item 7 has readable category names in the metadata badge. Legends, empty states, and result wrapping remain.
+  - Item 9 has one tab stop with arrow-key movement in the maze and Sudoku grids, keyboard placement of graph nodes, and list semantics for hash buckets. Named panel landmarks, `aria-pressed` on the maze tools, and linking the graph and tree drawings to the step description remain.
+
+  [improvement.md](improvement.md#3-finish-ux-audit-phase-1) lists what remains for each item, and task T9 in [improvement-tasks.md](improvement-tasks.md) covers it.
 - Phase 2 has not started.
 
 ## Audit Summary
