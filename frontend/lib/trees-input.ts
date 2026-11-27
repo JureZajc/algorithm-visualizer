@@ -1,3 +1,8 @@
+import { CATALOG_LIMITS } from "@/types/generated/catalog";
+
+// Every tree algorithm takes the same request, so any one's limits apply.
+const VALUE_LIMITS = CATALOG_LIMITS.trees.bst_insert.values;
+
 export type ParsedValues =
   | { ok: true; values: number[] }
   | { ok: false; error: string };
@@ -9,7 +14,7 @@ export type ParsedTarget =
 export function validateTreeValues(raw: string): ParsedValues {
   const trimmed = raw.trim();
   if (trimmed.length === 0) {
-    return { ok: false, error: "Enter 1 to 31 comma-separated integer values." };
+    return { ok: false, error: `Enter ${VALUE_LIMITS.min_items} to ${VALUE_LIMITS.max_items} comma-separated integer values.` };
   }
 
   const parts = raw.split(",").map((part) => part.trim());
@@ -21,8 +26,8 @@ export function validateTreeValues(raw: string): ParsedValues {
   if (values.some((value) => !Number.isInteger(value))) {
     return { ok: false, error: "Tree values must be numbers, like 10, 20, 30." };
   }
-  if (values.length < 1 || values.length > 31) {
-    return { ok: false, error: "Enter 1 to 31 values." };
+  if (values.length < VALUE_LIMITS.min_items || values.length > VALUE_LIMITS.max_items) {
+    return { ok: false, error: `Enter ${VALUE_LIMITS.min_items} to ${VALUE_LIMITS.max_items} values.` };
   }
 
   const seen = new Set<number>();

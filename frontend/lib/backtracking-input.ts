@@ -9,6 +9,9 @@ import type {
   SudokuBoard,
   SudokuCell,
 } from "@/types/backtracking";
+import { CATALOG_LIMITS } from "@/types/generated/catalog";
+
+const LIMITS = CATALOG_LIMITS.backtracking;
 
 export interface BacktrackingForm {
   size: string;
@@ -60,21 +63,30 @@ export function createRequest(
   if (algorithm === "n_queens") {
     return {
       algorithm,
-      size: requireRange(parseInteger(form.size, "Board size"), "Board size", 1, 10),
+      size: requireRange(
+        parseInteger(form.size, "Board size"),
+        "Board size",
+        LIMITS.n_queens.size.minimum,
+        LIMITS.n_queens.size.maximum,
+      ),
     };
   }
 
   if (algorithm === "permutations") {
     return {
       algorithm,
-      values: parseValueList(form.values, "Values", 6),
+      values: parseValueList(
+        form.values,
+        "Values",
+        LIMITS.permutations.values.max_items,
+      ),
     };
   }
 
   if (algorithm === "subsets") {
     return {
       algorithm,
-      values: parseValueList(form.values, "Values", 10),
+      values: parseValueList(form.values, "Values", LIMITS.subsets.values.max_items),
     };
   }
 
@@ -90,8 +102,18 @@ export function createRequest(
 
   const request: BacktrackingRequest = {
     algorithm,
-    rows: requireRange(parseInteger(form.rows, "Rows"), "Rows", 2, 15),
-    cols: requireRange(parseInteger(form.cols, "Columns"), "Columns", 2, 15),
+    rows: requireRange(
+      parseInteger(form.rows, "Rows"),
+      "Rows",
+      LIMITS.maze_solver.rows.minimum,
+      LIMITS.maze_solver.rows.maximum,
+    ),
+    cols: requireRange(
+      parseInteger(form.cols, "Columns"),
+      "Columns",
+      LIMITS.maze_solver.cols.minimum,
+      LIMITS.maze_solver.cols.maximum,
+    ),
     preset: form.preset,
   };
 

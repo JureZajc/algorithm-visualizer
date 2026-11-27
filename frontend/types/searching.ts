@@ -1,16 +1,10 @@
-import type { ArrayAlgorithmStep } from "@/types/algorithm";
+import type { components } from "@/types/generated/api";
+import { CATALOG_LABELS } from "@/types/generated/catalog";
 
-export type SearchingAlgorithm = "linear_search" | "binary_search";
+type Schemas = components["schemas"];
 
-export interface SearchingStepsResponse {
-  algorithm: SearchingAlgorithm;
-  target: number;
-  initial: number[];
-  steps: ArrayAlgorithmStep[];
-  step_count: number;
-}
+export type SearchingAlgorithm = Schemas["SearchRequest"]["algorithm"];
+export type SearchingStepsResponse = Schemas["SearchResponse"];
 
-export const SEARCHING_ALGORITHM_LABELS: Record<SearchingAlgorithm, string> = {
-  linear_search: "Linear Search",
-  binary_search: "Binary Search",
-};
+export const SEARCHING_ALGORITHM_LABELS: Record<SearchingAlgorithm, string> =
+  CATALOG_LABELS.searching;

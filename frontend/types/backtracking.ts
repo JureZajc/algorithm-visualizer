@@ -1,145 +1,75 @@
-export type BacktrackingAlgorithm =
-  | "n_queens"
-  | "maze_solver"
-  | "permutations"
-  | "subsets"
-  | "sudoku_solver";
+import type { components } from "@/types/generated/api";
+import { CATALOG_LABELS } from "@/types/generated/catalog";
 
-export type BacktrackingStepType =
-  | "try"
-  | "choose"
-  | "unchoose"
-  | "place"
-  | "remove"
-  | "move"
-  | "dead_end"
-  | "solution_found"
-  | "done";
+type Schemas = components["schemas"];
 
-export type BacktrackingCell =
-  | "empty"
-  | "wall"
-  | "start"
-  | "end"
-  | "queen"
-  | "attempt"
-  | "conflict"
-  | "visited"
-  | "path"
-  | "backtracked"
-  | "solution";
+/** A request model's fields other than `algorithm`, each optional. */
+type OptionalFields<Model> = Partial<Omit<Model, "algorithm">>;
 
-export type MazePreset = "classic" | "open" | "rooms";
+export type BacktrackingResponse =
+  | Schemas["NQueensResponse"]
+  | Schemas["MazeSolverResponse"]
+  | Schemas["PermutationsResponse"]
+  | Schemas["SubsetsResponse"]
+  | Schemas["SudokuSolverResponse"];
+export type BacktrackingStep = BacktrackingResponse["steps"][number];
+export type BacktrackingResult = NonNullable<BacktrackingStep["result"]>;
+
+export type NQueensResult = Schemas["NQueensResult"];
+export type MazeSolverResult = Schemas["MazeSolverResult"];
+export type ListBacktrackingState = Schemas["ListBacktrackingState"];
+export type PermutationsResult = Schemas["PermutationsResult"];
+export type SubsetsResult = Schemas["SubsetsResult"];
+export type SudokuResult = Schemas["SudokuResult"];
+
+/** Sudoku data that every step shares; the API sends it once per run. */
+export type SudokuRun = Pick<
+  Schemas["SudokuSolverResponse"],
+  "initial_board" | "fixed_cells"
+>;
+
+export type BacktrackingAlgorithm = BacktrackingResponse["algorithm"];
+export type BacktrackingStepType = BacktrackingStep["type"];
+export type MazePreset = MazeSolverResult["preset"];
+export type GridPosition = MazeSolverResult["path"][number];
+
+type MazeGridCell = NonNullable<Schemas["MazeSolverRequest"]["grid"]>[number][number];
+
+/**
+ * A cell token in a maze or N-Queens grid. The API types step grids as plain
+ * strings, so the N-Queens tokens are listed here.
+ */
+export type BacktrackingCell = MazeGridCell | "queen" | "attempt" | "conflict";
 export type MazeTool = "empty" | "wall" | "start" | "end";
-export type GridPosition = [number, number];
+
+/**
+ * A Sudoku cell as the editor holds it, with "." for an empty cell. The API
+ * accepts any digit string and returns plain strings.
+ */
 export type SudokuCell = "." | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 export type SudokuBoard = SudokuCell[][];
 export type BacktrackingStepGridCell = BacktrackingCell | SudokuCell;
 
-export interface NQueensResult {
-  solved: boolean;
-  size: number;
-  solution: GridPosition[];
-}
-
-export interface MazeSolverResult {
-  solved: boolean;
-  rows: number;
-  cols: number;
-  preset: MazePreset;
-  path: GridPosition[];
-}
-
-export interface ListBacktrackingState {
-  values: string[];
-  partial: string[];
-  active_item: string | null;
-  active_index: number | null;
-  depth: number;
-  used?: boolean[];
-  decision?: string;
-  /** Sent only on `solution_found` steps: the one result that step adds. */
-  generated_item?: string[];
-  generated_count: number;
-}
-
-export interface PermutationsResult {
-  values: string[];
-  permutations: string[][];
-  count: number;
-}
-
-export interface SubsetsResult {
-  values: string[];
-  subsets: string[][];
-  count: number;
-}
-
-export interface SudokuResult {
-  solved: boolean;
-  solution: SudokuBoard | [];
-  tried_value: SudokuCell | null;
-  conflicts: GridPosition[];
-}
-
-/** Sudoku data that every step shares; the API sends it once per run. */
-export interface SudokuRun {
-  initial_board: SudokuBoard;
-  fixed_cells: GridPosition[];
-}
-
-export type BacktrackingResult =
-  | NQueensResult
-  | MazeSolverResult
-  | ListBacktrackingState
-  | PermutationsResult
-  | SubsetsResult
-  | SudokuResult;
-
-export interface BacktrackingStep {
-  type: BacktrackingStepType;
-  grid: BacktrackingStepGridCell[][];
-  active_cell: GridPosition | null;
-  related_cells: GridPosition[];
-  description: string;
-  pseudocode_line: number | null;
-  result: BacktrackingResult | null;
-}
-
-export interface BacktrackingRequest {
+/**
+ * The API has one request model per algorithm and reads only the fields of the
+ * selected one. The forms and presets build every algorithm's request through
+ * this single type, so it has the fields of all the models. The maze grid and
+ * the Sudoku board use the editor's cell types.
+ */
+export type BacktrackingRequest = {
   algorithm: BacktrackingAlgorithm;
-  size?: number;
-  rows?: number;
-  cols?: number;
-  preset?: MazePreset;
-  values?: string[];
-  board?: SudokuBoard;
   grid?: BacktrackingCell[][];
-  start?: GridPosition;
-  end?: GridPosition;
-}
-
-export interface BacktrackingResponse {
-  algorithm: BacktrackingAlgorithm;
-  input: Record<string, unknown>;
-  steps: BacktrackingStep[];
-  step_count: number;
-  /** Sudoku only; null for the other algorithms. */
-  initial_board: SudokuBoard | null;
-  /** Sudoku only; null for the other algorithms. */
-  fixed_cells: GridPosition[] | null;
-}
+  board?: SudokuBoard;
+} & OptionalFields<Schemas["NQueensRequest"]> &
+  OptionalFields<Omit<Schemas["MazeSolverRequest"], "grid">> &
+  OptionalFields<Schemas["PermutationsRequest"]> &
+  OptionalFields<Schemas["SubsetsRequest"]> &
+  OptionalFields<Omit<Schemas["SudokuSolverRequest"], "board">>;
 
 export const BACKTRACKING_ALGORITHM_LABELS: Record<
   BacktrackingAlgorithm,
   string
-> = {
-  n_queens: "N-Queens",
-  maze_solver: "Maze Solver",
-  permutations: "Permutations",
-  subsets: "Subsets",
-  sudoku_solver: "Sudoku Solver",
-};
+> = CATALOG_LABELS.backtracking;
 
 export const MAZE_PRESET_LABELS: Record<MazePreset, string> = {
   classic: "Classic corridors",
