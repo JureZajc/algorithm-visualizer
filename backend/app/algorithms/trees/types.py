@@ -1,4 +1,6 @@
-from typing import Literal, NotRequired, TypeAlias, TypedDict
+from typing import Literal, NotRequired, TypeAlias, TypedDict, cast
+
+from pydantic import ConfigDict, with_config
 
 
 TreeAlgorithm = Literal[
@@ -25,7 +27,12 @@ TreeStepType = Literal[
 RotationType = Literal["left", "right", "left_right", "right_left"]
 
 TreeValue: TypeAlias = int
+# The algorithms build results as plain dicts. TreeStepResult describes their
+# shapes, and the API validates every step against it.
 TreeResult: TypeAlias = dict[str, object]
+
+# An undeclared key fails validation instead of being dropped from a response.
+_EXACT_KEYS = ConfigDict(extra="forbid")
 
 
 class TreeNode(TypedDict):
@@ -38,6 +45,47 @@ class TreeNode(TypedDict):
     balance_factor: NotRequired[int]
 
 
+@with_config(_EXACT_KEYS)
+class BstInsertResult(TypedDict):
+    """Result of a BST insert run: the final tree and its inorder values."""
+
+    root: TreeNode | None
+    values: list[TreeValue]
+    inorder: list[TreeValue]
+
+
+@with_config(_EXACT_KEYS)
+class AvlInsertResult(TypedDict):
+    """Result of an AVL insert run, with the final height and balance check."""
+
+    root: TreeNode | None
+    values: list[TreeValue]
+    inorder: list[TreeValue]
+    height: int
+    balanced: bool
+
+
+@with_config(_EXACT_KEYS)
+class BstSearchResult(TypedDict):
+    """Result of a BST search: whether the target was found and the path."""
+
+    found: bool
+    target: TreeValue
+    path: list[TreeValue]
+
+
+@with_config(_EXACT_KEYS)
+class TraversalResult(TypedDict):
+    """Result of an inorder, preorder, or postorder traversal."""
+
+    order: list[TreeValue]
+
+
+TreeStepResult: TypeAlias = (
+    BstInsertResult | AvlInsertResult | BstSearchResult | TraversalResult
+)
+
+
 class TreeStep(TypedDict):
     """A single visual state produced by a tree algorithm."""
 
@@ -47,7 +95,7 @@ class TreeStep(TypedDict):
     target: TreeValue | None
     visited: list[TreeValue]
     path: list[TreeValue]
-    result: TreeResult | None
+    result: TreeStepResult | None
     description: str
     pseudocode_line: int | None
     imbalanced_node: NotRequired[TreeValue | None]
@@ -96,7 +144,9 @@ def create_tree_step(
         "target": target,
         "visited": (visited or []).copy(),
         "path": (path or []).copy(),
-        "result": result.copy() if result is not None else None,
+        "result": (
+            cast(TreeStepResult, result.copy()) if result is not None else None
+        ),
         "description": description,
         "pseudocode_line": pseudocode_line,
     }

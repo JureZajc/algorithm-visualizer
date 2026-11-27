@@ -17,7 +17,7 @@ substitute the printed backend URL when a fallback is selected.
 | Method | Path | Purpose |
 | --- | --- | --- |
 | `GET` | `/` | API welcome response |
-| `GET` | `/algorithms` | Metadata, complexities, notes, and pseudocode |
+| `GET` | `/algorithms` | Metadata, complexities, notes, pseudocode, and input limits |
 | `POST` | `/numbers/random` | Generate a bounded random integer array |
 | `POST` | `/sorting/steps` | Generate sorting execution states |
 | `POST` | `/searching/steps` | Generate linear or binary search states |
@@ -32,6 +32,8 @@ substitute the printed backend URL when a fallback is selected.
 Step-generation responses identify the selected algorithm, repeat the normalized input where useful, return an ordered `steps` array, and include `step_count`.
 
 Each step contains the state fields needed by its visualization plus a human-readable `description`. Most steps also include a 1-based `pseudocode_line`, which the frontend uses to highlight the corresponding line from the metadata catalog.
+
+Every request, `input`, and step `result` has a typed schema in the OpenAPI document. Dynamic programming and backtracking have one request schema per algorithm, selected by `algorithm`, and backtracking also has one response schema per algorithm.
 
 Complexity values describe the algorithms themselves; they do not include the additional snapshots retained for animation.
 
@@ -59,11 +61,32 @@ Complexity values describe the algorithms themselves; they do not include the ad
     "  if the left value is larger, swap the pair",
     "  stop early if the pass made no swaps",
     "return the sorted array"
-  ]
+  ],
+  "limits": {
+    "numbers": {
+      "minimum": null,
+      "maximum": null,
+      "min_length": null,
+      "max_length": null,
+      "min_items": null,
+      "max_items": 50,
+      "items": {
+        "minimum": -1000000,
+        "maximum": 1000000,
+        "min_length": null,
+        "max_length": null,
+        "min_items": null,
+        "max_items": null,
+        "items": null
+      }
+    }
+  }
 }
 ```
 
 `label` is retained as a compatibility alias for `name`.
+
+`limits` maps each bounded request field to its bounds. `minimum` and `maximum` bound a number, `min_length` and `max_length` count the characters of a string, `min_items` and `max_items` count the items of a list, and `items` bounds each item of a list. A `null` bound does not apply, and a field without bounds is left out. The limits are read from the request models that enforce them, so they always match the OpenAPI schema. Rules that relate two fields, such as matching Knapsack lists or unique tree values, are described in the sections below.
 
 ## Arrays
 
@@ -169,7 +192,18 @@ Graph requests accept at most 30 nodes and 200 edges, with non-empty node names 
 
 ## Dynamic Programming
 
-The request fields vary by algorithm. For example, 0/1 Knapsack uses:
+Each algorithm has its own request schema, selected by `algorithm`. An omitted field takes its default, and fields that belong to another algorithm are ignored. The response's `input` repeats the fields the algorithm used.
+
+| `algorithm` | Fields and defaults |
+| --- | --- |
+| `fibonacci` | `n` = 8 |
+| `coin_change` | `coins` = `[1, 3, 4]`, `amount` = 6 |
+| `knapsack` | `weights` = `[2, 3, 4, 5]`, `values` = `[3, 4, 5, 6]`, `capacity` = 5 |
+| `lcs` | `text_a` = `"ABCDEF"`, `text_b` = `"ACE"` |
+| `edit_distance` | `text_a` = `"kitten"`, `text_b` = `"sitting"` |
+| `unique_paths` | `rows` = 3, `cols` = 7 |
+
+For example, 0/1 Knapsack uses:
 
 ```json
 {
@@ -190,9 +224,19 @@ Longest Common Subsequence uses:
 }
 ```
 
-Other algorithms use `n` for Fibonacci, `coins` and `amount` for Coin Change, `text_a` and `text_b` for Edit Distance, or `rows` and `cols` for Grid Unique Paths.
+Knapsack requires `weights` and `values` of the same length. The bounds of every field are listed under `limits` in `GET /algorithms`.
 
 ## Backtracking
+
+Each algorithm has its own request schema, selected by `algorithm`. An omitted field takes its default, and fields that belong to another algorithm are ignored.
+
+| `algorithm` | Fields and defaults |
+| --- | --- |
+| `n_queens` | `size` = 4 |
+| `maze_solver` | `rows` = 7, `cols` = 7, `preset` = `"classic"`; optional `grid`, `start`, `end` |
+| `permutations` | `values` = `["A", "B", "C"]` |
+| `subsets` | `values` = `["A", "B", "C"]` |
+| `sudoku_solver` | `board` = the default puzzle, which brute force solves in 1,434 steps |
 
 ```json
 {
@@ -208,7 +252,9 @@ Other algorithms use `n` for Fibonacci, `coins` and `amount` for Coin Change, `t
 }
 ```
 
-Backtracking also supports `maze_solver`, `subsets`, and `sudoku_solver`. Maze requests can use deterministic presets or a custom grid with start and end coordinates. Sudoku requests accept a 9 × 9 board; puzzles whose brute-force search exceeds 10,000 steps are rejected with HTTP 422. Permutation and subset values are limited to 12 characters each.
+Maze requests can use deterministic presets or a custom `grid` of `rows` rows and `cols` cells, with `[row, column]` coordinates for `start` and `end`. The response's `input` lists `end` under `target`. Sudoku requests accept a 9 × 9 board; puzzles whose brute-force search exceeds 10,000 steps are rejected with HTTP 422. Permutation and subset values are trimmed and limited to 12 characters each.
+
+The response schema also depends on `algorithm`: each one states the shape of its steps' `result`.
 
 Steps do not repeat data that a client can keep or rebuild:
 
@@ -241,6 +287,11 @@ The example is abbreviated with `"…"`; it shows the default puzzle's first try
 
 ## Validation Errors
 
-Invalid input is returned through FastAPI's standard HTTP 422 validation response. Algorithm-specific checks include array bounds and ordering, unique tree values, graph references and weight constraints, bounded dynamic-programming inputs, and well-formed backtracking boards or grids.
+Invalid input is rejected with HTTP 422 in one of two forms:
+
+- A request that does not match its schema, including a value outside its `limits`, returns FastAPI's standard validation response: `detail` is a list of errors, each with a `loc` path, a `msg`, and a `type`. For dynamic programming and backtracking, the path names the algorithm, for example `["body", "fibonacci", "n"]`.
+- A check that needs the algorithm itself returns `detail` as a single message, for example an unsorted Binary Search input, a negative Dijkstra weight, or a Sudoku puzzle with duplicate givens or more than 10,000 steps.
+
+Checks that relate several fields use the first form, with a `msg` that starts with `Value error,`. They include unique tree values, graph references, matching Knapsack lists, and a custom maze grid that matches `rows` and `cols`.
 
 For the exact current schema, use the generated OpenAPI interface at the API docs URL printed by the helper (`http://127.0.0.1:8000/docs` when the preferred port is available).

@@ -1,4 +1,6 @@
-from typing import Literal, TypeAlias, TypedDict
+from typing import Literal, NotRequired, TypeAlias, TypedDict, cast
+
+from pydantic import ConfigDict, with_config
 
 
 HashTableAlgorithm = Literal[
@@ -23,7 +25,39 @@ HashTableStepType = Literal[
 ]
 
 HashKey: TypeAlias = int | str
+# The algorithms build results as plain dicts. HashTableStepResult describes
+# their shapes, and the API validates every step against it.
 HashTableResult: TypeAlias = dict[str, object]
+
+# An undeclared key fails validation instead of being dropped from a response.
+_EXACT_KEYS = ConfigDict(extra="forbid")
+
+
+@with_config(_EXACT_KEYS)
+class HashInsertResult(TypedDict):
+    """Result of an insert run: the table's size and final load factor."""
+
+    strategy: HashTableStrategy
+    table_size: int
+    values: list[HashKey]
+    load_factor: float
+
+
+@with_config(_EXACT_KEYS)
+class HashSearchResult(TypedDict):
+    """Result of a search: where the target was found or the search stopped."""
+
+    found: bool
+    target: HashKey
+    # The bucket or slot where the search ended; null when probing wrapped
+    # around a full table without finding the target.
+    bucket: int | None
+    # Separate chaining only: the target's position within its bucket.
+    index: NotRequired[int]
+    visited_buckets: list[int]
+
+
+HashTableStepResult: TypeAlias = HashInsertResult | HashSearchResult
 
 
 class HashTableBucket(TypedDict):
@@ -47,7 +81,7 @@ class HashTableStep(TypedDict):
     active_bucket: int | None
     active_item: HashKey | None
     visited_buckets: list[int]
-    result: HashTableResult | None
+    result: HashTableStepResult | None
     description: str
     pseudocode_line: int | None
 
@@ -104,7 +138,9 @@ def create_hash_table_step(
         "active_bucket": active_bucket,
         "active_item": active_item,
         "visited_buckets": (visited_buckets or []).copy(),
-        "result": result.copy() if result is not None else None,
+        "result": (
+            cast(HashTableStepResult, result.copy()) if result is not None else None
+        ),
         "description": description,
         "pseudocode_line": pseudocode_line,
     }

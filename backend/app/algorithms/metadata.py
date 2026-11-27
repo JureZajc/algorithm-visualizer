@@ -2,6 +2,10 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from app.schemas import ALGORITHM_REQUEST_MODELS
+from app.schemas.backtracking import MAX_PERMUTATION_VALUES, MAX_SUBSET_VALUES
+from app.schemas.limits import InputLimit, request_limits
+
 
 AlgorithmCategory = Literal[
     "sorting",
@@ -30,6 +34,9 @@ class AlgorithmMetadata(BaseModel):
     space_complexity: str
     notes: list[str]
     pseudocode: list[str]
+    # Bounds on the algorithm's request fields, keyed by field name. They come
+    # from the request model, which enforces them.
+    limits: dict[str, InputLimit]
 
 
 class AlgorithmsResponse(BaseModel):
@@ -67,6 +74,7 @@ def metadata(
         space_complexity=space,
         notes=list(notes),
         pseudocode=ALGORITHM_PSEUDOCODE[algorithm_id],
+        limits=request_limits(ALGORITHM_REQUEST_MODELS[algorithm_id]),
     )
 
 
@@ -920,7 +928,7 @@ BACKTRACKING_ALGORITHM_METADATA = [
         "O(n · n!)",
         "O(n · n!)",
         "O(n)",
-        "Input is limited to 6 values to keep the step stream readable.",
+        f"Input is limited to {MAX_PERMUTATION_VALUES} values to keep the step stream readable.",
         "Duplicate input values are treated as distinct positions.",
     ),
     metadata(
@@ -932,7 +940,7 @@ BACKTRACKING_ALGORITHM_METADATA = [
         "O(n · 2ⁿ)",
         "O(n · 2ⁿ)",
         "O(n)",
-        "Input is limited to 10 values to keep output size bounded.",
+        f"Input is limited to {MAX_SUBSET_VALUES} values to keep output size bounded.",
         "The empty subset is included in the generated results.",
     ),
     metadata(
