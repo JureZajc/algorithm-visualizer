@@ -1,3 +1,4 @@
+import { OverflowFrame } from "@/components/overflow-frame";
 import type {
   HashKey,
   HashTableSnapshot,
@@ -38,57 +39,82 @@ const ITEM_STATE_CLASSES: Record<HashTableStepType | "idle", string> = {
 };
 
 export function HashTableView({ table, step }: HashTableViewProps) {
-  if (table.strategy === "linear_probing") {
-    return <LinearProbingTable table={table} step={step} />;
-  }
+  const isProbing = table.strategy === "linear_probing";
+  const containerName = isProbing ? "slot" : "bucket";
+  const containerCount = table.buckets.length;
+  const keyCount = table.buckets.reduce((total, bucket) => total + bucket.items.length, 0);
+  const caption = `${plural(containerCount, containerName)} · ${plural(keyCount, "key")} stored`;
 
-  return <ChainingTable table={table} step={step} />;
+  return (
+    <OverflowFrame
+      caption={caption}
+      className="max-h-[min(70vh,640px)] rounded-2xl border border-slate-200 bg-slate-50 p-3"
+      label={`Hash table, ${plural(containerCount, containerName)}`}
+    >
+      {isProbing ? <LinearProbingTable table={table} step={step} /> : <ChainingTable table={table} step={step} />}
+    </OverflowFrame>
+  );
 }
 
+// An explicit list role keeps list semantics in Safari, which drops them for unstyled lists.
 function ChainingTable({ table, step }: HashTableViewProps) {
   return (
-    <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+    <ol aria-label="Buckets" className="m-0 grid list-none gap-2 p-0" role="list">
       {table.buckets.map((bucket) => {
         const bucketClass = bucketStateClass(bucket.index, step);
+        const stateLabel = bucketStateLabel(bucket.index, step);
         return (
-          <div
+          <li
             className={`grid min-h-16 grid-cols-[4.25rem_minmax(0,1fr)] items-stretch overflow-hidden rounded-xl border shadow-sm transition ${bucketClass}`}
             key={bucket.index}
           >
             <div className="flex items-center justify-center border-r border-inherit px-3 py-2 font-mono text-sm font-black text-slate-700">
+              <span className="sr-only">Bucket </span>
               {bucket.index}
+              {stateLabel ? <span className="sr-only">, {stateLabel}</span> : null}
             </div>
-            <div className="flex min-w-0 flex-wrap items-center gap-2 px-3 py-2">
+            <div className="flex min-w-0 items-center px-3 py-2">
               {bucket.items.length > 0 ? (
-                bucket.items.map((item, itemIndex) => (
-                  <HashItem
-                    key={`${bucket.index}-${itemIndex}-${formatKey(item)}`}
-                    item={item}
-                    isActive={isActiveItem(bucket.index, item, step)}
-                    stepType={step?.type ?? null}
-                  />
-                ))
+                <ul
+                  aria-label={`Chain in bucket ${bucket.index}`}
+                  className="m-0 flex min-w-0 flex-1 list-none flex-wrap items-center gap-2 p-0"
+                  role="list"
+                >
+                  {bucket.items.map((item, itemIndex) => (
+                    <li className="flex min-w-0 max-w-full" key={`${bucket.index}-${itemIndex}-${formatKey(item)}`}>
+                      <HashItem
+                        item={item}
+                        isActive={isActiveItem(bucket.index, item, step)}
+                        stepType={step?.type ?? null}
+                      />
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <span className="rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs font-bold text-slate-400">
+                <span className="rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs font-bold text-slate-500">
                   empty chain
                 </span>
               )}
             </div>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
 
 function LinearProbingTable({ table, step }: HashTableViewProps) {
   return (
-    <div className="grid grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <ol
+      aria-label="Slots"
+      className="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+      role="list"
+    >
       {table.buckets.map((bucket) => {
         const item = bucket.items[0] ?? null;
         const bucketClass = bucketStateClass(bucket.index, step);
         return (
-          <div
+          <li
             className={`min-h-28 rounded-xl border p-3 shadow-sm transition ${bucketClass}`}
             key={bucket.index}
           >
@@ -105,14 +131,14 @@ function LinearProbingTable({ table, step }: HashTableViewProps) {
                 stepType={step?.type ?? null}
               />
             ) : (
-              <div className="flex min-h-11 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white/70 px-2 text-xs font-bold text-slate-400">
+              <div className="flex min-h-11 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white/70 px-2 text-xs font-bold text-slate-500">
                 empty
               </div>
             )}
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
 
@@ -136,18 +162,32 @@ function HashItem({
   );
 }
 
+const BUCKET_BADGE_CLASSES = {
+  active: "bg-slate-950 text-white",
+  hash: "bg-sky-100 text-sky-800",
+  visited: "bg-indigo-100 text-indigo-800",
+};
+
 function BucketBadge({ index, step }: { index: number; step: HashTableStep | null }) {
+  const label = bucketStateLabel(index, step);
+  if (!label) return null;
+  return (
+    <span className={`rounded-full px-2 py-1 text-[0.65rem] font-black uppercase ${BUCKET_BADGE_CLASSES[label]}`}>
+      {label}
+    </span>
+  );
+}
+
+function bucketStateLabel(index: number, step: HashTableStep | null): keyof typeof BUCKET_BADGE_CLASSES | null {
   if (!step) return null;
-  if (step.active_bucket === index) {
-    return <span className="rounded-full bg-slate-950 px-2 py-1 text-[0.65rem] font-black uppercase text-white">active</span>;
-  }
-  if (step.hash_index === index) {
-    return <span className="rounded-full bg-sky-100 px-2 py-1 text-[0.65rem] font-black uppercase text-sky-800">hash</span>;
-  }
-  if (step.visited_buckets.includes(index)) {
-    return <span className="rounded-full bg-indigo-100 px-2 py-1 text-[0.65rem] font-black uppercase text-indigo-800">visited</span>;
-  }
+  if (step.active_bucket === index) return "active";
+  if (step.hash_index === index) return "hash";
+  if (step.visited_buckets.includes(index)) return "visited";
   return null;
+}
+
+function plural(count: number, noun: string) {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
 }
 
 function bucketStateClass(index: number, step: HashTableStep | null) {

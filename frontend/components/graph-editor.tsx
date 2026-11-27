@@ -120,15 +120,15 @@ export function GraphEditor({
           </form>
           {pendingNodeId ? (
             <div className="mt-3 rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm text-indigo-800">
-              Click the canvas to place <strong>{pendingNodeId}</strong>.
+              Click the canvas to place <strong>{pendingNodeId}</strong>, or press Enter while the canvas has focus to place it at the next free position.
               <button className="ml-2 font-bold underline" type="button" disabled={disabled} onClick={onCancelNodePlacement}>Cancel</button>
             </div>
           ) : null}
           <div className="mt-3 flex flex-wrap gap-2">
             {nodes.length === 0 ? <span className="text-sm text-slate-500">No nodes yet.</span> : nodes.map((node) => (
-              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1 text-sm font-bold text-slate-700" key={node.id}>
+              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 pl-3 text-sm font-bold text-slate-700" key={node.id}>
                 {node.id}
-                <button className="flex h-7 w-7 items-center justify-center rounded-full text-rose-600 hover:bg-rose-100" type="button" aria-label={`Remove node ${node.id}`} disabled={disabled} onClick={() => onRemoveNode(node.id)}>×</button>
+                <button className="flex h-11 w-11 items-center justify-center rounded-full text-rose-600 hover:bg-rose-100" type="button" aria-label={`Remove node ${node.id}`} disabled={disabled} onClick={() => onRemoveNode(node.id)}>×</button>
               </span>
             ))}
           </div>
@@ -144,7 +144,7 @@ export function GraphEditor({
           </form>
           <div className="mt-3 grid max-h-44 gap-2 overflow-auto">
             {edges.length === 0 ? <span className="text-sm text-slate-500">No edges yet.</span> : edges.map((edge, index) => (
-              <div className="grid grid-cols-[minmax(0,1fr)_90px_36px] items-center gap-2 rounded-lg bg-slate-50 p-2 text-sm" key={`${edge.source}-${edge.target}-${edge.weight}-${index}`}>
+              <div className="grid grid-cols-[minmax(0,1fr)_90px_44px] items-center gap-2 rounded-lg bg-slate-50 p-2 text-sm" key={`${edge.source}-${edge.target}-${edge.weight}-${index}`}>
                 <span className="truncate font-mono font-bold text-slate-700">{edge.source} {directed ? "→" : "—"} {edge.target}</span>
                 <input
                   className={inputClassName(false, "h-9 px-2 text-sm")}
@@ -166,7 +166,7 @@ export function GraphEditor({
                     }
                   }}
                 />
-                <button className="flex h-9 w-9 items-center justify-center rounded-lg text-rose-600 hover:bg-rose-100" type="button" aria-label={`Remove edge ${edge.source} to ${edge.target}`} disabled={disabled} onClick={() => onRemoveEdge(index)}>×</button>
+                <button className="flex h-11 w-11 items-center justify-center rounded-lg text-rose-600 hover:bg-rose-100" type="button" aria-label={`Remove edge ${edge.source} to ${edge.target}`} disabled={disabled} onClick={() => onRemoveEdge(index)}>×</button>
               </div>
             ))}
           </div>

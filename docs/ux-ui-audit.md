@@ -272,7 +272,7 @@
 
   **Likely files:** Core UI, Supporting panels, Playback, and relevant category/surface files.
 
-- [ ] **8. Make wide visualizations intentionally scrollable**
+- [x] **8. Make wide visualizations intentionally scrollable**
 
   **Concrete problem:** DP is contained but lacks a scroll cue; graph content becomes too small; large trees compress; hash views become thousands of pixels tall; dense grids can overlap.
 
