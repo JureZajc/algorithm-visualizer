@@ -63,9 +63,7 @@ def a_star_steps(
     adjacency = build_adjacency_list(nodes, edges, directed)
     order = count()
     start_estimate = heuristic_values.get(start, 0)
-    priority_queue: list[PriorityEntry] = [
-        (start_estimate, next(order), start, 0)
-    ]
+    priority_queue: list[PriorityEntry] = [(start_estimate, next(order), start, 0)]
     distances: dict[str, int | float] = {start: 0}
     previous: dict[str, str | None] = {node: None for node in nodes}
     visited: list[str] = []

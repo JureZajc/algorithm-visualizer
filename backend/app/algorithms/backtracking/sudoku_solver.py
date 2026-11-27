@@ -61,9 +61,7 @@ def sudoku_solver_steps(
 
     def add_step(step: BacktrackingStep) -> None:
         if max_steps is not None and len(steps) >= max_steps:
-            raise ValueError(
-                f"Sudoku step limit of {max_steps} was exceeded."
-            )
+            raise ValueError(f"Sudoku step limit of {max_steps} was exceeded.")
         steps.append(step)
 
     add_step(
@@ -164,7 +162,9 @@ def sudoku_solver_steps(
         _create_sudoku_step(
             "done",
             solution if solved else working_board,
-            "Sudoku puzzle solved." if solved else "No solution exists for this puzzle.",
+            "Sudoku puzzle solved."
+            if solved
+            else "No solution exists for this puzzle.",
             active_cell=None,
             related_cells=fixed_cells if solved else [],
             pseudocode_line=8,
@@ -206,10 +206,7 @@ def _normalize_cell(value: SudokuInputValue, row: int, column: int) -> str:
             return "."
         if stripped in DIGITS:
             return stripped
-    raise ValueError(
-        "Sudoku cell "
-        f"({row + 1}, {column + 1}) must be 1-9, 0, or '.'."
-    )
+    raise ValueError(f"Sudoku cell ({row + 1}, {column + 1}) must be 1-9, 0, or '.'.")
 
 
 def _validate_givens(board: SudokuBoard) -> None:
@@ -227,9 +224,7 @@ def _validate_givens(board: SudokuBoard) -> None:
                 for row in range(box_row, box_row + BOX_SIZE)
                 for column in range(box_column, box_column + BOX_SIZE)
             ]
-            box_label = (
-                f"box ({box_row // BOX_SIZE + 1}, {box_column // BOX_SIZE + 1})"
-            )
+            box_label = f"box ({box_row // BOX_SIZE + 1}, {box_column // BOX_SIZE + 1})"
             _validate_unit(cells, box_label)
 
 

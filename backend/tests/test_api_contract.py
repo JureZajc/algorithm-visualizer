@@ -246,7 +246,11 @@ CUSTOM_MAZE = [
 ]
 CONTRACT_CASES = [
     *(
-        ("/dynamic-programming/steps", {"algorithm": algorithm}, _dynamic_programming_steps)
+        (
+            "/dynamic-programming/steps",
+            {"algorithm": algorithm},
+            _dynamic_programming_steps,
+        )
         for algorithm in get_args(DynamicProgrammingAlgorithm)
     ),
     *(
@@ -308,7 +312,9 @@ CONTRACT_CASES = [
 @pytest.mark.parametrize(
     ("path", "payload", "run_algorithm"),
     CONTRACT_CASES,
-    ids=[f"{case[1]['algorithm']}-{index}" for index, case in enumerate(CONTRACT_CASES)],
+    ids=[
+        f"{case[1]['algorithm']}-{index}" for index, case in enumerate(CONTRACT_CASES)
+    ],
 )
 def test_typed_responses_return_the_algorithm_steps_unchanged(
     path: str,

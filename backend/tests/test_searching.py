@@ -2,8 +2,8 @@ from collections.abc import Callable
 
 import pytest
 
-from app.algorithms.searching import binary_search_steps, linear_search_steps
 from app.algorithms.metadata import ALGORITHM_METADATA
+from app.algorithms.searching import binary_search_steps, linear_search_steps
 from app.algorithms.types import AlgorithmStep
 
 

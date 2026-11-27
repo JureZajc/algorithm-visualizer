@@ -127,10 +127,7 @@ def bst_search_steps(values: list[int], target: int) -> list[TreeStep]:
             )
             break
 
-        if target < current["value"]:
-            current = current["left"]
-        else:
-            current = current["right"]
+        current = current["left"] if target < current["value"] else current["right"]
     else:
         result = {"found": False, "target": target, "path": path.copy()}
         steps.append(
@@ -229,7 +226,13 @@ def _traversal_steps(
     traversal_name: str,
     done_description: str,
     visit: Callable[
-        [TreeNode | None, TreeNode | None, list[TreeStep], list[TreeValue], list[TreeValue]],
+        [
+            TreeNode | None,
+            TreeNode | None,
+            list[TreeStep],
+            list[TreeValue],
+            list[TreeValue],
+        ],
         None,
     ],
 ) -> list[TreeStep]:

@@ -74,7 +74,7 @@ def test_tree_algorithm_contract(
     assert steps[-1]["type"] == "done"
 
     for step in steps:
-        assert STEP_KEYS <= set(step)
+        assert set(step) >= STEP_KEYS
         assert set(step) - STEP_KEYS <= AVL_STEP_EXTRA_KEYS
         assert isinstance(step["visited"], list)
         assert isinstance(step["path"], list)

@@ -16,6 +16,7 @@ from typing import Any
 from app.main import app
 from app.routers.catalog import algorithms
 
+
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_DIRECTORY = REPOSITORY_ROOT / "frontend" / "types" / "generated"
 CATALOG_HEADER = """\

@@ -144,9 +144,7 @@ def create_tree_step(
         "target": target,
         "visited": (visited or []).copy(),
         "path": (path or []).copy(),
-        "result": (
-            cast(TreeStepResult, result.copy()) if result is not None else None
-        ),
+        "result": (cast(TreeStepResult, result.copy()) if result is not None else None),
         "description": description,
         "pseudocode_line": pseudocode_line,
     }

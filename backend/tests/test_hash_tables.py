@@ -160,9 +160,7 @@ def test_hash_insert_visualizes_collision_steps(
 def test_hash_insert_linear_probing_visits_expected_buckets() -> None:
     steps = hash_insert_linear_probing_steps(VALUES, 10)
     insert_step = next(
-        step
-        for step in steps
-        if step["type"] == "insert" and step["key"] == 32
+        step for step in steps if step["type"] == "insert" and step["key"] == 32
     )
 
     assert insert_step["visited_buckets"] == [2, 3, 4]
@@ -197,7 +195,4 @@ def test_hash_table_step_tables_are_independent_copies() -> None:
 
 
 def _bucket_items(step: HashTableStep) -> dict[int, list[HashKey]]:
-    return {
-        bucket["index"]: bucket["items"]
-        for bucket in step["table"]["buckets"]
-    }
+    return {bucket["index"]: bucket["items"] for bucket in step["table"]["buckets"]}

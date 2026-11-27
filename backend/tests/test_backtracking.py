@@ -67,9 +67,7 @@ SUDOKU_PUZZLE = [
     ["3", "4", "5", "2", "8", "6", "1", "7", "9"],
 ]
 
-BACKTRACKING_CASES: list[
-    tuple[str, BacktrackingFunction, dict[str, object]]
-] = [
+BACKTRACKING_CASES: list[tuple[str, BacktrackingFunction, dict[str, object]]] = [
     ("n_queens", n_queens_steps, {"size": 4}),
     ("maze_solver", maze_solver_steps, {"rows": 5, "cols": 6, "preset": "classic"}),
     ("permutations", permutations_steps, {"values": ["A", "B", "C"]}),

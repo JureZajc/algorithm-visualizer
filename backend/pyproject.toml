@@ -26,3 +26,16 @@ warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.ruff.lint]
+extend-select = ["I", "B", "UP", "SIM", "N", "RUF"]
+
+[tool.ruff.lint.isort]
+# Every module leaves two blank lines after its imports.
+lines-after-imports = 2
+
+[tool.ruff.lint.per-file-ignores]
+# These aliases reach the Pydantic request and response models. Pydantic turns
+# a PEP 695 `type` alias into a schema component of its own, which changes the
+# OpenAPI document, so they stay `TypeAlias` annotations.
+"app/algorithms/*/types.py" = ["UP040"]

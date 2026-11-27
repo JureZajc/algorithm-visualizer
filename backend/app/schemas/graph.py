@@ -42,9 +42,7 @@ class GraphRequest(BaseModel):
                 unknown = min(unknown_nodes)
                 raise ValueError(f"Heuristic node {unknown!r} is not in the graph.")
             if any(value < 0 for value in self.heuristics.values()):
-                raise ValueError(
-                    "A* search requires non-negative heuristic values."
-                )
+                raise ValueError("A* search requires non-negative heuristic values.")
         return self
 
     def graph_edges(self) -> list[GraphEdge]:

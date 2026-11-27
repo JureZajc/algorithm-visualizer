@@ -4,12 +4,14 @@
 import sys
 
 
-if sys.version_info < (3, 12):
+# Ruff applies the backend's Python floor here, but any interpreter can start this.
+if sys.version_info < (3, 12):  # noqa: UP036
     print("Error: Python 3.12 or newer is required.", file=sys.stderr)
     raise SystemExit(1)
 
 
 import argparse
+import contextlib
 import errno
 import os
 import shutil
@@ -98,6 +100,11 @@ def steps_for(command: str) -> tuple[Step, ...]:
         ("uv", "run", "--no-sync", "ruff", "check", ".", "../scripts"),
         BACKEND_DIRECTORY,
     )
+    backend_format = Step(
+        "Backend: checking formatting",
+        ("uv", "run", "--no-sync", "ruff", "format", "--check", ".", "../scripts"),
+        BACKEND_DIRECTORY,
+    )
     backend_mypy = Step(
         "Backend: running mypy",
         ("uv", "run", "--no-sync", "mypy"),
@@ -140,6 +147,7 @@ def steps_for(command: str) -> tuple[Step, ...]:
     if command == "check":
         return (
             backend_ruff,
+            backend_format,
             backend_mypy,
             backend_tests,
             frontend_lint,
@@ -154,6 +162,7 @@ def steps_for(command: str) -> tuple[Step, ...]:
                 BACKEND_DIRECTORY,
             ),
             backend_ruff,
+            backend_format,
             backend_mypy,
             backend_tests,
             Step(
@@ -301,10 +310,8 @@ def stop_servers(processes: list[subprocess.Popen], job: WindowsJob | None) -> N
             pass
     deadline = time.monotonic() + 5
     for process in processes:
-        try:
+        with contextlib.suppress(subprocess.TimeoutExpired):
             process.wait(timeout=max(0, deadline - time.monotonic()))
-        except subprocess.TimeoutExpired:
-            pass
     if job is not None:
         job.close()
     elif os.name != "nt":
@@ -347,7 +354,7 @@ def run_servers(servers: list[tuple[Step, dict[str, str]]]) -> int:
             if job is not None:
                 job.assign(process)
         while True:
-            for (step, _), process in zip(servers, processes):
+            for (step, _), process in zip(servers, processes, strict=True):
                 code = process.poll()
                 if code is not None:
                     print(

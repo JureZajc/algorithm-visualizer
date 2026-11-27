@@ -62,7 +62,5 @@ def cocktail_shaker_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
                 )
         start += 1
 
-    steps.append(
-        create_step("done", [], array, "Cocktail shaker sort is complete.")
-    )
+    steps.append(create_step("done", [], array, "Cocktail shaker sort is complete."))
     return apply_pseudocode_lines(steps, {"compare": 2, "swap": 2, "done": 7})

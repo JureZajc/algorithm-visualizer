@@ -49,6 +49,7 @@ From the `backend` directory:
 
 ```bash
 uv run ruff check . ../scripts
+uv run ruff format --check . ../scripts
 uv run mypy
 uv run pytest
 ```
@@ -62,6 +63,7 @@ root.
 ```text
 backend/
 ├── main.py                    # Re-exports app.main:app
+├── export_api.py              # Writes the OpenAPI schema and catalog that frontend/types/generated/ is built from
 ├── app/
 │   ├── main.py                # FastAPI app, middleware, router registration
 │   ├── routers/               # One router per category, plus the catalog and random numbers

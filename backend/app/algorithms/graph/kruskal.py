@@ -45,7 +45,9 @@ def kruskal_steps(
     """Build a minimum spanning forest using Kruskal's algorithm."""
 
     validate_graph_structure(nodes, edges)
-    sorted_edges = sorted(enumerate(edges), key=lambda item: (item[1]["weight"], item[0]))
+    sorted_edges = sorted(
+        enumerate(edges), key=lambda item: (item[1]["weight"], item[0])
+    )
     disjoint_set = DisjointSet(nodes)
     mst_edges: list[GraphEdge] = []
     total_weight: int | float = 0

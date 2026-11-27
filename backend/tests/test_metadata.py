@@ -28,27 +28,39 @@ def test_metadata_covers_every_supported_algorithm_once() -> None:
     metadata_ids = [item.id for item in ALGORITHM_METADATA]
 
     assert len(metadata_ids) == len(set(metadata_ids))
-    assert {item.id for item in SORTING_ALGORITHM_METADATA} == set(
-        get_args(SortingAlgorithm)
-    ) == set(SORTING_ALGORITHMS)
-    assert {item.id for item in SEARCHING_ALGORITHM_METADATA} == set(
-        get_args(SearchingAlgorithm)
-    ) == set(SEARCHING_ALGORITHMS)
+    assert (
+        {item.id for item in SORTING_ALGORITHM_METADATA}
+        == set(get_args(SortingAlgorithm))
+        == set(SORTING_ALGORITHMS)
+    )
+    assert (
+        {item.id for item in SEARCHING_ALGORITHM_METADATA}
+        == set(get_args(SearchingAlgorithm))
+        == set(SEARCHING_ALGORITHMS)
+    )
     assert {item.id for item in GRAPH_ALGORITHM_METADATA} == set(
         get_args(GraphAlgorithm)
     )
-    assert {item.id for item in DYNAMIC_PROGRAMMING_ALGORITHM_METADATA} == set(
-        get_args(DynamicProgrammingAlgorithm)
-    ) == set(DYNAMIC_PROGRAMMING_ALGORITHMS)
-    assert {item.id for item in BACKTRACKING_ALGORITHM_METADATA} == set(
-        get_args(BacktrackingAlgorithm)
-    ) == set(BACKTRACKING_ALGORITHMS)
-    assert {item.id for item in TREES_ALGORITHM_METADATA} == set(
-        get_args(TreeAlgorithm)
-    ) == set(TREES_ALGORITHMS)
-    assert {item.id for item in HASH_TABLE_ALGORITHM_METADATA} == set(
-        get_args(HashTableAlgorithm)
-    ) == set(HASH_TABLE_ALGORITHMS)
+    assert (
+        {item.id for item in DYNAMIC_PROGRAMMING_ALGORITHM_METADATA}
+        == set(get_args(DynamicProgrammingAlgorithm))
+        == set(DYNAMIC_PROGRAMMING_ALGORITHMS)
+    )
+    assert (
+        {item.id for item in BACKTRACKING_ALGORITHM_METADATA}
+        == set(get_args(BacktrackingAlgorithm))
+        == set(BACKTRACKING_ALGORITHMS)
+    )
+    assert (
+        {item.id for item in TREES_ALGORITHM_METADATA}
+        == set(get_args(TreeAlgorithm))
+        == set(TREES_ALGORITHMS)
+    )
+    assert (
+        {item.id for item in HASH_TABLE_ALGORITHM_METADATA}
+        == set(get_args(HashTableAlgorithm))
+        == set(HASH_TABLE_ALGORITHMS)
+    )
 
 
 def test_metadata_has_consistent_display_fields_and_categories() -> None:

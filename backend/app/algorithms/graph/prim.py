@@ -99,8 +99,7 @@ def prim_steps(
                     mst_edges=mst_edges,
                     total_weight=total_weight,
                     description=(
-                        f"Inspect edge from {edge['source']} to "
-                        f"{edge['target']}."
+                        f"Inspect edge from {edge['source']} to {edge['target']}."
                     ),
                 )
             )

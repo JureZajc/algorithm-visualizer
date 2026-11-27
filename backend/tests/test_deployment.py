@@ -34,7 +34,8 @@ def test_middleware_runs_in_the_documented_order(configure_main) -> None:
 def test_only_step_endpoints_are_limited_and_cached(configure_main) -> None:
     main = configure_main()
 
-    assert main.STEP_PATHS == {
+    # STEP_PATHS is the value under test, not the expected constant.
+    assert main.STEP_PATHS == {  # noqa: SIM300
         "/sorting/steps",
         "/searching/steps",
         "/graph/steps",

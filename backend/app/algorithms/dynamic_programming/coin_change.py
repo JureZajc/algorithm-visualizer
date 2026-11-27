@@ -22,7 +22,10 @@ def coin_change_steps(coins: list[int], amount: int) -> list[DynamicProgrammingS
     coin_values = coins.copy()
     impossible_value = amount + 1
     table = [
-        [0 if current_amount == 0 else impossible_value for current_amount in range(amount + 1)]
+        [
+            0 if current_amount == 0 else impossible_value
+            for current_amount in range(amount + 1)
+        ]
         for _ in range(len(coin_values) + 1)
     ]
     steps: list[DynamicProgrammingStep] = [
