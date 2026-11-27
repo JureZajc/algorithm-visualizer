@@ -8,7 +8,7 @@ import { BacktrackingListVisualizer } from "@/components/backtracking-list-visua
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { StepControls } from "@/components/step-controls";
 import { SudokuGrid } from "@/components/sudoku-grid";
-import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
+import { Alert, Button, FormField, InlineMessage, inputClassName, Panel, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
@@ -64,6 +64,42 @@ const selectedToolClasses: Record<MazeTool, string> = {
   wall: "border-slate-950 bg-slate-950 text-white shadow-lg shadow-slate-200",
   start: "border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-100",
   end: "border-rose-600 bg-rose-600 text-white shadow-lg shadow-rose-100",
+};
+
+// The colors of BacktrackingGrid, SudokuGrid, and the list view. Board cells are tinted, so
+// their swatches are soft; walls, queens, paths, and the active value are filled.
+const ATTEMPT: LegendItem = { label: "Attempt", tone: "amber-soft" };
+const BACKTRACK: LegendItem = { label: "Backtrack", tone: "violet-soft" };
+const SOLUTION: LegendItem = { label: "Solution", tone: "emerald-soft" };
+const LIST_LEGEND: LegendItem[] = [
+  { label: "Active", tone: "indigo" },
+  { label: "Chosen", tone: "emerald-soft" },
+];
+const LEGENDS: Record<BacktrackingAlgorithm, LegendItem[]> = {
+  n_queens: [
+    { label: "Queen", tone: "ink" },
+    ATTEMPT,
+    { label: "Conflict", tone: "rose-soft" },
+    BACKTRACK,
+    SOLUTION,
+  ],
+  maze_solver: [
+    { label: "Wall", tone: "ink" },
+    ATTEMPT,
+    { label: "Visited", tone: "sky-soft" },
+    { label: "Path", tone: "indigo" },
+    BACKTRACK,
+    SOLUTION,
+  ],
+  sudoku_solver: [
+    { label: "Given", tone: "slate-soft" },
+    { label: "Try", tone: "amber-soft" },
+    { label: "Conflict", tone: "rose-soft" },
+    BACKTRACK,
+    SOLUTION,
+  ],
+  permutations: LIST_LEGEND,
+  subsets: LIST_LEGEND,
 };
 
 function isListAlgorithm(algorithm: BacktrackingAlgorithm) {
@@ -407,14 +443,6 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
   }
 
   const editingDisabled = playback.isPlaying || isLoading;
-  const legend =
-    algorithm === "n_queens"
-      ? ["Attempt", "Conflict", "Backtrack", "Solution"]
-      : algorithm === "maze_solver"
-        ? ["Wall", "Visited", "Path", "Backtrack", "Solution"]
-        : algorithm === "sudoku_solver"
-          ? ["Given", "Try", "Conflict", "Backtrack", "Solution"]
-          : ["Active", "Chosen", "Backtrack", "Solution"];
 
   return (
     <div>
@@ -592,7 +620,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? "Choose an input and start the backtracking visualization."}
-          legend={legend}
+          legend={LEGENDS[algorithm]}
           resultSummary={playback.isComplete ? <span>{result}</span> : null}
         >
           {isListAlgorithm(algorithm) ? (

@@ -1,6 +1,6 @@
 import { useId, type ReactNode } from "react";
 
-import { Legend, Panel, ResultSummary, ScreenReaderStatus, StatusBadge } from "@/components/ui-primitives";
+import { Legend, Panel, ResultSummary, ScreenReaderStatus, StatusBadge, type LegendItem } from "@/components/ui-primitives";
 
 export type VisualizerStatus = "idle" | "loading" | "running" | "paused" | "complete" | "invalid" | "error";
 
@@ -52,7 +52,8 @@ export function VisualizationPanel({
   children: ReactNode;
   className?: string;
   description: string;
-  legend?: string[];
+  /** Each item's tone must match the color the visualization draws for that state. */
+  legend?: LegendItem[];
   resultSummary?: ReactNode;
   status: VisualizerStatus;
   statusLabel?: string;

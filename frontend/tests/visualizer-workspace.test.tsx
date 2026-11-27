@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { ControlPanel, Panel, RangeField, SpeedField, VisualizationEmptyState } from "@/components/ui-primitives";
+import { ControlPanel, Legend, Panel, RangeField, SpeedField, VisualizationEmptyState } from "@/components/ui-primitives";
 import { VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerWorkspace } from "@/components/visualizer-workspace";
 import type { AlgorithmMetadata } from "@/types/algorithm";
@@ -58,6 +58,24 @@ describe("RangeField", () => {
     const slider = screen.getByRole("slider", { name: /Animation speed/ });
     expect(screen.getByText("320 ms")).toBeTruthy();
     expect(slider.getAttribute("aria-valuetext")).toBe("320 milliseconds per step");
+  });
+});
+
+describe("Legend", () => {
+  it("lists each item with the swatch of its tone, whatever its label", () => {
+    render(<Legend items={[
+      { label: "Inspect", tone: "amber" },
+      { label: "Visited", tone: "sky-soft" },
+      { label: "Visited elsewhere", tone: "sky" },
+    ]} />);
+    const legend = screen.getByRole("list", { name: "Visualization legend" });
+    const items = within(legend).getAllByRole("listitem");
+    expect(items.map((item) => item.textContent)).toEqual(["Inspect", "Visited", "Visited elsewhere"]);
+    const swatch = (index: number) => items[index].querySelector("[aria-hidden='true']")!.className;
+    expect(swatch(0)).toContain("bg-amber-400");
+    expect(swatch(1)).toContain("bg-sky-100");
+    expect(swatch(1)).toContain("border-sky-400");
+    expect(swatch(2)).toContain("bg-sky-500");
   });
 });
 

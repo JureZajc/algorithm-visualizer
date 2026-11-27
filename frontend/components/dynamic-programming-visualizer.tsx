@@ -6,7 +6,7 @@ import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { DynamicProgrammingTable } from "@/components/dynamic-programming-table";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { StepControls } from "@/components/step-controls";
-import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
+import { Alert, Button, FormField, InlineMessage, inputClassName, Panel, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
@@ -35,6 +35,12 @@ import {
 } from "@/types/dynamic-programming";
 
 const FIBONACCI_COLUMNS_PER_ROW = 8;
+
+// DynamicProgrammingTable fills the active cell and tints the cells it reads from.
+const LEGEND: LegendItem[] = [
+  { label: "Active", tone: "indigo" },
+  { label: "Related", tone: "amber-soft" },
+];
 
 function createPreviewTable(
   algorithm: DynamicProgrammingAlgorithm,
@@ -370,7 +376,7 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? "Set the inputs and start the table visualization."}
-          legend={["Active", "Related"]}
+          legend={LEGEND}
           resultSummary={playback.isComplete ? <span>DP result: <span className="font-mono text-xs">{result}</span></span> : null}
         >
           <DynamicProgrammingTable

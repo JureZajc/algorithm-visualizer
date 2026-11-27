@@ -6,7 +6,7 @@ import { ArrayBars } from "@/components/array-bars";
 import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { StepControls } from "@/components/step-controls";
-import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { Alert, Button, FormField, inputClassName, Panel, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
@@ -18,6 +18,12 @@ import type { ArrayAlgorithmStep, MetadataSourceProps } from "@/types/algorithm"
 import { SEARCHING_ALGORITHM_LABELS, type SearchingAlgorithm } from "@/types/searching";
 
 const DEFAULT_NUMBERS = [8, 14, 23, 31, 42, 56, 67, 75, 83, 91];
+
+// ArrayBars draws an inspected value in the compare color. A missing target colors no bar.
+const LEGEND: LegendItem[] = [
+  { label: "Inspect", tone: "amber" },
+  { label: "Found", tone: "emerald" },
+];
 
 export function SearchingVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<SearchingAlgorithm>("linear_search");
@@ -176,7 +182,7 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? "Choose a target and start the search."}
-          legend={["Inspect", "Found", "Not found"]}
+          legend={LEGEND}
           resultSummary={playback.isComplete ? <span>{result}</span> : null}
         >
           <ArrayBars values={currentStep?.array ?? numbers} step={outcomeStep} />

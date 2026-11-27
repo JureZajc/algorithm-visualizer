@@ -6,7 +6,7 @@ import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { StepControls } from "@/components/step-controls";
 import { TreeCanvas } from "@/components/tree-canvas";
-import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { Alert, Button, FormField, inputClassName, Panel, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
@@ -28,6 +28,29 @@ const ROTATION_LABELS: Record<TreeRotationType, string> = {
   right: "Right rotation",
   left_right: "Left-right rotation",
   right_left: "Right-left rotation",
+};
+
+// The node colors TreeCanvas draws. Comparing is the current action while a value descends.
+const CURRENT: LegendItem = { label: "Current", tone: "amber" };
+const INSERTED: LegendItem = { label: "Inserted", tone: "violet" };
+const PATH: LegendItem = { label: "Path", tone: "indigo" };
+const VISITED: LegendItem = { label: "Visited", tone: "sky" };
+const TRAVERSAL_LEGEND = [PATH, VISITED];
+const LEGENDS: Record<TreeAlgorithm, LegendItem[]> = {
+  bst_insert: [CURRENT, INSERTED, PATH, VISITED],
+  avl_insert: [
+    CURRENT,
+    INSERTED,
+    PATH,
+    { label: "Balance check", tone: "cyan" },
+    { label: "Imbalanced", tone: "rose" },
+    { label: "Rotation", tone: "fuchsia" },
+    VISITED,
+  ],
+  bst_search: [CURRENT, PATH, { label: "Found", tone: "emerald" }, { label: "Not found", tone: "slate" }],
+  inorder_traversal: TRAVERSAL_LEGEND,
+  preorder_traversal: TRAVERSAL_LEGEND,
+  postorder_traversal: TRAVERSAL_LEGEND,
 };
 
 export function TreesVisualizer(props: MetadataSourceProps) {
@@ -167,7 +190,7 @@ export function TreesVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? "Enter unique values and start the tree visualization."}
-          legend={["Current", "Inserted", "Visited", "Path", "Found", "Imbalanced", "Rotation"]}
+          legend={LEGENDS[algorithm]}
           resultSummary={playback.isComplete ? <span>{resultLabel}: <span className="font-mono text-xs">{result}</span></span> : null}
         >
           <TreeCanvas tree={displayedTree} step={currentStep} />

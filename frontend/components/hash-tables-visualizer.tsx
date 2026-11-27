@@ -6,7 +6,7 @@ import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { HashTableView } from "@/components/hash-table-view";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { StepControls } from "@/components/step-controls";
-import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { Alert, Button, FormField, inputClassName, Panel, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useStepPlayback } from "@/hooks/use-step-playback";
@@ -30,6 +30,23 @@ import {
 const DEFAULT_VALUES = "12, 22, 32, 5";
 const DEFAULT_TARGET = "32";
 const DEFAULT_TABLE_SIZE = "10";
+
+// The colors HashTableView draws: tinted buckets for hashing, checking, and probing, and
+// filled keys for what happens to the active key.
+const HASH: LegendItem = { label: "Hash", tone: "sky-soft" };
+const CHECKED: LegendItem = { label: "Checked", tone: "indigo-soft" };
+const COMPARE: LegendItem = { label: "Compare", tone: "amber" };
+const COLLISION: LegendItem = { label: "Collision", tone: "rose" };
+const INSERTED: LegendItem = { label: "Inserted", tone: "violet" };
+const FOUND: LegendItem = { label: "Found", tone: "emerald" };
+const NOT_FOUND: LegendItem = { label: "Not found", tone: "slate" };
+const PROBE: LegendItem = { label: "Probe", tone: "cyan-soft" };
+const LEGENDS: Record<HashTableAlgorithm, LegendItem[]> = {
+  hash_insert_chaining: [HASH, CHECKED, COLLISION, INSERTED],
+  hash_search_chaining: [HASH, CHECKED, COMPARE, FOUND, NOT_FOUND],
+  hash_insert_linear_probing: [HASH, CHECKED, PROBE, COLLISION, INSERTED],
+  hash_search_linear_probing: [HASH, CHECKED, PROBE, COMPARE, FOUND, NOT_FOUND],
+};
 
 export function HashTablesVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<HashTableAlgorithm>("hash_insert_chaining");
@@ -235,7 +252,7 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? "Enter keys and start the hash table visualization."}
-          legend={["Hash", "Active", "Collision", "Probe", "Found", "Not found"]}
+          legend={LEGENDS[algorithm]}
           resultSummary={playback.isComplete ? <span>{isSearch ? "Search result" : "Insert result"}: <span className="font-mono text-xs">{result}</span></span> : null}
         >
           <HashTableView table={displayedTable} step={currentStep} />

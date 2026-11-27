@@ -75,38 +75,6 @@ const statusDots: Record<StatusVariant, string> = {
   error: "bg-rose-500",
 };
 
-const legendSwatches: Record<string, string> = {
-  Active: "bg-indigo-600",
-  Attempt: "bg-amber-400",
-  Backtrack: "bg-violet-400",
-  Candidate: "bg-cyan-400",
-  Chosen: "bg-emerald-500",
-  Collision: "bg-rose-500",
-  Compare: "bg-amber-400",
-  Conflict: "bg-rose-500",
-  Current: "bg-amber-400",
-  Found: "bg-emerald-500",
-  Frontier: "bg-violet-500",
-  Given: "bg-slate-500",
-  Hash: "bg-sky-400",
-  Imbalanced: "bg-rose-500",
-  Inspect: "bg-sky-500",
-  Inserted: "bg-violet-500",
-  "Not found": "bg-slate-500",
-  Overwrite: "bg-violet-500",
-  "Path / MST": "bg-emerald-500",
-  Path: "bg-indigo-500",
-  Probe: "bg-cyan-500",
-  Rejected: "bg-rose-500",
-  Related: "bg-amber-300",
-  Rotation: "bg-fuchsia-500",
-  Solution: "bg-emerald-500",
-  Swap: "bg-rose-500",
-  Try: "bg-amber-400",
-  Visited: "bg-sky-500",
-  Wall: "bg-slate-900",
-};
-
 function joinClasses(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
@@ -442,15 +410,69 @@ export function StatusBadge({
   );
 }
 
-export function Legend({ items }: { items: string[] }) {
+/**
+ * Legend swatches. A plain tone is a solid fill, for bars, nodes, and chips drawn in that
+ * color. A `-soft` tone is a pale fill inside a colored border, for cells that are tinted.
+ */
+export type LegendTone =
+  | "amber"
+  | "cyan"
+  | "emerald"
+  | "fuchsia"
+  | "indigo"
+  | "ink"
+  | "pink"
+  | "rose"
+  | "sky"
+  | "slate"
+  | "teal"
+  | "violet"
+  | "amber-soft"
+  | "cyan-soft"
+  | "emerald-soft"
+  | "indigo-soft"
+  | "rose-soft"
+  | "sky-soft"
+  | "slate-soft"
+  | "violet-soft";
+
+export interface LegendItem {
+  label: string;
+  tone: LegendTone;
+}
+
+const legendTones: Record<LegendTone, string> = {
+  amber: "border-amber-500 bg-amber-400",
+  cyan: "border-cyan-600 bg-cyan-500",
+  emerald: "border-emerald-600 bg-emerald-500",
+  fuchsia: "border-fuchsia-600 bg-fuchsia-500",
+  indigo: "border-indigo-600 bg-indigo-500",
+  ink: "border-slate-950 bg-slate-900",
+  pink: "border-pink-600 bg-pink-500",
+  rose: "border-rose-600 bg-rose-500",
+  sky: "border-sky-600 bg-sky-500",
+  slate: "border-slate-600 bg-slate-500",
+  teal: "border-teal-600 bg-teal-500",
+  violet: "border-violet-600 bg-violet-500",
+  "amber-soft": "border-amber-400 bg-amber-100",
+  "cyan-soft": "border-cyan-400 bg-cyan-100",
+  "emerald-soft": "border-emerald-400 bg-emerald-50",
+  "indigo-soft": "border-indigo-400 bg-indigo-50",
+  "rose-soft": "border-rose-400 bg-rose-100",
+  "sky-soft": "border-sky-400 bg-sky-100",
+  "slate-soft": "border-slate-400 bg-slate-100",
+  "violet-soft": "border-violet-400 bg-violet-100",
+};
+
+export function Legend({ items }: { items: LegendItem[] }) {
   return (
-    <div className="flex flex-wrap gap-x-3 gap-y-2 text-xs font-medium text-slate-500" aria-label="Visualization legend">
+    <ul className="m-0 flex list-none flex-wrap gap-x-3 gap-y-2 p-0 text-xs font-medium text-slate-600" aria-label="Visualization legend" role="list">
       {items.map((item) => (
-        <span className="inline-flex items-center gap-1.5" key={item}>
-          <span className={joinClasses("h-2.5 w-2.5 rounded-full", legendSwatches[item] ?? "bg-slate-400")} aria-hidden="true" />
-          {item}
-        </span>
+        <li className="inline-flex items-center gap-1.5" key={item.label}>
+          <span className={joinClasses("h-3 w-3 shrink-0 rounded-full border-2", legendTones[item.tone])} aria-hidden="true" />
+          {item.label}
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

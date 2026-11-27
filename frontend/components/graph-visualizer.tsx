@@ -7,7 +7,7 @@ import { GraphCanvas } from "@/components/graph-canvas";
 import { GraphEditor } from "@/components/graph-editor";
 import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { StepControls } from "@/components/step-controls";
-import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
+import { Alert, Button, FormField, InlineMessage, inputClassName, Panel, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
@@ -29,7 +29,25 @@ const PATH_ALGORITHMS = new Set<GraphAlgorithm>(["bfs", "dfs", "dijkstra", "a_st
 const WEIGHTED_PATH_ALGORITHMS = new Set<GraphAlgorithm>(["dijkstra", "a_star"]);
 const MST_ALGORITHMS = new Set<GraphAlgorithm>(["kruskal", "prim"]);
 
-const LEGEND_ITEMS = ["Current", "Visited", "Frontier", "Path / MST", "Candidate", "Rejected"] as const;
+// The node and edge colors GraphCanvas draws. The current node or edge takes the color of the
+// step's action; most actions inspect, so "Current" shows that color.
+const CURRENT: LegendItem = { label: "Current", tone: "amber" };
+const VISITED: LegendItem = { label: "Visited", tone: "sky" };
+const FRONTIER: LegendItem = { label: "Frontier", tone: "violet" };
+const PATH: LegendItem = { label: "Path", tone: "emerald" };
+const SPANNING_TREE: LegendItem = { label: "Spanning tree", tone: "emerald" };
+const CANDIDATE: LegendItem = { label: "Candidate", tone: "cyan" };
+const REJECTED: LegendItem = { label: "Rejected", tone: "rose" };
+
+const LEGENDS: Record<GraphAlgorithm, LegendItem[]> = {
+  bfs: [CURRENT, VISITED, FRONTIER, PATH],
+  dfs: [CURRENT, VISITED, FRONTIER, PATH],
+  dijkstra: [CURRENT, VISITED, FRONTIER, { label: "Relax", tone: "fuchsia" }, PATH],
+  a_star: [CURRENT, VISITED, FRONTIER, { label: "Relax", tone: "fuchsia" }, PATH],
+  topological_sort: [CURRENT, FRONTIER, { label: "Ordered", tone: "teal" }, { label: "Cycle", tone: "rose-soft" }],
+  kruskal: [CURRENT, SPANNING_TREE, CANDIDATE, REJECTED],
+  prim: [CURRENT, VISITED, SPANNING_TREE, CANDIDATE, REJECTED],
+};
 
 function graphFromPreset(preset: GraphPreset): ActiveGraph {
   return {
@@ -391,7 +409,7 @@ export function GraphVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? (pendingNodeId ? `Click the canvas to place node ${pendingNodeId}.` : activeGraph.description)}
-          legend={LEGEND_ITEMS.filter((item) => isMstAlgorithm || (item !== "Candidate" && item !== "Rejected"))}
+          legend={LEGENDS[algorithm]}
           resultSummary={playback.isComplete ? <span>{resultLabel}: <span className="font-mono text-xs">{result}</span></span> : null}
         >
           <GraphCanvas
