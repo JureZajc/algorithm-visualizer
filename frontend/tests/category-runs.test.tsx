@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import type { ComponentType } from "react";
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
+import { GraphVisualizer } from "@/components/graph-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
 import { RUN_TIMEOUT_MS, runTimeoutMessage } from "@/hooks/use-visualization-run";
@@ -9,6 +10,7 @@ import * as api from "@/lib/api";
 import type { MetadataSourceProps } from "@/types/algorithm";
 
 vi.mock("@/lib/api", () => ({
+  fetchGraphSteps: vi.fn(),
   fetchSearchingSteps: vi.fn(),
   fetchSortingSteps: vi.fn(),
   generateRandomNumbers: vi.fn(),
@@ -18,6 +20,7 @@ vi.mock("@/lib/api", () => ({
 const CATEGORIES: { name: string; component: ComponentType<MetadataSourceProps>; request: () => Mock }[] = [
   { name: "Sorting", component: SortingVisualizer, request: () => vi.mocked(api.fetchSortingSteps) },
   { name: "Searching", component: SearchingVisualizer, request: () => vi.mocked(api.fetchSearchingSteps) },
+  { name: "Graph", component: GraphVisualizer, request: () => vi.mocked(api.fetchGraphSteps) },
 ];
 
 const props = { algorithms: [], isMetadataLoading: false, metadataError: null };
