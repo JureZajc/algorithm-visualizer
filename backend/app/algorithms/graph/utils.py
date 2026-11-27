@@ -16,13 +16,9 @@ def validate_graph_structure(
     node_set = set(nodes)
     for edge in edges:
         if edge["source"] not in node_set:
-            raise ValueError(
-                f"Edge source {edge['source']!r} is not in the graph."
-            )
+            raise ValueError(f"Edge source {edge['source']!r} is not in the graph.")
         if edge["target"] not in node_set:
-            raise ValueError(
-                f"Edge target {edge['target']!r} is not in the graph."
-            )
+            raise ValueError(f"Edge target {edge['target']!r} is not in the graph.")
 
 
 def validate_graph(

@@ -29,7 +29,9 @@ def maze_solver_steps(
 
     start = start or (0, 0)
     target = target or (rows - 1, cols - 1)
-    walls = _walls_from_grid(grid) if grid is not None else _build_walls(rows, cols, preset)
+    walls = (
+        _walls_from_grid(grid) if grid is not None else _build_walls(rows, cols, preset)
+    )
     walls.discard(start)
     walls.discard(target)
     visited: set[GridPosition] = set()
@@ -259,7 +261,9 @@ def _clear_guaranteed_route(
 
 def _neighbors(position: GridPosition) -> list[GridPosition]:
     row, column = position
-    return [(row + row_delta, column + col_delta) for row_delta, col_delta in DIRECTIONS]
+    return [
+        (row + row_delta, column + col_delta) for row_delta, col_delta in DIRECTIONS
+    ]
 
 
 def _is_in_bounds(position: GridPosition, rows: int, cols: int) -> bool:

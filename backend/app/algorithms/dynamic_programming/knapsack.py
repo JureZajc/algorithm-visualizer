@@ -64,9 +64,7 @@ def knapsack_steps(
             else:
                 table[item_index][current_capacity] = without_item
                 step_type = "skip"
-                description = (
-                    f"Skip item {item_index}; keep value {without_item}."
-                )
+                description = f"Skip item {item_index}; keep value {without_item}."
                 pseudocode_line = 6
 
             steps.append(

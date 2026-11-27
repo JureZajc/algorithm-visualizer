@@ -229,7 +229,13 @@ def _traversal_steps(
     traversal_name: str,
     done_description: str,
     visit: Callable[
-        [TreeNode | None, TreeNode | None, list[TreeStep], list[TreeValue], list[TreeValue]],
+        [
+            TreeNode | None,
+            TreeNode | None,
+            list[TreeStep],
+            list[TreeValue],
+            list[TreeValue],
+        ],
         None,
     ],
 ) -> list[TreeStep]:

@@ -108,10 +108,7 @@ def create_hash_table(
     return {
         "strategy": strategy,
         "size": size,
-        "buckets": [
-            {"index": index, "items": []}
-            for index in range(size)
-        ],
+        "buckets": [{"index": index, "items": []} for index in range(size)],
     }
 
 

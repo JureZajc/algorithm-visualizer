@@ -31,6 +31,7 @@ def client() -> TestClient:
     # test_cors.py reloads app.main, so build the client from the current app.
     return TestClient(main.app)
 
+
 # 50 values (the maximum) with wide numbers, in both orders.
 DESCENDING = [1_000_000 - index * 40_000 for index in range(50)]
 ASCENDING = sorted(DESCENDING)
@@ -86,7 +87,16 @@ DYNAMIC_PROGRAMMING_CASES: dict[str, list[dict[str, object]]] = {
     "knapsack": [
         {
             "weights": [1, 2, 3, 4, 5, 6, 7, 8],
-            "values": [999_991, 999_992, 999_993, 999_994, 999_995, 999_996, 999_997, 999_998],
+            "values": [
+                999_991,
+                999_992,
+                999_993,
+                999_994,
+                999_995,
+                999_996,
+                999_997,
+                999_998,
+            ],
             "capacity": 50,
         }
     ],
@@ -128,7 +138,11 @@ def _cases() -> list[object]:
         cases.append(
             pytest.param(
                 "/searching/steps",
-                {"algorithm": algorithm, "numbers": ASCENDING, "target": MISSING_TARGET},
+                {
+                    "algorithm": algorithm,
+                    "numbers": ASCENDING,
+                    "target": MISSING_TARGET,
+                },
                 id=f"searching-{algorithm}",
             )
         )
@@ -148,7 +162,11 @@ def _cases() -> list[object]:
         cases.append(
             pytest.param(
                 "/trees/steps",
-                {"algorithm": algorithm, "values": TREE_VALUES, "target": MISSING_TARGET},
+                {
+                    "algorithm": algorithm,
+                    "values": TREE_VALUES,
+                    "target": MISSING_TARGET,
+                },
                 id=f"trees-{algorithm}",
             )
         )

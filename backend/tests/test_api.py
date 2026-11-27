@@ -87,8 +87,7 @@ def test_algorithms_endpoint() -> None:
     assert response.status_code == 200
     body = response.json()
     assert {
-        category: [item["id"] for item in items]
-        for category, items in body.items()
+        category: [item["id"] for item in items] for category, items in body.items()
     } == EXPECTED_ALGORITHM_IDS
 
     required_fields = {
@@ -469,9 +468,7 @@ def test_graph_steps_endpoint_supports_default_edge_weight() -> None:
     )
 
     assert response.status_code == 200
-    assert response.json()["edges"] == [
-        {"source": "A", "target": "B", "weight": 1}
-    ]
+    assert response.json()["edges"] == [{"source": "A", "target": "B", "weight": 1}]
 
 
 def test_graph_steps_endpoint_rejects_unsupported_algorithm() -> None:
@@ -970,9 +967,7 @@ def test_a_star_endpoint_rejects_negative_weights() -> None:
     )
 
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "A* search requires non-negative weights."
-    }
+    assert response.json() == {"detail": "A* search requires non-negative weights."}
 
 
 @pytest.mark.parametrize(
@@ -1018,9 +1013,7 @@ def test_topological_sort_steps_endpoint() -> None:
 
     assert response.status_code == 200
     body = response.json()
-    positions = {
-        node: index for index, node in enumerate(body["steps"][-1]["result"])
-    }
+    positions = {node: index for index, node in enumerate(body["steps"][-1]["result"])}
     assert all(
         positions[edge["source"]] < positions[edge["target"]]
         for edge in TOPOLOGICAL_REQUEST["edges"]
@@ -1055,9 +1048,7 @@ def test_topological_sort_endpoint_rejects_undirected_graph() -> None:
     )
 
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Topological sort requires a directed graph."
-    }
+    assert response.json() == {"detail": "Topological sort requires a directed graph."}
 
 
 MST_REQUEST = {

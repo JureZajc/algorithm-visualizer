@@ -274,9 +274,7 @@ def test_cache_hits_count_against_the_limit(configure_main) -> None:
     main = configure_main(RATE_LIMIT_REQUESTS="2")
 
     with TestClient(main.app) as client:
-        responses = [
-            client.post("/sorting/steps", json=SORT_REQUEST) for _ in range(3)
-        ]
+        responses = [client.post("/sorting/steps", json=SORT_REQUEST) for _ in range(3)]
 
     assert [response.status_code for response in responses] == [200, 200, 429]
     assert [response.headers.get("x-cache") for response in responses] == [

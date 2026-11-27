@@ -97,9 +97,7 @@ def topological_sort_steps(
                         previous=None,
                         path=[],
                         result=result,
-                        description=(
-                            f"Add {neighbor} to the zero in-degree frontier."
-                        ),
+                        description=(f"Add {neighbor} to the zero in-degree frontier."),
                     )
                 )
 

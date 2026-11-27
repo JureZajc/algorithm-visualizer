@@ -290,10 +290,7 @@ def test_topological_sort_returns_valid_order_without_mutating_input() -> None:
     assert steps
     assert steps[-1]["type"] == "done"
     assert len(result) == len(nodes)
-    assert all(
-        positions[edge["source"]] < positions[edge["target"]]
-        for edge in edges
-    )
+    assert all(positions[edge["source"]] < positions[edge["target"]] for edge in edges)
 
 
 def test_topological_sort_detects_cycle() -> None:
