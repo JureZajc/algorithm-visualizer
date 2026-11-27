@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { BacktrackingVisualizer } from "@/components/backtracking-visualizer";
 import { DynamicProgrammingVisualizer } from "@/components/dynamic-programming-visualizer";
 import { GraphVisualizer } from "@/components/graph-visualizer";
+import { HashTablesVisualizer } from "@/components/hash-tables-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
 import { TreesVisualizer } from "@/components/trees-visualizer";
@@ -16,6 +17,7 @@ vi.mock("@/lib/api", () => ({
   fetchBacktrackingSteps: vi.fn(),
   fetchDynamicProgrammingSteps: vi.fn(),
   fetchGraphSteps: vi.fn(),
+  fetchHashTableSteps: vi.fn(),
   fetchSearchingSteps: vi.fn(),
   fetchSortingSteps: vi.fn(),
   fetchTreeSteps: vi.fn(),
@@ -30,6 +32,7 @@ const CATEGORIES: { name: string; component: ComponentType<MetadataSourceProps>;
   { name: "Dynamic Programming", component: DynamicProgrammingVisualizer, request: () => vi.mocked(api.fetchDynamicProgrammingSteps) },
   { name: "Backtracking", component: BacktrackingVisualizer, request: () => vi.mocked(api.fetchBacktrackingSteps) },
   { name: "Trees", component: TreesVisualizer, request: () => vi.mocked(api.fetchTreeSteps) },
+  { name: "Hash Tables", component: HashTablesVisualizer, request: () => vi.mocked(api.fetchHashTableSteps) },
 ];
 
 const props = { algorithms: [], isMetadataLoading: false, metadataError: null };
