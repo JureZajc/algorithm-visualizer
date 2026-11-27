@@ -49,6 +49,7 @@ From the `backend` directory:
 
 ```bash
 uv run ruff check . ../scripts
+uv run mypy
 uv run pytest
 ```
 
@@ -62,7 +63,9 @@ root.
 backend/
 ├── main.py                    # Re-exports app.main:app
 ├── app/
-│   ├── main.py                # FastAPI app, request and response models, input limits, routes
+│   ├── main.py                # FastAPI app, middleware, router registration
+│   ├── routers/               # One router per category, plus the catalog and random numbers
+│   ├── schemas/               # Request and response models per category; limits.py reads input limits from them
 │   └── algorithms/
 │       ├── metadata.py        # Catalog served by GET /algorithms
 │       ├── types.py           # Shared step type; sorting and searching identifiers
@@ -82,6 +85,14 @@ needs one. Its `__init__.py` maps algorithm identifiers to step functions, for
 example `SORTING_ALGORITHMS`; the graph package uses `graph_algorithm_steps`
 instead.
 
+Each module in `app/schemas/` defines the category's request and response
+models and maps every algorithm identifier to the model that validates its
+input, for example `SORTING_REQUEST_MODELS`. Input limits are declared once, as
+`Field` constraints on those models; `GET /algorithms` reads them back, so the
+catalog, the OpenAPI schema, and validation always agree. Dynamic programming
+and backtracking have one request model per algorithm, joined into a union
+discriminated on `algorithm`.
+
 To add an algorithm:
 
 1. Write a function that returns its list of steps in the category package, and
@@ -90,6 +101,10 @@ To add an algorithm:
 3. Add its entry, including pseudocode, to `app/algorithms/metadata.py`.
    `tests/test_metadata.py` fails when the metadata, the `Literal` type, and the
    registry disagree.
-4. If it needs input that the category's request model does not accept yet,
-   extend the model and its limits in `app/main.py`.
+4. Map its identifier to a request model in `app/schemas/<category>.py`. For
+   dynamic programming and backtracking, add a request model with its fields
+   and limits, add it to the category's union, and register it in the
+   category's `*_REQUEST_MODELS`; the category's router in `app/routers/` calls
+   the model's `algorithm_input()`. `tests/test_api_contract.py` fails when an
+   algorithm has no request model.
 5. Add tests beside the existing ones for that category.

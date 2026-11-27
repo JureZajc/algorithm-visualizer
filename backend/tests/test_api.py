@@ -101,6 +101,7 @@ def test_algorithms_endpoint() -> None:
         "space_complexity",
         "notes",
         "pseudocode",
+        "limits",
     }
     for category, items in body.items():
         for item in items:
