@@ -307,7 +307,7 @@ function SharedInputPreview({ numbers }: { numbers: number[] }) {
 
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-      <span className="mb-1 block text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-slate-500">Shared input</span>
+      <span className="mb-1 block text-xs font-extrabold uppercase tracking-[0.09em] text-slate-500">Shared input</span>
       <span className="break-words font-mono text-xs font-medium text-slate-800">[{preview}]</span>
     </div>
   );
@@ -325,7 +325,7 @@ function ComparisonCard({
       <div className="mb-4 flex items-start justify-between gap-3">
         <h3 className="m-0 text-base font-extrabold tracking-normal text-slate-950">{result.algorithmName}</h3>
         {isWinner ? (
-          <span className="shrink-0 rounded-full bg-emerald-700 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.08em] text-white">
+          <span className="shrink-0 rounded-full bg-emerald-700 px-2.5 py-1 text-xs font-extrabold uppercase tracking-[0.08em] text-white">
             Fewest steps
           </span>
         ) : null}
@@ -345,7 +345,7 @@ function ComparisonCard({
 function Metric({ className, label, value }: { className?: string; label: string; value: string }) {
   return (
     <div className={className}>
-      <dt className="mb-1 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-slate-500">{label}</dt>
+      <dt className="mb-1 text-xs font-extrabold uppercase tracking-[0.09em] text-slate-500">{label}</dt>
       <dd className="m-0 font-mono text-sm font-bold text-slate-950">{value}</dd>
     </div>
   );
