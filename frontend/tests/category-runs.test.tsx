@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import type { ComponentType } from "react";
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
+import { BacktrackingVisualizer } from "@/components/backtracking-visualizer";
 import { DynamicProgrammingVisualizer } from "@/components/dynamic-programming-visualizer";
 import { GraphVisualizer } from "@/components/graph-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
@@ -11,6 +12,7 @@ import * as api from "@/lib/api";
 import type { MetadataSourceProps } from "@/types/algorithm";
 
 vi.mock("@/lib/api", () => ({
+  fetchBacktrackingSteps: vi.fn(),
   fetchDynamicProgrammingSteps: vi.fn(),
   fetchGraphSteps: vi.fn(),
   fetchSearchingSteps: vi.fn(),
@@ -24,6 +26,7 @@ const CATEGORIES: { name: string; component: ComponentType<MetadataSourceProps>;
   { name: "Searching", component: SearchingVisualizer, request: () => vi.mocked(api.fetchSearchingSteps) },
   { name: "Graph", component: GraphVisualizer, request: () => vi.mocked(api.fetchGraphSteps) },
   { name: "Dynamic Programming", component: DynamicProgrammingVisualizer, request: () => vi.mocked(api.fetchDynamicProgrammingSteps) },
+  { name: "Backtracking", component: BacktrackingVisualizer, request: () => vi.mocked(api.fetchBacktrackingSteps) },
 ];
 
 const props = { algorithms: [], isMetadataLoading: false, metadataError: null };
@@ -110,5 +113,37 @@ describe("category runs", () => {
     expect(api.generateRandomNumbers).toHaveBeenCalledWith(5, expect.any(AbortSignal));
     expect(api.fetchSortingSteps).toHaveBeenCalledWith([9, 4, 7, 1, 5], "bubble_sort", expect.any(AbortSignal));
     expect(screen.getByTitle("Index 0: 9")).toBeTruthy();
+  });
+});
+
+describe("category controls", () => {
+  it.each(CATEGORIES)("$name names its control panel and its visualization", ({ component: Component }) => {
+    render(<Component {...props} />);
+    const controls = screen.getByRole("region", { name: /controls$/ });
+    expect(controls.textContent).toContain("Start visualization");
+    // The visualization region takes its name from its heading, the algorithm's name.
+    const title = screen.getAllByRole("heading", { level: 2 })[0];
+    const visualization = screen.getByRole("region", { name: title.textContent ?? "" });
+    expect(visualization.getAttribute("aria-labelledby")).toBe(title.id);
+  });
+
+  it.each(CATEGORIES)("$name uses one speed slider with a 44px box", ({ component: Component }) => {
+    render(<Component {...props} />);
+    const sliders = screen.getAllByRole("slider", { name: /Animation speed/ });
+    expect(sliders).toHaveLength(1);
+    expect(sliders[0].className.split(" ")).toContain("h-11");
+    expect(sliders[0].getAttribute("aria-valuetext")).toMatch(/^\d+ milliseconds per step$/);
+  });
+
+  it("Backtracking marks the selected maze tool as pressed", () => {
+    render(<BacktrackingVisualizer {...props} />);
+    fireEvent.change(screen.getByLabelText("Backtracking algorithm"), { target: { value: "maze_solver" } });
+    const tools = screen.getByRole("group", { name: "Maze editing tool" });
+    const pressed = () => Array.from(tools.querySelectorAll("button")).filter((button) => button.getAttribute("aria-pressed") === "true").map((button) => button.textContent);
+
+    expect(pressed()).toEqual(["Wall"]);
+    fireEvent.click(screen.getByRole("button", { name: "Start" }));
+    expect(pressed()).toEqual(["Start"]);
+    expect(screen.getByRole("button", { name: "End", pressed: false })).toBeTruthy();
   });
 });
