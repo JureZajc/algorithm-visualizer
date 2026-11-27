@@ -281,10 +281,25 @@ def test_checks_run_static_analysis_before_backend_tests(command):
     steps = dev.steps_for(command)
     commands = [step.command for step in steps]
     ruff = ("uv", "run", "--no-sync", "ruff", "check", ".", "../scripts")
+    ruff_format = (
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        ".",
+        "../scripts",
+    )
     mypy = ("uv", "run", "--no-sync", "mypy")
     tests = ("uv", "run", "--no-sync", "pytest")
 
-    assert commands.index(ruff) < commands.index(mypy) < commands.index(tests)
+    assert (
+        commands.index(ruff)
+        < commands.index(ruff_format)
+        < commands.index(mypy)
+        < commands.index(tests)
+    )
     assert ("npm", "run", "lint") in commands
     for step in steps:
         if step.command[0] == "uv":

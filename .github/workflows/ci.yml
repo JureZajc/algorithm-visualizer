@@ -35,6 +35,9 @@ jobs:
       - name: Run Ruff
         run: uv run ruff check . ../scripts
 
+      - name: Check formatting
+        run: uv run ruff format --check . ../scripts
+
       - name: Run mypy
         run: uv run mypy
 

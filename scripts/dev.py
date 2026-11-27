@@ -100,6 +100,11 @@ def steps_for(command: str) -> tuple[Step, ...]:
         ("uv", "run", "--no-sync", "ruff", "check", ".", "../scripts"),
         BACKEND_DIRECTORY,
     )
+    backend_format = Step(
+        "Backend: checking formatting",
+        ("uv", "run", "--no-sync", "ruff", "format", "--check", ".", "../scripts"),
+        BACKEND_DIRECTORY,
+    )
     backend_mypy = Step(
         "Backend: running mypy",
         ("uv", "run", "--no-sync", "mypy"),
@@ -142,6 +147,7 @@ def steps_for(command: str) -> tuple[Step, ...]:
     if command == "check":
         return (
             backend_ruff,
+            backend_format,
             backend_mypy,
             backend_tests,
             frontend_lint,
@@ -156,6 +162,7 @@ def steps_for(command: str) -> tuple[Step, ...]:
                 BACKEND_DIRECTORY,
             ),
             backend_ruff,
+            backend_format,
             backend_mypy,
             backend_tests,
             Step(
