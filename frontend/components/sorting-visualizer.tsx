@@ -3,20 +3,52 @@
 import { useState } from "react";
 
 import { ArrayBars } from "@/components/array-bars";
-import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
-import { PseudocodePanel } from "@/components/pseudocode-panel";
-import { Alert } from "@/components/ui-primitives";
+import { LearningPanel } from "@/components/learning-panel";
+import type { LegendItem } from "@/components/ui-primitives";
 import { VisualizerControls } from "@/components/visualizer-controls";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
+import { VisualizerWorkspace } from "@/components/visualizer-workspace";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
-import { LearningPanel } from "@/components/learning-panel";
+import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
 import { SORTING_PRESETS } from "@/lib/array-presets";
-import type { MetadataSourceProps } from "@/types/algorithm";
+import type { ArrayStepType, MetadataSourceProps } from "@/types/algorithm";
 import { ALGORITHM_LABELS, type AlgorithmStep, type SortingAlgorithm } from "@/types/sorting";
 
 const DEFAULT_NUMBERS = [42, 17, 83, 29, 64, 8, 51, 36, 75, 23, 92, 58];
+
+type SortingLegendStep = Exclude<ArrayStepType, "found" | "not_found">;
+
+// The colors ArrayBars draws for each step type.
+const LEGEND_ITEMS: Record<SortingLegendStep, LegendItem> = {
+  compare: { label: "Compare", tone: "amber" },
+  swap: { label: "Swap", tone: "rose" },
+  overwrite: { label: "Overwrite", tone: "violet" },
+  partition: { label: "Partition", tone: "sky" },
+  merge: { label: "Merge", tone: "emerald" },
+  heapify: { label: "Heapify", tone: "pink" },
+  done: { label: "Sorted", tone: "emerald" },
+};
+
+// The step types each algorithm produces, so the legend lists only colors that can appear.
+const ALGORITHM_STEP_TYPES: Record<SortingAlgorithm, SortingLegendStep[]> = {
+  bubble_sort: ["compare", "swap"],
+  selection_sort: ["compare", "swap"],
+  insertion_sort: ["compare", "overwrite"],
+  merge_sort: ["compare", "partition", "merge", "overwrite"],
+  quick_sort: ["compare", "partition", "swap"],
+  heap_sort: ["compare", "heapify", "swap"],
+  shell_sort: ["compare", "overwrite"],
+  cocktail_shaker_sort: ["compare", "swap"],
+  gnome_sort: ["compare", "swap"],
+  comb_sort: ["compare", "swap"],
+  counting_sort: ["overwrite"],
+};
+
+function sortingLegend(algorithm: SortingAlgorithm): LegendItem[] {
+  return [...ALGORITHM_STEP_TYPES[algorithm], "done" as const].map((type) => LEGEND_ITEMS[type]);
+}
 
 export function SortingVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<SortingAlgorithm>("bubble_sort");
@@ -24,44 +56,39 @@ export function SortingVisualizer(props: MetadataSourceProps) {
   const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(320);
   const [initialNumbers, setInitialNumbers] = useState(DEFAULT_NUMBERS);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const run = useVisualizationRun();
   const playback = useLearningPlayback<AlgorithmStep>(speed, algorithm);
   const displayedNumbers = playback.currentStep?.array ?? initialNumbers;
   const finalArray = playback.isComplete ? playback.currentStep?.array : null;
 
-  async function handleGenerate(numberCount: number) {
-    setError(null);
-    setIsLoading(true);
-    playback.reset();
-    try {
-      const response = await generateRandomNumbers(numberCount);
-      setInitialNumbers(response.numbers);
-      setPresetId("");
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Could not generate numbers.");
-    } finally {
-      setIsLoading(false);
-    }
+  function handleGenerate(numberCount: number) {
+    return run.start({
+      onStart: playback.reset,
+      request: (signal) => generateRandomNumbers(numberCount, signal),
+      onSuccess: (response) => {
+        setInitialNumbers(response.numbers);
+        setPresetId("");
+      },
+      errorMessage: "Could not generate numbers.",
+    });
   }
 
-  async function handleStart(numberCount: number) {
-    setError(null);
-    setIsLoading(true);
-    playback.reset();
-    try {
-      let numbers = initialNumbers;
-      if (numbers.length !== numberCount) {
-        numbers = (await generateRandomNumbers(numberCount)).numbers;
-        setInitialNumbers(numbers);
-        setPresetId("");
-      }
-      playback.load((await fetchSortingSteps(numbers, algorithm)).steps);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Could not load sorting steps.");
-    } finally {
-      setIsLoading(false);
-    }
+  function handleStart(numberCount: number) {
+    return run.start({
+      onStart: playback.reset,
+      request: async (signal) => {
+        let numbers = initialNumbers;
+        if (numbers.length !== numberCount) {
+          numbers = (await generateRandomNumbers(numberCount, signal)).numbers;
+          signal.throwIfAborted();
+          setInitialNumbers(numbers);
+          setPresetId("");
+        }
+        return fetchSortingSteps(numbers, algorithm, signal);
+      },
+      onSuccess: (response) => playback.load(response.steps),
+      errorMessage: "Could not load sorting steps.",
+    });
   }
 
   function changeAlgorithm(next: SortingAlgorithm) {
@@ -76,76 +103,76 @@ export function SortingVisualizer(props: MetadataSourceProps) {
     setPresetId(preset.id);
     setCount(numbers.length);
     setInitialNumbers(numbers);
-    setError(null);
+    run.clearError();
     playback.reset();
   }
 
   return (
-    <div>
-      <VisualizerControls
-        key={count}
-        algorithm={algorithm}
-        count={count}
-        speed={speed}
-        isLoading={isLoading}
-        isPlaying={playback.isPlaying}
-            learningBlocked={playback.learning.blocked}
-        currentStepIndex={playback.currentStepIndex}
-        totalSteps={playback.steps.length}
-        presetId={presetId}
-        presets={SORTING_PRESETS}
-        onAlgorithmChange={changeAlgorithm}
-        onCountChange={(nextCount) => {
-          setCount(nextCount);
-          if (nextCount !== initialNumbers.length) setPresetId("");
-        }}
-        onSpeedChange={setSpeed}
-        onGenerate={handleGenerate}
-        onStart={handleStart}
-        onTogglePlayback={playback.toggle}
-        onPreviousStep={playback.previous}
-        onNextStep={playback.next}
-        onJumpToStart={playback.jumpToStart}
-        onJumpToEnd={playback.jumpToEnd}
-        onRestart={playback.restart}
-        onSeek={playback.seek}
-        onReset={playback.reset}
-        onPresetChange={loadPreset}
-      />
-
-      <LearningPanel learning={playback.learning} isLoading={isLoading} />
-
-      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
-
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
+    <VisualizerWorkspace
+      algorithmId={algorithm}
+      metadata={props}
+      controls={
+        <VisualizerControls
+          key={count}
+          algorithm={algorithm}
+          count={count}
+          speed={speed}
+          isLoading={run.isLoading}
+          isPlaying={playback.isPlaying}
+          learningBlocked={playback.learning.blocked}
+          currentStepIndex={playback.currentStepIndex}
+          totalSteps={playback.steps.length}
+          presetId={presetId}
+          presets={SORTING_PRESETS}
+          onAlgorithmChange={changeAlgorithm}
+          onCountChange={(nextCount) => {
+            setCount(nextCount);
+            if (nextCount !== initialNumbers.length) setPresetId("");
+          }}
+          onSpeedChange={setSpeed}
+          onGenerate={handleGenerate}
+          onStart={handleStart}
+          onTogglePlayback={playback.toggle}
+          onPreviousStep={playback.previous}
+          onNextStep={playback.next}
+          onJumpToStart={playback.jumpToStart}
+          onJumpToEnd={playback.jumpToEnd}
+          onRestart={playback.restart}
+          onSeek={playback.seek}
+          onReset={playback.reset}
+          onPresetChange={loadPreset}
+        />
+      }
+      notices={<LearningPanel learning={playback.learning} isLoading={run.isLoading} />}
+      error={run.error}
+      visualization={
         <VisualizationPanel
           title={ALGORITHM_LABELS[algorithm]}
           status={playbackStatus({
-            hasError: error !== null,
+            hasError: run.error !== null,
             isComplete: playback.isComplete,
-            isLoading,
+            isLoading: run.isLoading,
             isPlaying: playback.isPlaying,
             totalSteps: playback.steps.length,
           })}
           description={playback.currentStep?.description ?? "Generate a new array or start with the sample values."}
-          legend={["Compare", "Swap", "Overwrite"]}
-          resultSummary={finalArray ? <span>Final sorted array: <span className="font-mono text-xs">[{finalArray.join(", ")}]</span></span> : null}
+          legend={sortingLegend(algorithm)}
+          resultSummary={finalArray ? <span>Final sorted array ({finalArray.length} values): <span className="font-mono text-xs">[{finalArray.join(", ")}]</span></span> : null}
         >
           <ArrayBars values={displayedNumbers} step={playback.currentStep} />
         </VisualizationPanel>
-        <div className="grid gap-5 self-start">
-          <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={playback.currentStep?.pseudocode_line} isLoading={props.isMetadataLoading} error={props.metadataError} />
-          <VisualizerStats
-            algorithmName={ALGORITHM_LABELS[algorithm]}
-            currentStep={playback.currentStepIndex + 1}
-            totalSteps={playback.steps.length}
-            elapsedMs={playback.elapsedMs}
-            resultLabel="Final sorted array"
-            result={<span className="font-mono text-xs font-medium">{finalArray ? `[${finalArray.join(", ")}]` : "Waiting for completion"}</span>}
-          />
-        </div>
-      </div>
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
-    </div>
+      }
+      pseudocodeLine={playback.currentStep?.pseudocode_line}
+      stats={
+        <VisualizerStats
+          algorithmName={ALGORITHM_LABELS[algorithm]}
+          currentStep={playback.currentStepIndex + 1}
+          totalSteps={playback.steps.length}
+          elapsedMs={playback.elapsedMs}
+          resultLabel="Final sorted array"
+          result={<span className="font-mono text-xs font-medium">{finalArray ? `[${finalArray.join(", ")}]` : "Waiting for completion"}</span>}
+        />
+      }
+    />
   );
 }

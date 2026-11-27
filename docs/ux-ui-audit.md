@@ -6,14 +6,15 @@
 
 - Audit completed on 2026-07-10.
 - Phase 1 is in progress. The checkboxes below record which items have shipped.
-- Reviewed against the code on 2026-11-27: items 1, 2, 5, 6, and 8 have shipped. Items 3, 4, 7, and 9 are partly done:
-  - Item 3 has `OverflowFrame`; the other primitives remain.
-  - Item 4 has the “Reset run” label, form message rows that render only when there is a message, and 44px graph remove buttons. The 44px slider hit area and the danger variant for clear and remove actions remain.
-  - Item 7 has readable category names in the metadata badge. Legends, empty states, and result wrapping remain.
-  - Item 9 has one tab stop with arrow-key movement in the maze and Sudoku grids, keyboard placement of graph nodes, and list semantics for hash buckets. Named panel landmarks, `aria-pressed` on the maze tools, and linking the graph and tree drawings to the step description remain.
+- Reviewed against the code on 2026-11-27, after task T9: items 1, 2, 3, 5, 6, and 8 have shipped. Items 4, 7, and 9 are partly done:
+  - Item 3 has `ControlPanel`, `SectionHeader`, `RangeField`, `ActionRow`, `ResultSummary`, `VisualizationEmptyState`, and `OverflowFrame`. `Panel` renders a `section` only when it has a name, and every category uses one 300px support rail. The stats, pseudocode, and backtracking list panels still style their own headers and use 0.65–0.68rem labels.
+  - Item 4 has the “Reset run” label, form message rows that render only when there is a message, 44px speed sliders, the danger variant on “Clear walls” and “Clear puzzle”, and 44px graph remove buttons. The step slider in the playback controls still has the browser's default hit area.
+  - Item 7 has readable category names, legends built from explicit `{ label, tone }` items that match the drawn colors (Searching's “Inspect” is now amber), an empty state for Trees, and result summaries that wrap and give the length of the sorted array. A consistent outline for the current graph and tree action, and slot numbers in the wrapped Fibonacci table, remain; the cell titles there still restart at “Slot 0” in each row.
+  - Item 9 has one tab stop with arrow-key movement in the maze and Sudoku grids, keyboard placement of graph nodes, list semantics for hash buckets, a named region for every control and visualization panel, and `aria-pressed` on the maze tools. Linking the graph and tree drawings to the step description remains.
 
-  [improvement.md](improvement.md#3-finish-ux-audit-phase-1) lists what remains for each item, and task T9 in [improvement-tasks.md](improvement-tasks.md) covers it.
-- Phase 2 has not started.
+  [improvement.md](improvement.md#3-finish-ux-audit-phase-1) has the review that led to task T9 in [improvement-tasks.md](improvement-tasks.md).
+- Phase 2 item 1 has shipped: every category renders through `VisualizerWorkspace` and `VisualizerSupportRail`. Items 2 to 4 have not started.
+- The Playwright smoke tests run axe on every category before and after a run and fail on serious and critical findings.
 
 ## Audit Summary
 
@@ -208,7 +209,7 @@
 
   **Likely files:** Category shells and Supporting panels.
 
-- [ ] **3. Complete the shared visual primitives**
+- [x] **3. Complete the shared visual primitives**
 
   **Concrete problem:** Repeated speed fields, control panels, action rows, result boxes, and overflow wrappers still use local class strings. `Panel` always renders a semantic `section`, even when unnamed.
 

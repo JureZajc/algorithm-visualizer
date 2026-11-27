@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 
-import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { BacktrackingGrid } from "@/components/backtracking-grid";
 import { BacktrackingListVisualizer } from "@/components/backtracking-list-visualizer";
-import { PseudocodePanel } from "@/components/pseudocode-panel";
+import { LearningPanel } from "@/components/learning-panel";
 import { StepControls } from "@/components/step-controls";
 import { SudokuGrid } from "@/components/sudoku-grid";
-import { Alert, Button, FormField, InlineMessage, inputClassName, Panel } from "@/components/ui-primitives";
+import { ActionRow, Button, ControlPanel, FormField, InlineMessage, inputClassName, SpeedField, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
+import { VisualizerWorkspace } from "@/components/visualizer-workspace";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
-import { LearningPanel } from "@/components/learning-panel";
+import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchBacktrackingSteps } from "@/lib/api";
 import {
   cloneSudokuBoard,
@@ -64,6 +64,42 @@ const selectedToolClasses: Record<MazeTool, string> = {
   wall: "border-slate-950 bg-slate-950 text-white shadow-lg shadow-slate-200",
   start: "border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-100",
   end: "border-rose-600 bg-rose-600 text-white shadow-lg shadow-rose-100",
+};
+
+// The colors of BacktrackingGrid, SudokuGrid, and the list view. Board cells are tinted, so
+// their swatches are soft; walls, queens, paths, and the active value are filled.
+const ATTEMPT: LegendItem = { label: "Attempt", tone: "amber-soft" };
+const BACKTRACK: LegendItem = { label: "Backtrack", tone: "violet-soft" };
+const SOLUTION: LegendItem = { label: "Solution", tone: "emerald-soft" };
+const LIST_LEGEND: LegendItem[] = [
+  { label: "Active", tone: "indigo" },
+  { label: "Chosen", tone: "emerald-soft" },
+];
+const LEGENDS: Record<BacktrackingAlgorithm, LegendItem[]> = {
+  n_queens: [
+    { label: "Queen", tone: "ink" },
+    ATTEMPT,
+    { label: "Conflict", tone: "rose-soft" },
+    BACKTRACK,
+    SOLUTION,
+  ],
+  maze_solver: [
+    { label: "Wall", tone: "ink" },
+    ATTEMPT,
+    { label: "Visited", tone: "sky-soft" },
+    { label: "Path", tone: "indigo" },
+    BACKTRACK,
+    SOLUTION,
+  ],
+  sudoku_solver: [
+    { label: "Given", tone: "slate-soft" },
+    { label: "Try", tone: "amber-soft" },
+    { label: "Conflict", tone: "rose-soft" },
+    BACKTRACK,
+    SOLUTION,
+  ],
+  permutations: LIST_LEGEND,
+  subsets: LIST_LEGEND,
 };
 
 function isListAlgorithm(algorithm: BacktrackingAlgorithm) {
@@ -192,12 +228,12 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
   );
   const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(420);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [controlMessage, setControlMessage] = useState<string | null>(null);
   // Playback holds only the steps; run-level Sudoku data is kept here.
   const [sudokuRun, setSudokuRun] = useState<SudokuRun | null>(null);
+  const run = useVisualizationRun();
   const playback = useLearningPlayback<BacktrackingStep>(speed, algorithm);
+  const isLoading = run.isLoading;
   const currentStep = playback.currentStep;
   const availablePresets = BACKTRACKING_PRESETS.filter(
     (preset) => preset.algorithm === algorithm,
@@ -227,7 +263,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
   const hasValidationError = Object.keys(formErrors).length > 0;
 
   function resetForInputChange() {
-    setError(null);
+    run.clearError();
     setControlMessage(null);
     playback.reset();
   }
@@ -325,7 +361,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
 
       nextGrid[row][column] = mazeTool;
       setControlMessage(null);
-      setError(null);
+      run.clearError();
       playback.reset();
       return nextGrid;
     });
@@ -376,215 +412,201 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
     resetForInputChange();
   }
 
-  async function startVisualization() {
+  function startVisualization() {
     if (hasValidationError) return;
 
-    setError(null);
-    setIsLoading(true);
-    setSudokuRun(null);
-    playback.reset();
-    try {
-      const request = createRequest(
-        algorithm,
-        form,
-        algorithm === "maze_solver" ? mazeGrid : undefined,
-        algorithm === "sudoku_solver" ? sudokuBoard : undefined,
-      );
-      const response = await fetchBacktrackingSteps(request);
-      const initialBoard = response.initial_board ?? null;
-      const fixedCells = response.fixed_cells ?? null;
-      setSudokuRun(
-        initialBoard && fixedCells
-          ? { initial_board: initialBoard, fixed_cells: fixedCells }
-          : null,
-      );
-      playback.load(response.steps);
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not load backtracking steps.");
-    } finally {
-      setIsLoading(false);
-    }
+    return run.start({
+      onStart: () => {
+        setSudokuRun(null);
+        playback.reset();
+      },
+      // Built inside the request, as before, so an input it rejects shows as the run's error.
+      request: (signal) => fetchBacktrackingSteps(
+        createRequest(
+          algorithm,
+          form,
+          algorithm === "maze_solver" ? mazeGrid : undefined,
+          algorithm === "sudoku_solver" ? sudokuBoard : undefined,
+        ),
+        signal,
+      ),
+      onSuccess: (response) => {
+        const initialBoard = response.initial_board ?? null;
+        const fixedCells = response.fixed_cells ?? null;
+        setSudokuRun(
+          initialBoard && fixedCells
+            ? { initial_board: initialBoard, fixed_cells: fixedCells }
+            : null,
+        );
+        playback.load(response.steps);
+      },
+      errorMessage: "Could not load backtracking steps.",
+    });
   }
 
   const editingDisabled = playback.isPlaying || isLoading;
-  const legend =
-    algorithm === "n_queens"
-      ? ["Attempt", "Conflict", "Backtrack", "Solution"]
-      : algorithm === "maze_solver"
-        ? ["Wall", "Visited", "Path", "Backtrack", "Solution"]
-        : algorithm === "sudoku_solver"
-          ? ["Given", "Try", "Conflict", "Backtrack", "Solution"]
-          : ["Active", "Chosen", "Backtrack", "Solution"];
+
+  const controls = (
+    <ControlPanel className="md:grid-cols-2 xl:grid-cols-6" label="Backtracking controls">
+      <FormField label="Backtracking algorithm" className="xl:col-span-2">
+        <select
+          className={inputClassName()}
+          value={algorithm}
+          disabled={editingDisabled}
+          onChange={(event) => changeAlgorithm(event.target.value as BacktrackingAlgorithm)}
+        >
+          {Object.entries(BACKTRACKING_ALGORITHM_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label="Sample preset" className="xl:col-span-2">
+        <select
+          className={inputClassName()}
+          value={presetId}
+          disabled={editingDisabled}
+          onChange={(event) => loadPreset(event.target.value)}
+        >
+          <option value="" disabled>Choose a preset</option>
+          {availablePresets.map((preset) => (
+            <option key={preset.id} value={preset.id}>{preset.label}</option>
+          ))}
+        </select>
+      </FormField>
+
+      <SpeedField className="xl:col-span-2" min={80} max={1200} step={20} value={speed} onChange={setSpeed} />
+
+      <AlgorithmInputFields
+        algorithm={algorithm}
+        errors={formErrors}
+        form={form}
+        disabled={editingDisabled}
+        onChange={updateField}
+      />
+
+      {algorithm === "maze_solver" ? (
+        <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-6">
+          <div className="flex flex-col gap-1">
+            <p className="m-0 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
+              Maze editing tools
+            </p>
+            <p className="m-0 text-sm leading-6 text-slate-600">
+              Choose a tool, then click cells to edit the maze.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Maze editing tool">
+            {MAZE_TOOLS.map((tool) => (
+              <button
+                aria-pressed={mazeTool === tool.id}
+                className={`min-h-11 rounded-xl border px-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-45 ${mazeTool === tool.id ? selectedToolClasses[tool.id] : toolClasses[tool.id]}`}
+                disabled={editingDisabled}
+                key={tool.id}
+                type="button"
+                onClick={() => setMazeTool(tool.id)}
+              >
+                {tool.label}
+              </button>
+            ))}
+          </div>
+          {controlMessage ? <InlineMessage tone="error">{controlMessage}</InlineMessage> : null}
+          <ActionRow>
+            <Button
+              disabled={editingDisabled}
+              onClick={resetMaze}
+            >
+              Reset maze
+            </Button>
+            <Button
+              disabled={editingDisabled}
+              variant="danger"
+              onClick={clearWalls}
+            >
+              Clear walls
+            </Button>
+          </ActionRow>
+        </div>
+      ) : algorithm === "sudoku_solver" ? (
+        <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-6">
+          <div className="flex flex-col gap-1">
+            <p className="m-0 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
+              Sudoku puzzle
+            </p>
+            <p className="m-0 text-sm leading-6 text-slate-600">
+              Type digits into the board, or clear cells to leave them empty.
+            </p>
+          </div>
+          <ActionRow>
+            <Button
+              disabled={editingDisabled}
+              onClick={resetSudokuPuzzle}
+            >
+              Reset puzzle
+            </Button>
+            <Button
+              disabled={editingDisabled}
+              variant="danger"
+              onClick={clearSudokuPuzzle}
+            >
+              Clear puzzle
+            </Button>
+          </ActionRow>
+        </div>
+      ) : null}
+
+      {formErrors.form ? (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
+          <InlineMessage tone="error">{formErrors.form}</InlineMessage>
+        </div>
+      ) : null}
+
+      <ActionRow className="md:col-span-2 xl:col-span-6">
+        <Button
+          variant="primary"
+          disabled={editingDisabled || hasValidationError}
+          onClick={startVisualization}
+        >
+          {isLoading ? "Loading steps..." : "Start visualization"}
+        </Button>
+        <Button
+          disabled={isLoading}
+          onClick={playback.reset}
+        >
+          Reset run
+        </Button>
+      </ActionRow>
+
+      <div className="md:col-span-2 xl:col-span-6">
+        <StepControls
+          currentStepIndex={playback.currentStepIndex}
+          totalSteps={playback.steps.length}
+          isLoading={isLoading}
+          isPlaying={playback.isPlaying}
+          learningBlocked={playback.learning.blocked}
+          onTogglePlayback={playback.toggle}
+          onPrevious={playback.previous}
+          onNext={playback.next}
+          onJumpToStart={playback.jumpToStart}
+          onJumpToEnd={playback.jumpToEnd}
+          onRestart={playback.restart}
+          onSeek={playback.seek}
+        />
+      </div>
+    </ControlPanel>
+  );
 
   return (
-    <div>
-      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
-        <FormField label="Backtracking algorithm" className="xl:col-span-2">
-          <select
-            className={inputClassName()}
-            value={algorithm}
-            disabled={editingDisabled}
-            onChange={(event) => changeAlgorithm(event.target.value as BacktrackingAlgorithm)}
-          >
-            {Object.entries(BACKTRACKING_ALGORITHM_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </FormField>
-
-        <FormField label="Sample preset" className="xl:col-span-2">
-          <select
-            className={inputClassName()}
-            value={presetId}
-            disabled={editingDisabled}
-            onChange={(event) => loadPreset(event.target.value)}
-          >
-            <option value="" disabled>Choose a preset</option>
-            {availablePresets.map((preset) => (
-              <option key={preset.id} value={preset.id}>{preset.label}</option>
-            ))}
-          </select>
-        </FormField>
-
-        <label className="flex flex-col gap-3 text-xs font-bold text-slate-700 xl:col-span-2">
-          <span className="flex justify-between gap-3">
-            Animation speed
-            <span className="font-mono text-indigo-600">{speed} ms</span>
-          </span>
-          <input
-            className="w-full accent-indigo-600"
-            type="range"
-            min={80}
-            max={1200}
-            step={20}
-            value={speed}
-            onChange={(event) => setSpeed(Number(event.target.value))}
-          />
-        </label>
-
-        <AlgorithmInputFields
-          algorithm={algorithm}
-          errors={formErrors}
-          form={form}
-          disabled={editingDisabled}
-          onChange={updateField}
-        />
-
-        {algorithm === "maze_solver" ? (
-          <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-6">
-            <div className="flex flex-col gap-1">
-              <p className="m-0 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
-                Maze editing tools
-              </p>
-              <p className="m-0 text-sm leading-6 text-slate-600">
-                Choose a tool, then click cells to edit the maze.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {MAZE_TOOLS.map((tool) => (
-                <button
-                  className={`min-h-10 rounded-xl border px-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-45 ${mazeTool === tool.id ? selectedToolClasses[tool.id] : toolClasses[tool.id]}`}
-                  disabled={editingDisabled}
-                  key={tool.id}
-                  type="button"
-                  onClick={() => setMazeTool(tool.id)}
-                >
-                  {tool.label}
-                </button>
-              ))}
-            </div>
-            {controlMessage ? <InlineMessage tone="error">{controlMessage}</InlineMessage> : null}
-            <div className="flex flex-wrap gap-2">
-              <Button
-                disabled={editingDisabled}
-                onClick={resetMaze}
-              >
-                Reset maze
-              </Button>
-              <Button
-                disabled={editingDisabled}
-                onClick={clearWalls}
-              >
-                Clear walls
-              </Button>
-            </div>
-          </div>
-        ) : algorithm === "sudoku_solver" ? (
-          <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-6">
-            <div className="flex flex-col gap-1">
-              <p className="m-0 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
-                Sudoku puzzle
-              </p>
-              <p className="m-0 text-sm leading-6 text-slate-600">
-                Type digits into the board, or clear cells to leave them empty.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                disabled={editingDisabled}
-                onClick={resetSudokuPuzzle}
-              >
-                Reset puzzle
-              </Button>
-              <Button
-                disabled={editingDisabled}
-                onClick={clearSudokuPuzzle}
-              >
-                Clear puzzle
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {formErrors.form ? (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
-            <InlineMessage tone="error">{formErrors.form}</InlineMessage>
-          </div>
-        ) : null}
-
-        <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
-          <Button
-            variant="primary"
-            disabled={editingDisabled || hasValidationError}
-            onClick={startVisualization}
-          >
-            {isLoading ? "Loading steps..." : "Start visualization"}
-          </Button>
-          <Button
-            disabled={isLoading}
-            onClick={playback.reset}
-          >
-            Reset run
-          </Button>
-        </div>
-
-        <div className="md:col-span-2 xl:col-span-6">
-          <StepControls
-            currentStepIndex={playback.currentStepIndex}
-            totalSteps={playback.steps.length}
-            isLoading={isLoading}
-            isPlaying={playback.isPlaying}
-            learningBlocked={playback.learning.blocked}
-            onTogglePlayback={playback.toggle}
-            onPrevious={playback.previous}
-            onNext={playback.next}
-            onJumpToStart={playback.jumpToStart}
-            onJumpToEnd={playback.jumpToEnd}
-            onRestart={playback.restart}
-            onSeek={playback.seek}
-          />
-        </div>
-      </Panel>
-
-      <LearningPanel learning={playback.learning} isLoading={isLoading} />
-
-      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
-
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
+    <VisualizerWorkspace
+      algorithmId={algorithm}
+      metadata={props}
+      controls={controls}
+      notices={<LearningPanel learning={playback.learning} isLoading={isLoading} />}
+      error={run.error}
+      visualization={
         <VisualizationPanel
           title={BACKTRACKING_ALGORITHM_LABELS[algorithm]}
           status={playbackStatus({
-            hasError: error !== null,
+            hasError: run.error !== null,
             hasValidationError,
             isComplete: playback.isComplete,
             isLoading,
@@ -592,7 +614,7 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? "Choose an input and start the backtracking visualization."}
-          legend={legend}
+          legend={LEGENDS[algorithm]}
           resultSummary={playback.isComplete ? <span>{result}</span> : null}
         >
           {isListAlgorithm(algorithm) ? (
@@ -620,20 +642,19 @@ export function BacktrackingVisualizer(props: MetadataSourceProps) {
             />
           )}
         </VisualizationPanel>
-        <div className="grid gap-5 self-start">
-          <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line ?? undefined} isLoading={props.isMetadataLoading} error={props.metadataError} />
-          <VisualizerStats
-            algorithmName={BACKTRACKING_ALGORITHM_LABELS[algorithm]}
-            currentStep={playback.currentStepIndex + 1}
-            totalSteps={playback.steps.length}
-            elapsedMs={playback.elapsedMs}
-            resultLabel="Backtracking result"
-            result={result}
-          />
-        </div>
-      </div>
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
-    </div>
+      }
+      pseudocodeLine={currentStep?.pseudocode_line}
+      stats={
+        <VisualizerStats
+          algorithmName={BACKTRACKING_ALGORITHM_LABELS[algorithm]}
+          currentStep={playback.currentStepIndex + 1}
+          totalSteps={playback.steps.length}
+          elapsedMs={playback.elapsedMs}
+          resultLabel="Backtracking result"
+          result={result}
+        />
+      }
+    />
   );
 }
 

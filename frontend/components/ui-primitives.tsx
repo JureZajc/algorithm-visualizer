@@ -75,38 +75,6 @@ const statusDots: Record<StatusVariant, string> = {
   error: "bg-rose-500",
 };
 
-const legendSwatches: Record<string, string> = {
-  Active: "bg-indigo-600",
-  Attempt: "bg-amber-400",
-  Backtrack: "bg-violet-400",
-  Candidate: "bg-cyan-400",
-  Chosen: "bg-emerald-500",
-  Collision: "bg-rose-500",
-  Compare: "bg-amber-400",
-  Conflict: "bg-rose-500",
-  Current: "bg-amber-400",
-  Found: "bg-emerald-500",
-  Frontier: "bg-violet-500",
-  Given: "bg-slate-500",
-  Hash: "bg-sky-400",
-  Imbalanced: "bg-rose-500",
-  Inspect: "bg-sky-500",
-  Inserted: "bg-violet-500",
-  "Not found": "bg-slate-500",
-  Overwrite: "bg-violet-500",
-  "Path / MST": "bg-emerald-500",
-  Path: "bg-indigo-500",
-  Probe: "bg-cyan-500",
-  Rejected: "bg-rose-500",
-  Related: "bg-amber-300",
-  Rotation: "bg-fuchsia-500",
-  Solution: "bg-emerald-500",
-  Swap: "bg-rose-500",
-  Try: "bg-amber-400",
-  Visited: "bg-sky-500",
-  Wall: "bg-slate-900",
-};
-
 function joinClasses(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
@@ -145,19 +113,133 @@ export function Button({
   );
 }
 
+/**
+ * A card. It renders a `section`, which is a landmark, only when it has an accessible name
+ * (`aria-label` or `aria-labelledby`); an unnamed panel is a plain `div`. Pass `as` to choose.
+ */
 export function Panel({
+  as,
   children,
   className,
   variant = "default",
   ...props
 }: HTMLAttributes<HTMLElement> & {
+  as?: "section" | "div" | "aside";
   children: ReactNode;
   variant?: PanelVariant;
 }) {
+  const isNamed = Boolean(props["aria-label"] || props["aria-labelledby"]);
+  const Element = as ?? (isNamed ? "section" : "div");
   return (
-    <section className={panelClassName(variant, className)} {...props}>
+    <Element className={panelClassName(variant, className)} {...props}>
       {children}
-    </section>
+    </Element>
+  );
+}
+
+/** The control panel of a category: a named region that lays its fields out on a grid. */
+export function ControlPanel({
+  children,
+  className,
+  label,
+}: {
+  children: ReactNode;
+  /** Grid columns and other layout classes, added to the shared padding and gap. */
+  className?: string;
+  /** Accessible name of the region, such as "Searching controls". */
+  label: string;
+}) {
+  return (
+    <Panel aria-label={label} className={joinClasses("mb-5 grid gap-4 p-5", className)} variant="control">
+      {children}
+    </Panel>
+  );
+}
+
+/** A wrapping row of buttons. */
+export function ActionRow({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={joinClasses("flex flex-wrap items-center gap-2", className)}>{children}</div>;
+}
+
+/**
+ * A labelled slider that shows its value. The input box is 44px tall, so the whole row is a
+ * pointer target, not only the 16px track. The arrow keys move it by `step`.
+ */
+export function RangeField({
+  className,
+  disabled,
+  label,
+  max,
+  min,
+  onChange,
+  step,
+  unit,
+  value,
+  valueText,
+}: {
+  className?: string;
+  disabled?: boolean;
+  label: string;
+  max: number;
+  min: number;
+  onChange: (value: number) => void;
+  step: number;
+  /** Shown after the value, such as "ms". */
+  unit?: string;
+  value: number;
+  /** What a screen reader announces for the value; defaults to the visible value. */
+  valueText?: string;
+}) {
+  const shownValue = unit ? `${value} ${unit}` : String(value);
+  return (
+    <label className={joinClasses("flex flex-col gap-1 text-xs font-bold text-slate-700", className)}>
+      <span className="flex justify-between gap-3">
+        <span>{label}</span>
+        <span className="font-mono text-indigo-600">{shownValue}</span>
+      </span>
+      <input
+        aria-valuetext={valueText ?? shownValue}
+        className="h-11 w-full cursor-pointer accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-45"
+        disabled={disabled}
+        max={max}
+        min={min}
+        step={step}
+        type="range"
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+    </label>
+  );
+}
+
+/** The animation speed slider: the delay between autoplay steps, in milliseconds. */
+export function SpeedField({
+  className,
+  max,
+  min,
+  onChange,
+  step,
+  value,
+}: {
+  className?: string;
+  max: number;
+  min: number;
+  onChange: (value: number) => void;
+  step: number;
+  value: number;
+}) {
+  return (
+    <RangeField
+      className={className}
+      label="Animation speed"
+      max={max}
+      min={min}
+      step={step}
+      unit="ms"
+      value={value}
+      valueText={`${value} milliseconds per step`}
+      onChange={onChange}
+    />
   );
 }
 
@@ -266,6 +348,53 @@ export function EmptyState({
   );
 }
 
+/** The placeholder inside a visualization panel before there is anything to draw. */
+export function VisualizationEmptyState({
+  description,
+  title,
+}: {
+  description: string;
+  title: string;
+}) {
+  return (
+    <div className="grid min-h-48 place-content-center gap-1 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+      <p className="m-0 text-sm font-extrabold text-slate-800">{title}</p>
+      <p className="m-0 max-w-md text-sm leading-6 text-slate-600">{description}</p>
+    </div>
+  );
+}
+
+/** An eyebrow, a heading, and an optional description at the top of a panel. */
+export function SectionHeader({
+  description,
+  eyebrow,
+  title,
+  titleId,
+}: {
+  description?: ReactNode;
+  eyebrow: string;
+  title: string;
+  /** Lets the panel name itself after the heading through `aria-labelledby`. */
+  titleId?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-black uppercase tracking-[0.14em] text-indigo-600">{eyebrow}</span>
+      <h2 className="m-0 text-xl font-extrabold tracking-normal text-slate-950" id={titleId}>{title}</h2>
+      {description ? <p className="m-0 max-w-3xl text-sm leading-6 text-slate-600">{description}</p> : null}
+    </div>
+  );
+}
+
+/** The outcome of a finished run. Long values wrap instead of widening the panel. */
+export function ResultSummary({ children }: { children: ReactNode }) {
+  return (
+    <div className="mt-3 break-words rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-800" aria-live="polite">
+      {children}
+    </div>
+  );
+}
+
 export function StatusBadge({
   label,
   variant,
@@ -281,15 +410,69 @@ export function StatusBadge({
   );
 }
 
-export function Legend({ items }: { items: string[] }) {
+/**
+ * Legend swatches. A plain tone is a solid fill, for bars, nodes, and chips drawn in that
+ * color. A `-soft` tone is a pale fill inside a colored border, for cells that are tinted.
+ */
+export type LegendTone =
+  | "amber"
+  | "cyan"
+  | "emerald"
+  | "fuchsia"
+  | "indigo"
+  | "ink"
+  | "pink"
+  | "rose"
+  | "sky"
+  | "slate"
+  | "teal"
+  | "violet"
+  | "amber-soft"
+  | "cyan-soft"
+  | "emerald-soft"
+  | "indigo-soft"
+  | "rose-soft"
+  | "sky-soft"
+  | "slate-soft"
+  | "violet-soft";
+
+export interface LegendItem {
+  label: string;
+  tone: LegendTone;
+}
+
+const legendTones: Record<LegendTone, string> = {
+  amber: "border-amber-500 bg-amber-400",
+  cyan: "border-cyan-600 bg-cyan-500",
+  emerald: "border-emerald-600 bg-emerald-500",
+  fuchsia: "border-fuchsia-600 bg-fuchsia-500",
+  indigo: "border-indigo-600 bg-indigo-500",
+  ink: "border-slate-950 bg-slate-900",
+  pink: "border-pink-600 bg-pink-500",
+  rose: "border-rose-600 bg-rose-500",
+  sky: "border-sky-600 bg-sky-500",
+  slate: "border-slate-600 bg-slate-500",
+  teal: "border-teal-600 bg-teal-500",
+  violet: "border-violet-600 bg-violet-500",
+  "amber-soft": "border-amber-400 bg-amber-100",
+  "cyan-soft": "border-cyan-400 bg-cyan-100",
+  "emerald-soft": "border-emerald-400 bg-emerald-50",
+  "indigo-soft": "border-indigo-400 bg-indigo-50",
+  "rose-soft": "border-rose-400 bg-rose-100",
+  "sky-soft": "border-sky-400 bg-sky-100",
+  "slate-soft": "border-slate-400 bg-slate-100",
+  "violet-soft": "border-violet-400 bg-violet-100",
+};
+
+export function Legend({ items }: { items: LegendItem[] }) {
   return (
-    <div className="flex flex-wrap gap-x-3 gap-y-2 text-xs font-medium text-slate-500" aria-label="Visualization legend">
+    <ul className="m-0 flex list-none flex-wrap gap-x-3 gap-y-2 p-0 text-xs font-medium text-slate-600" aria-label="Visualization legend" role="list">
       {items.map((item) => (
-        <span className="inline-flex items-center gap-1.5" key={item}>
-          <span className={joinClasses("h-2.5 w-2.5 rounded-full", legendSwatches[item] ?? "bg-slate-400")} aria-hidden="true" />
-          {item}
-        </span>
+        <li className="inline-flex items-center gap-1.5" key={item.label}>
+          <span className={joinClasses("h-3 w-3 shrink-0 rounded-full border-2", legendTones[item.tone])} aria-hidden="true" />
+          {item.label}
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

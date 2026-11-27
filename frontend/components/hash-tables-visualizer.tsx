@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 
-import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { HashTableView } from "@/components/hash-table-view";
-import { PseudocodePanel } from "@/components/pseudocode-panel";
 import { StepControls } from "@/components/step-controls";
-import { Alert, Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { ActionRow, Button, ControlPanel, FormField, inputClassName, SpeedField, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
+import { VisualizerWorkspace } from "@/components/visualizer-workspace";
 import { useStepPlayback } from "@/hooks/use-step-playback";
+import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchHashTableSteps } from "@/lib/api";
 import {
   validateHashValues,
@@ -31,15 +31,32 @@ const DEFAULT_VALUES = "12, 22, 32, 5";
 const DEFAULT_TARGET = "32";
 const DEFAULT_TABLE_SIZE = "10";
 
+// The colors HashTableView draws: tinted buckets for hashing, checking, and probing, and
+// filled keys for what happens to the active key.
+const HASH: LegendItem = { label: "Hash", tone: "sky-soft" };
+const CHECKED: LegendItem = { label: "Checked", tone: "indigo-soft" };
+const COMPARE: LegendItem = { label: "Compare", tone: "amber" };
+const COLLISION: LegendItem = { label: "Collision", tone: "rose" };
+const INSERTED: LegendItem = { label: "Inserted", tone: "violet" };
+const FOUND: LegendItem = { label: "Found", tone: "emerald" };
+const NOT_FOUND: LegendItem = { label: "Not found", tone: "slate" };
+const PROBE: LegendItem = { label: "Probe", tone: "cyan-soft" };
+const LEGENDS: Record<HashTableAlgorithm, LegendItem[]> = {
+  hash_insert_chaining: [HASH, CHECKED, COLLISION, INSERTED],
+  hash_search_chaining: [HASH, CHECKED, COMPARE, FOUND, NOT_FOUND],
+  hash_insert_linear_probing: [HASH, CHECKED, PROBE, COLLISION, INSERTED],
+  hash_search_linear_probing: [HASH, CHECKED, PROBE, COMPARE, FOUND, NOT_FOUND],
+};
+
 export function HashTablesVisualizer(props: MetadataSourceProps) {
   const [algorithm, setAlgorithm] = useState<HashTableAlgorithm>("hash_insert_chaining");
   const [valuesInput, setValuesInput] = useState(DEFAULT_VALUES);
   const [tableSizeInput, setTableSizeInput] = useState(DEFAULT_TABLE_SIZE);
   const [targetInput, setTargetInput] = useState(DEFAULT_TARGET);
   const [speed, setSpeed] = useState(520);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const run = useVisualizationRun();
   const playback = useStepPlayback<HashTableStep>(speed);
+  const isLoading = run.isLoading;
   const currentStep = playback.currentStep;
   const isSearch = isSearchAlgorithm(algorithm);
   const strategy = strategyForAlgorithm(algorithm);
@@ -66,7 +83,7 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
   const result = formatResult(algorithm, playback.isComplete, currentStep);
 
   function resetForInputChange() {
-    setError(null);
+    run.clearError();
     playback.reset();
   }
 
@@ -75,7 +92,7 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
     resetForInputChange();
   }
 
-  async function startVisualization() {
+  function startVisualization() {
     if (
       !valuesValidation.ok ||
       !tableSizeValidation.ok ||
@@ -85,149 +102,135 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
       return;
     }
 
-    setError(null);
-    setIsLoading(true);
-    playback.reset();
-    try {
-      const response = await fetchHashTableSteps({
-        algorithm,
-        values: valuesValidation.values,
-        table_size: tableSizeValidation.tableSize,
-        ...(isSearch ? { target: targetValidation.target } : {}),
-      });
-      playback.load(response.steps);
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not load hash table steps.");
-    } finally {
-      setIsLoading(false);
-    }
+    const request = {
+      algorithm,
+      values: valuesValidation.values,
+      table_size: tableSizeValidation.tableSize,
+      ...(isSearch ? { target: targetValidation.target } : {}),
+    };
+    return run.start({
+      onStart: playback.reset,
+      request: (signal) => fetchHashTableSteps(request, signal),
+      onSuccess: (response) => playback.load(response.steps),
+      errorMessage: "Could not load hash table steps.",
+    });
   }
 
-  return (
-    <div>
-      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
-        <FormField label="Hash table operation" className="xl:col-span-2">
-          <select
-            className={inputClassName()}
-            value={algorithm}
-            disabled={editingDisabled}
-            onChange={(event) => changeAlgorithm(event.target.value as HashTableAlgorithm)}
-          >
-            {Object.entries(HASH_TABLE_ALGORITHM_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </FormField>
-
-        <FormField
-          className="xl:col-span-2"
-          error={!valuesValidation.ok ? valuesValidation.error : capacityError ?? undefined}
-          helperText="Use 1 to 31 comma-separated keys."
-          label="Values"
-          messageId="hash-values-validation"
+  const controls = (
+    <ControlPanel className="md:grid-cols-2 xl:grid-cols-6" label="Hash table controls">
+      <FormField label="Hash table operation" className="xl:col-span-2">
+        <select
+          className={inputClassName()}
+          value={algorithm}
+          disabled={editingDisabled}
+          onChange={(event) => changeAlgorithm(event.target.value as HashTableAlgorithm)}
         >
+          {Object.entries(HASH_TABLE_ALGORITHM_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField
+        className="xl:col-span-2"
+        error={!valuesValidation.ok ? valuesValidation.error : capacityError ?? undefined}
+        helperText="Use 1 to 31 comma-separated keys."
+        label="Values"
+        messageId="hash-values-validation"
+      >
+        <input
+          className={inputClassName(!valuesValidation.ok || capacityError !== null)}
+          value={valuesInput}
+          disabled={editingDisabled}
+          aria-invalid={!valuesValidation.ok || capacityError !== null}
+          aria-describedby="hash-values-validation"
+          onChange={(event) => {
+            setValuesInput(event.target.value);
+            resetForInputChange();
+          }}
+        />
+      </FormField>
+
+      <FormField error={tableSizeValidation.ok ? undefined : tableSizeValidation.error} helperText="Use a table size from 2 to 31." label="Table size" messageId="hash-table-size-validation">
+        <input
+          className={inputClassName(!tableSizeValidation.ok || capacityError !== null)}
+          type="number"
+          min={2}
+          max={31}
+          value={tableSizeInput}
+          disabled={editingDisabled}
+          aria-invalid={!tableSizeValidation.ok || capacityError !== null}
+          aria-describedby="hash-table-size-validation"
+          onChange={(event) => {
+            setTableSizeInput(event.target.value);
+            resetForInputChange();
+          }}
+        />
+      </FormField>
+
+      {isSearch ? (
+        <FormField error={targetValidation.ok ? undefined : targetValidation.error} helperText="Use a number or string key." label="Target" messageId="hash-target-validation">
           <input
-            className={inputClassName(!valuesValidation.ok || capacityError !== null)}
-            value={valuesInput}
+            className={inputClassName(!targetValidation.ok)}
+            value={targetInput}
             disabled={editingDisabled}
-            aria-invalid={!valuesValidation.ok || capacityError !== null}
-            aria-describedby="hash-values-validation"
+            aria-invalid={!targetValidation.ok}
+            aria-describedby="hash-target-validation"
             onChange={(event) => {
-              setValuesInput(event.target.value);
+              setTargetInput(event.target.value);
               resetForInputChange();
             }}
           />
         </FormField>
+      ) : null}
 
-        <FormField error={tableSizeValidation.ok ? undefined : tableSizeValidation.error} helperText="Use a table size from 2 to 31." label="Table size" messageId="hash-table-size-validation">
-          <input
-            className={inputClassName(!tableSizeValidation.ok || capacityError !== null)}
-            type="number"
-            min={2}
-            max={31}
-            value={tableSizeInput}
-            disabled={editingDisabled}
-            aria-invalid={!tableSizeValidation.ok || capacityError !== null}
-            aria-describedby="hash-table-size-validation"
-            onChange={(event) => {
-              setTableSizeInput(event.target.value);
-              resetForInputChange();
-            }}
-          />
-        </FormField>
+      <SpeedField min={100} max={1200} step={20} value={speed} onChange={setSpeed} />
 
-        {isSearch ? (
-          <FormField error={targetValidation.ok ? undefined : targetValidation.error} helperText="Use a number or string key." label="Target" messageId="hash-target-validation">
-            <input
-              className={inputClassName(!targetValidation.ok)}
-              value={targetInput}
-              disabled={editingDisabled}
-              aria-invalid={!targetValidation.ok}
-              aria-describedby="hash-target-validation"
-              onChange={(event) => {
-                setTargetInput(event.target.value);
-                resetForInputChange();
-              }}
-            />
-          </FormField>
-        ) : null}
+      <ActionRow className="md:col-span-2 xl:col-span-6">
+        <Button
+          variant="primary"
+          disabled={editingDisabled || hasValidationError}
+          onClick={startVisualization}
+        >
+          {isLoading ? "Loading steps..." : "Start visualization"}
+        </Button>
+        <Button
+          disabled={isLoading}
+          onClick={playback.reset}
+        >
+          Reset run
+        </Button>
+      </ActionRow>
 
-        <label className="flex flex-col gap-3 text-xs font-bold text-slate-700">
-          <span className="flex justify-between gap-3">
-            Animation speed
-            <span className="font-mono text-indigo-600">{speed} ms</span>
-          </span>
-          <input
-            className="w-full accent-indigo-600"
-            type="range"
-            min={100}
-            max={1200}
-            step={20}
-            value={speed}
-            onChange={(event) => setSpeed(Number(event.target.value))}
-          />
-        </label>
+      <div className="md:col-span-2 xl:col-span-6">
+        <StepControls
+          currentStepIndex={playback.currentStepIndex}
+          totalSteps={playback.steps.length}
+          isLoading={isLoading}
+          isPlaying={playback.isPlaying}
+          onTogglePlayback={playback.toggle}
+          onPrevious={playback.previous}
+          onNext={playback.next}
+          onJumpToStart={playback.jumpToStart}
+          onJumpToEnd={playback.jumpToEnd}
+          onRestart={playback.restart}
+          onSeek={playback.seek}
+        />
+      </div>
+    </ControlPanel>
+  );
 
-        <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
-          <Button
-            variant="primary"
-            disabled={editingDisabled || hasValidationError}
-            onClick={startVisualization}
-          >
-            {isLoading ? "Loading steps..." : "Start visualization"}
-          </Button>
-          <Button
-            disabled={isLoading}
-            onClick={playback.reset}
-          >
-            Reset run
-          </Button>
-        </div>
-
-        <div className="md:col-span-2 xl:col-span-6">
-          <StepControls
-            currentStepIndex={playback.currentStepIndex}
-            totalSteps={playback.steps.length}
-            isLoading={isLoading}
-            isPlaying={playback.isPlaying}
-            onTogglePlayback={playback.toggle}
-            onPrevious={playback.previous}
-            onNext={playback.next}
-            onJumpToStart={playback.jumpToStart}
-            onJumpToEnd={playback.jumpToEnd}
-            onRestart={playback.restart}
-            onSeek={playback.seek}
-          />
-        </div>
-      </Panel>
-
-      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
-
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+  return (
+    <VisualizerWorkspace
+      algorithmId={algorithm}
+      metadata={props}
+      controls={controls}
+      error={run.error}
+      visualization={
         <VisualizationPanel
           title={HASH_TABLE_ALGORITHM_LABELS[algorithm]}
           status={playbackStatus({
-            hasError: error !== null,
+            hasError: run.error !== null,
             hasValidationError,
             isComplete: playback.isComplete,
             isLoading,
@@ -235,31 +238,29 @@ export function HashTablesVisualizer(props: MetadataSourceProps) {
             totalSteps: playback.steps.length,
           })}
           description={currentStep?.description ?? "Enter keys and start the hash table visualization."}
-          legend={["Hash", "Active", "Collision", "Probe", "Found", "Not found"]}
+          legend={LEGENDS[algorithm]}
           resultSummary={playback.isComplete ? <span>{isSearch ? "Search result" : "Insert result"}: <span className="font-mono text-xs">{result}</span></span> : null}
         >
           <HashTableView table={displayedTable} step={currentStep} />
         </VisualizationPanel>
-
-        <div className="grid gap-5 self-start">
-          <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line ?? undefined} isLoading={props.isMetadataLoading} error={props.metadataError} />
-          <VisualizerStats
-            algorithmName={HASH_TABLE_ALGORITHM_LABELS[algorithm]}
-            currentStep={playback.currentStepIndex + 1}
-            totalSteps={playback.steps.length}
-            elapsedMs={playback.elapsedMs}
-            resultLabel={isSearch ? "Search result" : "Insert result"}
-            result={<span className="font-mono text-xs font-medium">{result}</span>}
-          >
-            <Stat label="Input values"><span className="font-mono text-xs">{valuesValidation.ok ? formatKeyList(valuesValidation.values) : "Invalid input"}</span></Stat>
-            <Stat label="Table size"><span className="font-mono text-xs">{tableSizeValidation.ok ? tableSizeValidation.tableSize : "Invalid"}</span></Stat>
-            <Stat label="Hash index"><span className="font-mono text-xs">{currentStep?.hash_index ?? "None"}</span></Stat>
-            <Stat label="Visited buckets"><span className="font-mono text-xs">{currentStep?.visited_buckets.length ? currentStep.visited_buckets.join(" -> ") : "None"}</span></Stat>
-          </VisualizerStats>
-        </div>
-      </div>
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
-    </div>
+      }
+      pseudocodeLine={currentStep?.pseudocode_line}
+      stats={
+        <VisualizerStats
+          algorithmName={HASH_TABLE_ALGORITHM_LABELS[algorithm]}
+          currentStep={playback.currentStepIndex + 1}
+          totalSteps={playback.steps.length}
+          elapsedMs={playback.elapsedMs}
+          resultLabel={isSearch ? "Search result" : "Insert result"}
+          result={<span className="font-mono text-xs font-medium">{result}</span>}
+        >
+          <Stat label="Input values"><span className="font-mono text-xs">{valuesValidation.ok ? formatKeyList(valuesValidation.values) : "Invalid input"}</span></Stat>
+          <Stat label="Table size"><span className="font-mono text-xs">{tableSizeValidation.ok ? tableSizeValidation.tableSize : "Invalid"}</span></Stat>
+          <Stat label="Hash index"><span className="font-mono text-xs">{currentStep?.hash_index ?? "None"}</span></Stat>
+          <Stat label="Visited buckets"><span className="font-mono text-xs">{currentStep?.visited_buckets.length ? currentStep.visited_buckets.join(" -> ") : "None"}</span></Stat>
+        </VisualizerStats>
+      }
+    />
   );
 }
 

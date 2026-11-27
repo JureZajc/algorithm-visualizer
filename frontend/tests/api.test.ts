@@ -37,6 +37,26 @@ describe("API requests", () => {
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ size: 5, min_value: 5, max_value: 100 });
   });
 
+  it("passes the abort signal on POST requests", async () => {
+    const controller = new AbortController();
+    respondWithJson(200, { numbers: [5, 6, 7, 8, 9] });
+    await generateRandomNumbers(5, controller.signal);
+    respondWithJson(200, { algorithm: "bubble_sort", step_count: 0, steps: [] });
+    await fetchSortingSteps([3, 1, 2], "bubble_sort", controller.signal);
+    expect(fetchMock.mock.calls.map(([, init]) => init?.signal)).toEqual([controller.signal, controller.signal]);
+  });
+
+  it("rejects when the signal aborts the request", async () => {
+    const controller = new AbortController();
+    const abort = new DOMException("The operation was aborted.", "AbortError");
+    fetchMock.mockImplementationOnce((_url, init) => new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => reject(abort));
+    }));
+    const request = fetchSortingSteps([1], "bubble_sort", controller.signal);
+    controller.abort();
+    await expect(request).rejects.toBe(abort);
+  });
+
   it("passes the abort signal on GET requests", async () => {
     const controller = new AbortController();
     respondWithJson(200, { sorting: [] });

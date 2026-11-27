@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { StepControls } from "@/components/step-controls";
-import { Button, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { ActionRow, Button, ControlPanel, FormField, inputClassName, SpeedField } from "@/components/ui-primitives";
 import type { SortingPreset } from "@/lib/array-presets";
 import { validateCountDraft } from "@/lib/sorting-input";
 import { ALGORITHM_LABELS, type SortingAlgorithm } from "@/types/sorting";
@@ -46,11 +46,7 @@ export function VisualizerControls(props: VisualizerControlsProps) {
   }
 
   return (
-    <Panel
-      className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-4"
-      variant="control"
-      aria-label="Sorting visualization controls"
-    >
+    <ControlPanel className="md:grid-cols-2 xl:grid-cols-4" label="Sorting controls">
       <FormField label="Sorting algorithm">
         <select
           className={inputClassName()}
@@ -100,23 +96,9 @@ export function VisualizerControls(props: VisualizerControlsProps) {
         />
       </FormField>
 
-      <label className="flex flex-col gap-3 text-xs font-bold text-slate-700">
-        <span className="flex justify-between gap-3">
-          Animation speed
-          <span className="font-mono text-indigo-600">{props.speed} ms</span>
-        </span>
-        <input
-          className="w-full accent-indigo-600"
-          type="range"
-          min={80}
-          max={1000}
-          step={20}
-          value={props.speed}
-          onChange={(event) => props.onSpeedChange(Number(event.target.value))}
-        />
-      </label>
+      <SpeedField min={80} max={1000} step={20} value={props.speed} onChange={props.onSpeedChange} />
 
-      <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-4">
+      <ActionRow className="md:col-span-2 xl:col-span-4">
         <Button disabled={props.isPlaying || props.isLoading || hasCountError} onClick={() => props.onGenerate(commitCount())}>
           Generate numbers
         </Button>
@@ -126,7 +108,7 @@ export function VisualizerControls(props: VisualizerControlsProps) {
         <Button disabled={props.isLoading} onClick={props.onReset}>
           Reset run
         </Button>
-      </div>
+      </ActionRow>
 
       <div className="md:col-span-2 xl:col-span-4">
         <StepControls
@@ -144,6 +126,6 @@ export function VisualizerControls(props: VisualizerControlsProps) {
           onSeek={props.onSeek}
         />
       </div>
-    </Panel>
+    </ControlPanel>
   );
 }
