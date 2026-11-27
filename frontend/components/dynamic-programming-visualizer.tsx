@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { DynamicProgrammingTable } from "@/components/dynamic-programming-table";
 import { LearningPanel } from "@/components/learning-panel";
@@ -25,6 +25,7 @@ import {
   DYNAMIC_PROGRAMMING_PRESETS,
   type DynamicProgrammingPreset,
 } from "@/lib/dynamic-programming-presets";
+import { dynamicProgrammingQuery, parseDynamicProgrammingQuery, type QueryStateProps } from "@/lib/url-state";
 import type { MetadataSourceProps } from "@/types/algorithm";
 import {
   DYNAMIC_PROGRAMMING_ALGORITHM_LABELS,
@@ -191,11 +192,16 @@ function createTableLabels(
   };
 }
 
-export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
-  const [algorithm, setAlgorithm] = useState<DynamicProgrammingAlgorithm>("fibonacci");
-  const [form, setForm] = useState<DynamicProgrammingForm>(INITIAL_FORM);
+export function DynamicProgrammingVisualizer({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseDynamicProgrammingQuery(initialQuery));
+  const [algorithm, setAlgorithm] = useState<DynamicProgrammingAlgorithm>(restored.algorithm ?? "fibonacci");
+  const [form, setForm] = useState<DynamicProgrammingForm>(restored.form ?? INITIAL_FORM);
   const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(520);
+  const query = dynamicProgrammingQuery({ algorithm, form });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   const run = useVisualizationRun();
   const playback = useLearningPlayback<DynamicProgrammingStep>(speed, algorithm);
   const isLoading = run.isLoading;

@@ -1,65 +1,27 @@
-export type HashKey = number | string;
+import type { components } from "@/types/generated/api";
+import { CATALOG_LABELS } from "@/types/generated/catalog";
 
-export type HashTableAlgorithm =
-  | "hash_insert_chaining"
-  | "hash_search_chaining"
-  | "hash_insert_linear_probing"
-  | "hash_search_linear_probing";
+type Schemas = components["schemas"];
 
-export type HashTableStrategy = "separate_chaining" | "linear_probing";
-
-export type HashTableStepType =
-  | "hash"
-  | "inspect_bucket"
-  | "compare"
-  | "insert"
-  | "collision"
-  | "probe"
-  | "found"
-  | "not_found"
-  | "done";
-
-export interface HashTableBucket {
-  index: number;
-  items: HashKey[];
-}
-
-export interface HashTableSnapshot {
-  strategy: HashTableStrategy;
-  size: number;
-  buckets: HashTableBucket[];
-}
-
-export interface HashTableStep {
-  type: HashTableStepType;
-  table: HashTableSnapshot;
-  key: HashKey;
-  hash_index: number | null;
-  active_bucket: number | null;
-  active_item: HashKey | null;
-  visited_buckets: number[];
+export type HashTableRequest = Schemas["HashTableRequest"];
+export type HashTableResponse = Schemas["HashTableResponse"];
+/** The result of a step, typed per operation. */
+export type HashTableStepResult = NonNullable<Schemas["HashTableStep"]["result"]>;
+/**
+ * A step of a hash table operation. The hash table view reads `result` as a
+ * plain record, so it stays one here until the view narrows it to
+ * `HashTableStepResult`.
+ */
+export type HashTableStep = Omit<Schemas["HashTableStep"], "result"> & {
   result: Record<string, unknown> | null;
-  description: string;
-  pseudocode_line: number | null;
-}
-
-export interface HashTableRequest {
-  algorithm: HashTableAlgorithm;
-  values: HashKey[];
-  table_size: number;
-  target?: HashKey | null;
-}
-
-export interface HashTableResponse {
-  algorithm: HashTableAlgorithm;
-  input: Record<string, unknown>;
-  steps: HashTableStep[];
-  step_count: number;
-}
-
-export const HASH_TABLE_ALGORITHM_LABELS: Record<HashTableAlgorithm, string> = {
-  hash_insert_chaining: "Insert - Separate Chaining",
-  hash_search_chaining: "Search - Separate Chaining",
-  hash_insert_linear_probing: "Insert - Linear Probing",
-  hash_search_linear_probing: "Search - Linear Probing",
 };
+export type HashTableSnapshot = Schemas["HashTableSnapshot"];
+export type HashTableBucket = Schemas["HashTableBucket"];
+
+export type HashKey = HashTableBucket["items"][number];
+export type HashTableAlgorithm = HashTableRequest["algorithm"];
+export type HashTableStrategy = HashTableSnapshot["strategy"];
+export type HashTableStepType = HashTableStep["type"];
+
+export const HASH_TABLE_ALGORITHM_LABELS: Record<HashTableAlgorithm, string> =
+  CATALOG_LABELS.hash_tables;

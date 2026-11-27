@@ -1,12 +1,19 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 import { ActionRow, Alert, Button, EmptyState, FormField, inputClassName, Panel, SectionHeader } from "@/components/ui-primitives";
 import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
 import { SORTING_PRESETS } from "@/lib/array-presets";
 import { validateCountDraft } from "@/lib/sorting-input";
+import {
+  compareQuery,
+  MAX_COMPARED_ALGORITHMS as MAX_SELECTED,
+  MIN_COMPARED_ALGORITHMS as MIN_SELECTED,
+  parseCompareQuery,
+  type QueryStateProps,
+} from "@/lib/url-state";
 import type { AlgorithmMetadata, MetadataSourceProps } from "@/types/algorithm";
 import {
   ALGORITHM_LABELS,
@@ -21,8 +28,6 @@ const DEFAULT_SELECTION: SortingAlgorithm[] = [
   "selection_sort",
   "insertion_sort",
 ];
-const MIN_SELECTED = 2;
-const MAX_SELECTED = 4;
 
 interface ComparisonResult {
   algorithm: SortingAlgorithm;
@@ -34,14 +39,19 @@ interface ComparisonResult {
   timeComplexity: string;
 }
 
-export function SortingComparison(props: MetadataSourceProps) {
+export function SortingComparison({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseCompareQuery(initialQuery));
   const [selectedAlgorithms, setSelectedAlgorithms] =
-    useState<SortingAlgorithm[]>(DEFAULT_SELECTION);
-  const [count, setCount] = useState(DEFAULT_NUMBERS.length);
-  const [countDraft, setCountDraft] = useState(String(DEFAULT_NUMBERS.length));
+    useState<SortingAlgorithm[]>(restored.algorithms ?? DEFAULT_SELECTION);
+  const [count, setCount] = useState((restored.numbers ?? DEFAULT_NUMBERS).length);
+  const [countDraft, setCountDraft] = useState(String(count));
   const [presetId, setPresetId] = useState("");
-  const [initialNumbers, setInitialNumbers] = useState(DEFAULT_NUMBERS);
+  const [initialNumbers, setInitialNumbers] = useState(restored.numbers ?? DEFAULT_NUMBERS);
   const [results, setResults] = useState<ComparisonResult[]>([]);
+  const query = compareQuery({ algorithms: selectedAlgorithms, numbers: initialNumbers });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   const run = useVisualizationRun();
   const isLoading = run.isLoading;
   const headingId = useId();

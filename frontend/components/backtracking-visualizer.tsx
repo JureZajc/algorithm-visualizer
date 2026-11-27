@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BacktrackingGrid } from "@/components/backtracking-grid";
 import { BacktrackingListVisualizer } from "@/components/backtracking-list-visualizer";
@@ -30,6 +30,7 @@ import {
   DEFAULT_SUDOKU_BOARD,
   type BacktrackingPreset,
 } from "@/lib/backtracking-presets";
+import { backtrackingQuery, parseBacktrackingQuery, type QueryStateProps } from "@/lib/url-state";
 import type { MetadataSourceProps } from "@/types/algorithm";
 import {
   BACKTRACKING_ALGORITHM_LABELS,
@@ -216,19 +217,26 @@ function describeResult(
   return mazeResult.solved ? `${mazeResult.path.length} cells in path` : "No route";
 }
 
-export function BacktrackingVisualizer(props: MetadataSourceProps) {
-  const [algorithm, setAlgorithm] = useState<BacktrackingAlgorithm>("n_queens");
-  const [form, setForm] = useState<BacktrackingForm>(INITIAL_FORM);
-  const [mazeGrid, setMazeGrid] = useState<BacktrackingCell[][]>(() =>
-    createPreviewMazeGrid(7, 7, "classic"),
-  );
+export function BacktrackingVisualizer({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseBacktrackingQuery(initialQuery));
+  const [algorithm, setAlgorithm] = useState<BacktrackingAlgorithm>(restored.algorithm ?? "n_queens");
+  const [form, setForm] = useState<BacktrackingForm>(restored.form ?? INITIAL_FORM);
+  const [mazeGrid, setMazeGrid] = useState<BacktrackingCell[][]>(() => {
+    if (restored.mazeGrid) return restored.mazeGrid;
+    const request = safeRequest("maze_solver", restored.form ?? INITIAL_FORM);
+    return createPreviewMazeGrid(request.rows ?? 7, request.cols ?? 7, request.preset ?? "classic");
+  });
   const [mazeTool, setMazeTool] = useState<MazeTool>("wall");
   const [sudokuBoard, setSudokuBoard] = useState<SudokuBoard>(() =>
-    cloneSudokuBoard(DEFAULT_SUDOKU_BOARD),
+    cloneSudokuBoard(restored.sudokuBoard ?? DEFAULT_SUDOKU_BOARD),
   );
   const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(420);
   const [controlMessage, setControlMessage] = useState<string | null>(null);
+  const query = backtrackingQuery({ algorithm, form, mazeGrid, sudokuBoard });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   // Playback holds only the steps; run-level Sudoku data is kept here.
   const [sudokuRun, setSudokuRun] = useState<SudokuRun | null>(null);
   const run = useVisualizationRun();

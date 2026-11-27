@@ -3,6 +3,9 @@ import type {
   DynamicProgrammingAlgorithm,
   DynamicProgrammingRequest,
 } from "@/types/dynamic-programming";
+import { CATALOG_LIMITS } from "@/types/generated/catalog";
+
+const LIMITS = CATALOG_LIMITS.dynamic_programming;
 
 export interface DynamicProgrammingForm {
   n: string;
@@ -85,9 +88,9 @@ export function requireNonnegativeValues(values: number[], label: string) {
   return values;
 }
 
-export function requireText(value: string, label: string) {
-  if (value.length > 12) {
-    throw new Error(`${label} must be 12 characters or fewer.`);
+export function requireText(value: string, label: string, maximum: number) {
+  if (value.length > maximum) {
+    throw new Error(`${label} must be ${maximum} characters or fewer.`);
   }
   return value;
 }
@@ -99,19 +102,34 @@ export function createRequest(
   if (algorithm === "fibonacci") {
     return {
       algorithm,
-      n: requireRange(parseInteger(form.n, "n"), "n", 0, 40),
+      n: requireRange(
+        parseInteger(form.n, "n"),
+        "n",
+        LIMITS.fibonacci.n.minimum,
+        LIMITS.fibonacci.n.maximum,
+      ),
     };
   }
 
   if (algorithm === "coin_change") {
     const coins = requirePositiveValues(
-      requireListLength(parseIntegerList(form.coins, "Coins"), "Coins", 1, 8),
+      requireListLength(
+        parseIntegerList(form.coins, "Coins"),
+        "Coins",
+        LIMITS.coin_change.coins.min_items,
+        LIMITS.coin_change.coins.max_items,
+      ),
       "Coins",
     );
     return {
       algorithm,
       coins,
-      amount: requireRange(parseInteger(form.amount, "Amount"), "Amount", 0, 50),
+      amount: requireRange(
+        parseInteger(form.amount, "Amount"),
+        "Amount",
+        LIMITS.coin_change.amount.minimum,
+        LIMITS.coin_change.amount.maximum,
+      ),
     };
   }
 
@@ -120,13 +138,18 @@ export function createRequest(
       requireListLength(
         parseIntegerList(form.weights, "Weights"),
         "Weights",
-        1,
-        8,
+        LIMITS.knapsack.weights.min_items,
+        LIMITS.knapsack.weights.max_items,
       ),
       "Weights",
     );
     const values = requireNonnegativeValues(
-      requireListLength(parseIntegerList(form.values, "Values"), "Values", 1, 8),
+      requireListLength(
+        parseIntegerList(form.values, "Values"),
+        "Values",
+        LIMITS.knapsack.values.min_items,
+        LIMITS.knapsack.values.max_items,
+      ),
       "Values",
     );
     if (weights.length !== values.length) {
@@ -139,8 +162,8 @@ export function createRequest(
       capacity: requireRange(
         parseInteger(form.capacity, "Capacity"),
         "Capacity",
-        0,
-        50,
+        LIMITS.knapsack.capacity.minimum,
+        LIMITS.knapsack.capacity.maximum,
       ),
     };
   }
@@ -148,23 +171,41 @@ export function createRequest(
   if (algorithm === "lcs") {
     return {
       algorithm,
-      text_a: requireText(form.textA, "First string"),
-      text_b: requireText(form.textB, "Second string"),
+      text_a: requireText(form.textA, "First string", LIMITS.lcs.text_a.max_length),
+      text_b: requireText(form.textB, "Second string", LIMITS.lcs.text_b.max_length),
     };
   }
 
   if (algorithm === "edit_distance") {
     return {
       algorithm,
-      text_a: requireText(form.textA, "Source string"),
-      text_b: requireText(form.textB, "Target string"),
+      text_a: requireText(
+        form.textA,
+        "Source string",
+        LIMITS.edit_distance.text_a.max_length,
+      ),
+      text_b: requireText(
+        form.textB,
+        "Target string",
+        LIMITS.edit_distance.text_b.max_length,
+      ),
     };
   }
 
   return {
     algorithm,
-    rows: requireRange(parseInteger(form.rows, "Rows"), "Rows", 1, 12),
-    cols: requireRange(parseInteger(form.cols, "Columns"), "Columns", 1, 12),
+    rows: requireRange(
+      parseInteger(form.rows, "Rows"),
+      "Rows",
+      LIMITS.unique_paths.rows.minimum,
+      LIMITS.unique_paths.rows.maximum,
+    ),
+    cols: requireRange(
+      parseInteger(form.cols, "Columns"),
+      "Columns",
+      LIMITS.unique_paths.cols.minimum,
+      LIMITS.unique_paths.cols.maximum,
+    ),
   };
 }
 

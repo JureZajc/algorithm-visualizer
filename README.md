@@ -18,6 +18,7 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 - See the active pseudocode line, current operation, progress, elapsed time, result, and algorithm-specific state together.
 - Review descriptions, best/average/worst time complexity, space complexity, and implementation notes for every algorithm.
 - Start quickly with curated examples, generate random arrays, or enter problem-specific values manually.
+- Share a link to what you are exploring: the address keeps the category, algorithm, and input, and opening it fills in the controls without starting a run. Each category also remembers its last input for the session when you switch away and back.
 - Compare two to four sorting algorithms on the same input using step, comparison, swap, overwrite, and average-complexity metrics.
 - Explore graph traversals, shortest paths, topological ordering, and minimum spanning trees on weighted presets or a custom graph.
 - Build custom directed or undirected graphs, edit edge weights, choose endpoints, and import, copy, or export graph JSON.

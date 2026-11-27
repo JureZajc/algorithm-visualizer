@@ -1,68 +1,15 @@
-export type GraphAlgorithm =
-  | "bfs"
-  | "dfs"
-  | "dijkstra"
-  | "a_star"
-  | "topological_sort"
-  | "kruskal"
-  | "prim";
+import type { components } from "@/types/generated/api";
+import { CATALOG_LABELS } from "@/types/generated/catalog";
 
-export type GraphStepType =
-  | "visit"
-  | "inspect_edge"
-  | "enqueue"
-  | "dequeue"
-  | "push"
-  | "pop"
-  | "relax"
-  | "path_found"
-  | "not_found"
-  | "cycle_detected"
-  | "accept_edge"
-  | "reject_edge"
-  | "add_to_result"
-  | "update_frontier"
-  | "done";
+type Schemas = components["schemas"];
 
-export interface GraphEdge {
-  source: string;
-  target: string;
-  weight: number;
-}
+export type GraphRequest = Schemas["GraphRequest"];
+export type GraphResponse = Schemas["GraphResponse"];
+export type GraphStep = Schemas["GraphStep"];
+export type GraphEdge = Schemas["GraphEdge"];
 
-export interface GraphStep {
-  type: GraphStepType;
-  current: string | null;
-  neighbor: string | null;
-  edge: GraphEdge | null;
-  visited: string[];
-  frontier: string[];
-  distances: Record<string, number> | null;
-  previous: Record<string, string | null> | null;
-  path: string[];
-  result: string[];
-  frontier_edges: GraphEdge[];
-  mst_edges: GraphEdge[];
-  total_weight: number | null;
-  description: string;
-  pseudocode_line?: number;
-}
-
-export interface GraphRequest {
-  nodes: string[];
-  edges: GraphEdge[];
-  start: string;
-  target: string;
-  algorithm: GraphAlgorithm;
-  directed: boolean;
-  heuristics?: Record<string, number> | null;
-}
-
-export interface GraphResponse extends GraphRequest {
-  heuristics: Record<string, number> | null;
-  steps: GraphStep[];
-  step_count: number;
-}
+export type GraphAlgorithm = GraphRequest["algorithm"];
+export type GraphStepType = GraphStep["type"];
 
 export interface GraphNodePosition {
   id: string;
@@ -91,12 +38,5 @@ export interface GraphPreset {
   defaultDirected?: boolean;
 }
 
-export const GRAPH_ALGORITHM_LABELS: Record<GraphAlgorithm, string> = {
-  bfs: "Breadth-First Search",
-  dfs: "Depth-First Search",
-  dijkstra: "Dijkstra's Algorithm",
-  a_star: "A* Search",
-  topological_sort: "Topological Sort",
-  kruskal: "Kruskal's Minimum Spanning Tree",
-  prim: "Prim's Minimum Spanning Tree",
-};
+export const GRAPH_ALGORITHM_LABELS: Record<GraphAlgorithm, string> =
+  CATALOG_LABELS.graph;
