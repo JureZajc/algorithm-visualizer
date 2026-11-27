@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { GraphCanvas } from "@/components/graph-canvas";
 import { GraphEditor } from "@/components/graph-editor";
@@ -15,16 +15,15 @@ import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchGraphSteps } from "@/lib/api";
 import { parseGraphJson, serializeGraph, type ActiveGraph } from "@/lib/graph-input";
 import { createAdmissibleHeuristics, GRAPH_PRESETS } from "@/lib/graph-presets";
+import { createEmptyGraph, CUSTOM_GRAPH_ID, graphFromPreset, graphQuery, parseGraphQuery, type QueryStateProps } from "@/lib/url-state";
 import type { MetadataSourceProps } from "@/types/algorithm";
 import {
   GRAPH_ALGORITHM_LABELS,
   type GraphAlgorithm,
   type GraphEdge,
-  type GraphPreset,
   type GraphStep,
 } from "@/types/graph";
 
-const CUSTOM_GRAPH_ID = "custom";
 const PATH_ALGORITHMS = new Set<GraphAlgorithm>(["bfs", "dfs", "dijkstra", "a_star"]);
 const WEIGHTED_PATH_ALGORITHMS = new Set<GraphAlgorithm>(["dijkstra", "a_star"]);
 const MST_ALGORITHMS = new Set<GraphAlgorithm>(["kruskal", "prim"]);
@@ -49,42 +48,25 @@ const LEGENDS: Record<GraphAlgorithm, LegendItem[]> = {
   prim: [CURRENT, VISITED, SPANNING_TREE, CANDIDATE, REJECTED],
 };
 
-function graphFromPreset(preset: GraphPreset): ActiveGraph {
-  return {
-    nodes: preset.nodes.map((node) => ({ ...node })),
-    edges: preset.edges.map((edge) => ({ ...edge })),
-    start: preset.defaultStart,
-    target: preset.defaultTarget,
-    directed: preset.defaultDirected ?? false,
-    description: preset.description,
-  };
-}
-
-function createEmptyGraph(): ActiveGraph {
-  return {
-    nodes: [],
-    edges: [],
-    start: "",
-    target: "",
-    directed: false,
-    description: "Create a graph, choose its start and target nodes, then run an algorithm.",
-  };
-}
-
 function formatEdges(edges: GraphEdge[]) {
   return edges.length > 0
     ? edges.map((edge) => `${edge.source}-${edge.target} (${edge.weight})`).join(", ")
     : "None";
 }
 
-export function GraphVisualizer(props: MetadataSourceProps) {
-  const [graphId, setGraphId] = useState(GRAPH_PRESETS[0].id);
-  const [customGraph, setCustomGraph] = useState<ActiveGraph>(createEmptyGraph);
-  const [activeGraph, setActiveGraph] = useState<ActiveGraph>(() => graphFromPreset(GRAPH_PRESETS[0]));
-  const [algorithm, setAlgorithm] = useState<GraphAlgorithm>("bfs");
+export function GraphVisualizer({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseGraphQuery(initialQuery));
+  const [graphId, setGraphId] = useState(restored.graphId);
+  const [customGraph, setCustomGraph] = useState<ActiveGraph>(() => restored.graphId === CUSTOM_GRAPH_ID ? restored.graph : createEmptyGraph());
+  const [activeGraph, setActiveGraph] = useState<ActiveGraph>(restored.graph);
+  const [algorithm, setAlgorithm] = useState<GraphAlgorithm>(restored.algorithm ?? "bfs");
   const [speed, setSpeed] = useState(520);
   const [editorError, setEditorError] = useState<string | null>(null);
   const [pendingNodeId, setPendingNodeId] = useState<string | null>(null);
+  const query = graphQuery({ algorithm, graphId, graph: activeGraph });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   const run = useVisualizationRun();
   const playback = useLearningPlayback<GraphStep>(speed, algorithm);
   const isLoading = run.isLoading;

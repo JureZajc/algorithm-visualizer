@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { LearningPanel } from "@/components/learning-panel";
 import { StepControls } from "@/components/step-controls";
@@ -22,6 +22,7 @@ import { useLearningPlayback } from "@/hooks/use-learning-playback";
 import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchTreeSteps } from "@/lib/api";
 import { validateTarget, validateTreeValues } from "@/lib/trees-input";
+import { parseTreesQuery, treesQuery, type QueryStateProps } from "@/lib/url-state";
 import type { MetadataSourceProps } from "@/types/algorithm";
 import {
   TREE_ALGORITHM_LABELS,
@@ -62,16 +63,21 @@ const LEGENDS: Record<TreeAlgorithm, LegendItem[]> = {
   postorder_traversal: TRAVERSAL_LEGEND,
 };
 
-export function TreesVisualizer(props: MetadataSourceProps) {
-  const [algorithm, setAlgorithm] = useState<TreeAlgorithm>("bst_insert");
-  const [valuesInput, setValuesInput] = useState(DEFAULT_VALUES);
-  const [targetInput, setTargetInput] = useState(String(DEFAULT_TARGET));
+export function TreesVisualizer({ initialQuery, onQueryChange, ...props }: MetadataSourceProps & QueryStateProps) {
+  const [restored] = useState(() => parseTreesQuery(initialQuery));
+  const [algorithm, setAlgorithm] = useState<TreeAlgorithm>(restored.algorithm ?? "bst_insert");
+  const [valuesInput, setValuesInput] = useState(restored.values ?? DEFAULT_VALUES);
+  const [targetInput, setTargetInput] = useState(restored.target ?? String(DEFAULT_TARGET));
   const [speed, setSpeed] = useState(520);
   const run = useVisualizationRun();
   const playback = useLearningPlayback<TreeStep>(speed, algorithm);
   const isLoading = run.isLoading;
   const currentStep = playback.currentStep;
   const isSearch = algorithm === "bst_search";
+  const query = treesQuery({ algorithm, values: valuesInput, target: isSearch ? targetInput : undefined });
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [onQueryChange, query]);
   const isInsert = algorithm === "bst_insert" || algorithm === "avl_insert";
   const valuesValidation = validateTreeValues(valuesInput);
   const targetValidation = validateTarget(targetInput, isSearch);
