@@ -214,7 +214,16 @@ This runs Ruff for the backend and development helper, mypy for the backend appl
 python scripts/dev.py check-clean
 ```
 
-CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (22). A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
+End-to-end smoke tests are separate from `check`. They run one default visualization per category, Compare and Hash Tables included, against the real backend in Chromium. After `setup`, install the browser once and run them from the `frontend` directory:
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+Playwright starts its own backend and a production build of the frontend on free ports, and stops both when it finishes. The run replaces `frontend/.next` with a build that points at that stopped backend, so run `npm run build` again before using `npm run start`; `next dev` is not affected.
+
+CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (22). A separate job runs the smoke tests. A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
 
 ## API
 

@@ -32,6 +32,12 @@ build of the frontend. `python scripts/dev.py check-clean` runs the same checks
 after reinstalling both projects from their lockfiles, which is closer to what
 CI does.
 
+CI also runs Playwright smoke tests, one per category, in a separate job. If
+your change touches a visualizer's controls or results, run them locally with
+`npm run test:e2e` from `frontend`; the
+[Validation section](README.md#validation) explains the one-time browser
+install.
+
 Add or update tests for the behavior you change. If you change a request or
 response, update [docs/api.md](docs/api.md) as well.
 

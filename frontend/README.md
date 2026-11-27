@@ -75,6 +75,11 @@ npm test
 npm run build
 ```
 
+`npm run test:e2e` runs the Playwright smoke tests in `e2e/`. It needs the
+backend dependencies installed and Chromium installed once with
+`npx playwright install chromium`; see Validation in the
+[root README](../README.md#validation).
+
 This project uses Next.js 16, which differs from earlier versions. Read
 [AGENTS.md](AGENTS.md) and the guides in `node_modules/next/dist/docs/` before
 changing framework code.
@@ -85,9 +90,10 @@ changing framework code.
 frontend/
 ├── app/           # Root layout, the single page, and global styles
 ├── components/    # Category visualizers, visualization surfaces, playback, and shared UI
+├── e2e/           # Playwright smoke tests, one per category
 ├── hooks/         # Step playback and Learning mode playback
 ├── learning/      # Learning mode question strategies, checkpoint selection, and sessions
-├── lib/           # API client and input presets
+├── lib/           # API client, input presets, and input parsing and validation
 ├── types/         # Request and response types for each category
 └── tests/         # Vitest tests and fixtures
 ```
