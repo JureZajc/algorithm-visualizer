@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
-import { Alert, Button, EmptyState, FormField, inputClassName, Panel } from "@/components/ui-primitives";
+import { ActionRow, Alert, Button, EmptyState, FormField, inputClassName, Panel, SectionHeader } from "@/components/ui-primitives";
+import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
 import { SORTING_PRESETS } from "@/lib/array-presets";
 import { validateCountDraft } from "@/lib/sorting-input";
@@ -41,8 +42,11 @@ export function SortingComparison(props: MetadataSourceProps) {
   const [presetId, setPresetId] = useState("");
   const [initialNumbers, setInitialNumbers] = useState(DEFAULT_NUMBERS);
   const [results, setResults] = useState<ComparisonResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const run = useVisualizationRun();
+  const isLoading = run.isLoading;
+  const headingId = useId();
+  const summaryHeadingId = useId();
+  const chartHeadingId = useId();
 
   const fewestSteps =
     results.length > 0
@@ -81,58 +85,56 @@ export function SortingComparison(props: MetadataSourceProps) {
     setCountDraft(String(numbers.length));
     setInitialNumbers(numbers);
     setResults([]);
-    setError(null);
+    run.clearError();
   }
 
-  async function handleGenerate(numberCount: number) {
-    setError(null);
-    setIsLoading(true);
-    setResults([]);
-    try {
-      const response = await generateRandomNumbers(numberCount);
-      setInitialNumbers(response.numbers);
-      setPresetId("");
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Could not generate numbers.");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleCompare(numberCount: number) {
-    setError(null);
-    setIsLoading(true);
-    setResults([]);
-    try {
-      let numbers = initialNumbers;
-      if (numbers.length !== numberCount) {
-        numbers = (await generateRandomNumbers(numberCount)).numbers;
-        setInitialNumbers(numbers);
+  function handleGenerate(numberCount: number) {
+    return run.start({
+      onStart: () => setResults([]),
+      request: (signal) => generateRandomNumbers(numberCount, signal),
+      onSuccess: (response) => {
+        setInitialNumbers(response.numbers);
         setPresetId("");
-      }
+      },
+      errorMessage: "Could not generate numbers.",
+    });
+  }
 
-      const responses = await Promise.all(
-        selectedAlgorithms.map((algorithm) => fetchSortingSteps(numbers, algorithm)),
-      );
-      setResults(
-        responses.map((response) =>
-          summarizeResponse(response, props.algorithms),
+  function handleCompare(numberCount: number) {
+    return run.start({
+      onStart: () => setResults([]),
+      request: async (signal) => {
+        let numbers = initialNumbers;
+        if (numbers.length !== numberCount) {
+          numbers = (await generateRandomNumbers(numberCount, signal)).numbers;
+          signal.throwIfAborted();
+          setInitialNumbers(numbers);
+          setPresetId("");
+        }
+        return Promise.all(
+          selectedAlgorithms.map((algorithm) => fetchSortingSteps(numbers, algorithm, signal)),
+        );
+      },
+      onSuccess: (responses) =>
+        setResults(
+          responses.map((response) =>
+            summarizeResponse(response, props.algorithms),
+          ),
         ),
-      );
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Could not compare sorting algorithms.");
-    } finally {
-      setIsLoading(false);
-    }
+      errorMessage: "Could not compare sorting algorithms.",
+    });
   }
 
   return (
     <div>
-      <Panel className="mb-5 p-5" variant="control" aria-label="Sorting comparison controls">
-        <div className="mb-5 flex flex-col gap-2">
-          <span className="text-xs font-black uppercase tracking-[0.14em] text-indigo-600">Sorting comparison</span>
-          <h2 className="m-0 text-xl font-extrabold tracking-normal text-slate-950">Compare algorithms on one shared array</h2>
-          <p className="m-0 max-w-3xl text-sm leading-6 text-slate-600">Select two to four sorting algorithms, generate one input, and compare the step counts returned by the API.</p>
+      <Panel className="mb-5 p-5" variant="control" aria-labelledby={headingId}>
+        <div className="mb-5">
+          <SectionHeader
+            eyebrow="Sorting comparison"
+            title="Compare algorithms on one shared array"
+            titleId={headingId}
+            description="Select two to four sorting algorithms, generate one input, and compare the step counts returned by the API."
+          />
         </div>
 
         <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -170,7 +172,7 @@ export function SortingComparison(props: MetadataSourceProps) {
             />
           </FormField>
 
-          <div className="flex items-start gap-2 md:col-span-2 md:self-start md:pt-[1.625rem]">
+          <ActionRow className="md:col-span-2 md:self-start md:pt-[1.625rem]">
             <Button
               disabled={isLoading || hasCountError}
               onClick={() => handleGenerate(commitCount())}
@@ -184,7 +186,7 @@ export function SortingComparison(props: MetadataSourceProps) {
             >
               {isLoading ? "Comparing..." : "Run comparison"}
             </Button>
-          </div>
+          </ActionRow>
         </div>
 
         <div className="mb-5">
@@ -228,14 +230,14 @@ export function SortingComparison(props: MetadataSourceProps) {
         </Alert>
       ) : null}
 
-      {error ? (
-        <Alert title="Comparison unavailable">{error}</Alert>
+      {run.error ? (
+        <Alert title="Comparison unavailable">{run.error}</Alert>
       ) : null}
 
       {results.length > 0 ? (
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <Panel className="p-5">
-            <h2 className="mb-4 text-lg font-extrabold tracking-normal text-slate-950">Comparison summary</h2>
+          <Panel className="p-5" aria-labelledby={summaryHeadingId}>
+            <h2 className="mb-4 text-lg font-extrabold tracking-normal text-slate-950" id={summaryHeadingId}>Comparison summary</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {results.map((result) => (
                 <ComparisonCard
@@ -247,8 +249,8 @@ export function SortingComparison(props: MetadataSourceProps) {
             </div>
           </Panel>
 
-          <Panel className="p-5">
-            <h2 className="mb-4 text-lg font-extrabold tracking-normal text-slate-950">Step count</h2>
+          <Panel className="p-5" aria-labelledby={chartHeadingId}>
+            <h2 className="mb-4 text-lg font-extrabold tracking-normal text-slate-950" id={chartHeadingId}>Step count</h2>
             <div className="grid gap-4">
               {results.map((result) => (
                 <div className="grid gap-2" key={result.algorithm}>

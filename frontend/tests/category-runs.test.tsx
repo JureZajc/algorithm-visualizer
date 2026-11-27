@@ -7,6 +7,7 @@ import { DynamicProgrammingVisualizer } from "@/components/dynamic-programming-v
 import { GraphVisualizer } from "@/components/graph-visualizer";
 import { HashTablesVisualizer } from "@/components/hash-tables-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
+import { SortingComparison } from "@/components/sorting-comparison";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
 import { TreesVisualizer } from "@/components/trees-visualizer";
 import { RUN_TIMEOUT_MS, runTimeoutMessage } from "@/hooks/use-visualization-run";
@@ -119,6 +120,41 @@ describe("category runs", () => {
     expect(api.generateRandomNumbers).toHaveBeenCalledWith(5, expect.any(AbortSignal));
     expect(api.fetchSortingSteps).toHaveBeenCalledWith([9, 4, 7, 1, 5], "bubble_sort", expect.any(AbortSignal));
     expect(screen.getByTitle("Index 0: 9")).toBeTruthy();
+  });
+});
+
+describe("Compare runs", () => {
+  const compareButton = () => screen.getByRole("button", { name: /Run comparison|Comparing/ }) as HTMLButtonElement;
+
+  it("cancels every request of the comparison when the view unmounts", () => {
+    const stalled = stalledRequest();
+    vi.mocked(api.fetchSortingSteps).mockImplementation(stalled.request);
+    const { unmount } = render(<SortingComparison {...props} />);
+
+    fireEvent.click(compareButton());
+    expect(compareButton().textContent).toBe("Comparing...");
+    expect(stalled.signals).toHaveLength(3);
+    expect(stalled.signals.every((signal) => !signal.aborted)).toBe(true);
+    unmount();
+    expect(stalled.signals.every((signal) => signal.aborted)).toBe(true);
+  });
+
+  it("ends a stalled comparison with the timeout message", async () => {
+    vi.useFakeTimers();
+    vi.mocked(api.fetchSortingSteps).mockImplementation(stalledRequest().request);
+    render(<SortingComparison {...props} />);
+
+    fireEvent.click(compareButton());
+    await act(() => vi.advanceTimersByTimeAsync(RUN_TIMEOUT_MS));
+    const alert = screen.getAllByRole("alert").find((item) => item.textContent?.startsWith("Comparison unavailable"));
+    expect(alert?.textContent).toBe(`Comparison unavailable${runTimeoutMessage(RUN_TIMEOUT_MS)}`);
+    expect(compareButton().disabled).toBe(false);
+    expect(screen.getByRole("heading", { name: "Ready to compare" })).toBeTruthy();
+  });
+
+  it("names its control panel after its heading", () => {
+    render(<SortingComparison {...props} />);
+    expect(screen.getByRole("region", { name: "Compare algorithms on one shared array" })).toBeTruthy();
   });
 });
 
