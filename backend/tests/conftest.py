@@ -5,7 +5,7 @@ from types import ModuleType
 
 import pytest
 
-import app.main as main
+from app import main
 
 
 DEPLOYMENT_VARIABLES = (

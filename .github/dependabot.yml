@@ -1,10 +1,17 @@
 version: 2
 
+# Each ecosystem gets one grouped pull request a week instead of one per
+# dependency. Grouping also keeps packages that must move together, such as
+# react and react-dom, in the same pull request.
 updates:
   - package-ecosystem: npm
     directory: /frontend
     schedule:
       interval: weekly
+    groups:
+      frontend:
+        patterns:
+          - "*"
     ignore:
       # The project pins Node.js 22 (.nvmrc and engines), so keep its types on 22.
       - dependency-name: "@types/node"
@@ -15,8 +22,16 @@ updates:
     directory: /backend
     schedule:
       interval: weekly
+    groups:
+      backend:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"

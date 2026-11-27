@@ -122,7 +122,15 @@ const CASES: Case[] = [
       await page.getByRole("button", { name: "Wall", exact: true }).click();
       await page.getByRole("button", { name: "Edit row 2, column 2: empty" }).click();
     },
-    expected: { algorithm: "maze_solver", rows: "7", cols: "7", maze: "open" },
+    // The grid holds the wall. Without it here, the poll can pass on the address
+    // written for the pattern, before the debounced write that adds the wall.
+    expected: {
+      algorithm: "maze_solver",
+      rows: "7",
+      cols: "7",
+      maze: "open",
+      grid: "s......,.x.....,.......,.......,.......,.......,......e",
+    },
     check: async (page) => {
       await expect(page.getByRole("combobox", { name: "Backtracking algorithm" })).toHaveValue("maze_solver");
       await expect(page.getByRole("combobox", { name: "Maze pattern" })).toHaveValue("open");
