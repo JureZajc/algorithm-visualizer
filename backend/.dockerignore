@@ -1,0 +1,7 @@
+# Send only what the image needs: the lockfile, the project file, and the app.
+*
+!app/
+!pyproject.toml
+!uv.lock
+**/__pycache__
+**/*.pyc

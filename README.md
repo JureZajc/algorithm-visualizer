@@ -225,6 +225,18 @@ Playwright starts its own backend and a production build of the frontend on free
 
 CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (22). A separate job runs the smoke tests. A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
 
+## Deployment
+
+The backend and the frontend are hosted separately. The backend ships as a container image that installs from `backend/uv.lock`, runs as an unprivileged user, and serves the API on `$PORT`:
+
+```bash
+docker build -t algorithm-visualizer-api backend
+docker run --rm -p 8000:8000 algorithm-visualizer-api
+curl http://localhost:8000/health
+```
+
+For a public instance, the backend can rate-limit the step endpoints per client, and it caches step responses in memory, since the same input always produces the same steps. The frontend is built with `NEXT_PUBLIC_API_URL` set to the backend's URL. [docs/deployment.md](docs/deployment.md) describes the environment variables, clients behind a proxy, the cache, and how to build and serve the frontend.
+
 ## API
 
 The FastAPI service exposes the algorithm metadata catalog, random-number generation, and one step-generation endpoint for each visualization family:
