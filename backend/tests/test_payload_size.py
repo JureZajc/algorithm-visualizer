@@ -13,7 +13,7 @@ from typing import get_args
 import pytest
 from starlette.testclient import TestClient
 
-import app.main as main
+from app import main
 from app.algorithms.backtracking import BACKTRACKING_ALGORITHMS
 from app.algorithms.dynamic_programming import DYNAMIC_PROGRAMMING_ALGORITHMS
 from app.algorithms.graph.types import GraphAlgorithm

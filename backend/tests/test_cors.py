@@ -3,7 +3,7 @@ import importlib
 import pytest
 from starlette.testclient import TestClient
 
-import app.main as main
+from app import main
 
 
 @pytest.mark.parametrize(

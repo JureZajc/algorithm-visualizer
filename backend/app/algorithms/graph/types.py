@@ -73,7 +73,7 @@ def create_graph_step(
     result: list[str] | None = None,
     frontier_edges: list[GraphEdge] | None = None,
     mst_edges: list[GraphEdge] | None = None,
-    total_weight: int | float | None = None,
+    total_weight: float | None = None,
     pseudocode_line: int | None = None,
 ) -> GraphStep:
     """Create a graph step with independent copies of mutable values."""

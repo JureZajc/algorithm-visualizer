@@ -13,7 +13,7 @@ def comb_sort_steps(numbers: list[int]) -> list[AlgorithmStep]:
         gap = max(1, (gap * 10) // 13)
         swapped = False
 
-        for index in range(0, len(array) - gap):
+        for index in range(len(array) - gap):
             next_index = index + gap
             steps.append(
                 create_step(
