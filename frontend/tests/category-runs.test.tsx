@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import type { ComponentType } from "react";
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
+import { DynamicProgrammingVisualizer } from "@/components/dynamic-programming-visualizer";
 import { GraphVisualizer } from "@/components/graph-visualizer";
 import { SearchingVisualizer } from "@/components/searching-visualizer";
 import { SortingVisualizer } from "@/components/sorting-visualizer";
@@ -10,6 +11,7 @@ import * as api from "@/lib/api";
 import type { MetadataSourceProps } from "@/types/algorithm";
 
 vi.mock("@/lib/api", () => ({
+  fetchDynamicProgrammingSteps: vi.fn(),
   fetchGraphSteps: vi.fn(),
   fetchSearchingSteps: vi.fn(),
   fetchSortingSteps: vi.fn(),
@@ -21,6 +23,7 @@ const CATEGORIES: { name: string; component: ComponentType<MetadataSourceProps>;
   { name: "Sorting", component: SortingVisualizer, request: () => vi.mocked(api.fetchSortingSteps) },
   { name: "Searching", component: SearchingVisualizer, request: () => vi.mocked(api.fetchSearchingSteps) },
   { name: "Graph", component: GraphVisualizer, request: () => vi.mocked(api.fetchGraphSteps) },
+  { name: "Dynamic Programming", component: DynamicProgrammingVisualizer, request: () => vi.mocked(api.fetchDynamicProgrammingSteps) },
 ];
 
 const props = { algorithms: [], isMetadataLoading: false, metadataError: null };

@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 
-import { AlgorithmMetadataPanel } from "@/components/algorithm-metadata-panel";
 import { DynamicProgrammingTable } from "@/components/dynamic-programming-table";
-import { PseudocodePanel } from "@/components/pseudocode-panel";
+import { LearningPanel } from "@/components/learning-panel";
 import { StepControls } from "@/components/step-controls";
-import { Alert, Button, FormField, InlineMessage, inputClassName, Panel, type LegendItem } from "@/components/ui-primitives";
+import { ActionRow, Button, ControlPanel, FormField, InlineMessage, inputClassName, SpeedField, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { VisualizerStats } from "@/components/visualizer-stats";
+import { VisualizerWorkspace } from "@/components/visualizer-workspace";
 import { useLearningPlayback } from "@/hooks/use-learning-playback";
-import { LearningPanel } from "@/components/learning-panel";
+import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchDynamicProgrammingSteps } from "@/lib/api";
 import {
   createRequest,
@@ -196,9 +196,9 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
   const [form, setForm] = useState<DynamicProgrammingForm>(INITIAL_FORM);
   const [presetId, setPresetId] = useState("");
   const [speed, setSpeed] = useState(520);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const run = useVisualizationRun();
   const playback = useLearningPlayback<DynamicProgrammingStep>(speed, algorithm);
+  const isLoading = run.isLoading;
   const currentStep = playback.currentStep;
   const availablePresets = DYNAMIC_PROGRAMMING_PRESETS.filter(
     (preset) => preset.algorithm === algorithm,
@@ -217,7 +217,7 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
   const hasValidationError = Object.keys(formErrors).length > 0;
 
   function resetForInputChange() {
-    setError(null);
+    run.clearError();
     playback.reset();
   }
 
@@ -248,127 +248,112 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
     resetForInputChange();
   }
 
-  async function startVisualization() {
+  function startVisualization() {
     if (hasValidationError) return;
 
-    setError(null);
-    setIsLoading(true);
-    playback.reset();
-    try {
-      const request = createRequest(algorithm, form);
-      playback.load((await fetchDynamicProgrammingSteps(request)).steps);
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not load dynamic programming steps.");
-    } finally {
-      setIsLoading(false);
-    }
+    return run.start({
+      onStart: playback.reset,
+      // Built inside the request, as before, so an input it rejects shows as the run's error.
+      request: (signal) => fetchDynamicProgrammingSteps(createRequest(algorithm, form), signal),
+      onSuccess: (response) => playback.load(response.steps),
+      errorMessage: "Could not load dynamic programming steps.",
+    });
   }
 
   const editingDisabled = playback.isPlaying || isLoading;
 
-  return (
-    <div>
-      <Panel className="mb-5 grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6" variant="control">
-        <FormField label="Dynamic programming algorithm" className="xl:col-span-2">
-          <select
-            className={inputClassName()}
-            value={algorithm}
-            disabled={editingDisabled}
-            onChange={(event) => changeAlgorithm(event.target.value as DynamicProgrammingAlgorithm)}
-          >
-            {Object.entries(DYNAMIC_PROGRAMMING_ALGORITHM_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </FormField>
-
-        <FormField label="Sample preset" className="xl:col-span-2">
-          <select
-            className={inputClassName()}
-            value={presetId}
-            disabled={editingDisabled}
-            onChange={(event) => loadPreset(event.target.value)}
-          >
-            <option value="" disabled>Choose a preset</option>
-            {availablePresets.map((preset) => (
-              <option key={preset.id} value={preset.id}>{preset.label}</option>
-            ))}
-          </select>
-        </FormField>
-
-        <label className="flex flex-col gap-3 text-xs font-bold text-slate-700 xl:col-span-2">
-          <span className="flex justify-between gap-3">
-            Animation speed
-            <span className="font-mono text-indigo-600">{speed} ms</span>
-          </span>
-          <input
-            className="w-full accent-indigo-600"
-            type="range"
-            min={80}
-            max={1200}
-            step={20}
-            value={speed}
-            onChange={(event) => setSpeed(Number(event.target.value))}
-          />
-        </label>
-
-        <AlgorithmInputFields
-          algorithm={algorithm}
-          errors={formErrors}
-          form={form}
+  const controls = (
+    <ControlPanel className="md:grid-cols-2 xl:grid-cols-6" label="Dynamic programming controls">
+      <FormField label="Dynamic programming algorithm" className="xl:col-span-2">
+        <select
+          className={inputClassName()}
+          value={algorithm}
           disabled={editingDisabled}
-          onChange={updateField}
+          onChange={(event) => changeAlgorithm(event.target.value as DynamicProgrammingAlgorithm)}
+        >
+          {Object.entries(DYNAMIC_PROGRAMMING_ALGORITHM_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label="Sample preset" className="xl:col-span-2">
+        <select
+          className={inputClassName()}
+          value={presetId}
+          disabled={editingDisabled}
+          onChange={(event) => loadPreset(event.target.value)}
+        >
+          <option value="" disabled>Choose a preset</option>
+          {availablePresets.map((preset) => (
+            <option key={preset.id} value={preset.id}>{preset.label}</option>
+          ))}
+        </select>
+      </FormField>
+
+      <SpeedField className="xl:col-span-2" min={80} max={1200} step={20} value={speed} onChange={setSpeed} />
+
+      <AlgorithmInputFields
+        algorithm={algorithm}
+        errors={formErrors}
+        form={form}
+        disabled={editingDisabled}
+        onChange={updateField}
+      />
+
+      {formErrors.form ? (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
+          <InlineMessage tone="error">{formErrors.form}</InlineMessage>
+        </div>
+      ) : null}
+
+      <ActionRow className="md:col-span-2 xl:col-span-6">
+        <Button
+          variant="primary"
+          disabled={editingDisabled || hasValidationError}
+          onClick={startVisualization}
+        >
+          {isLoading ? "Loading steps..." : "Start visualization"}
+        </Button>
+        <Button
+          disabled={isLoading}
+          onClick={playback.reset}
+        >
+          Reset run
+        </Button>
+      </ActionRow>
+
+      <div className="md:col-span-2 xl:col-span-6">
+        <StepControls
+          currentStepIndex={playback.currentStepIndex}
+          totalSteps={playback.steps.length}
+          isLoading={isLoading}
+          isPlaying={playback.isPlaying}
+          learningBlocked={playback.learning.blocked}
+          onTogglePlayback={playback.toggle}
+          onPrevious={playback.previous}
+          onNext={playback.next}
+          onJumpToStart={playback.jumpToStart}
+          onJumpToEnd={playback.jumpToEnd}
+          onRestart={playback.restart}
+          onSeek={playback.seek}
         />
+      </div>
+    </ControlPanel>
+  );
 
-        {formErrors.form ? (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 md:col-span-2 xl:col-span-6">
-            <InlineMessage tone="error">{formErrors.form}</InlineMessage>
-          </div>
-        ) : null}
-
-        <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-6">
-          <Button
-            variant="primary"
-            disabled={editingDisabled || hasValidationError}
-            onClick={startVisualization}
-          >
-            {isLoading ? "Loading steps..." : "Start visualization"}
-          </Button>
-          <Button
-            disabled={isLoading}
-            onClick={playback.reset}
-          >
-            Reset run
-          </Button>
-        </div>
-
-        <div className="md:col-span-2 xl:col-span-6">
-          <StepControls
-            currentStepIndex={playback.currentStepIndex}
-            totalSteps={playback.steps.length}
-            isLoading={isLoading}
-            isPlaying={playback.isPlaying}
-            learningBlocked={playback.learning.blocked}
-            onTogglePlayback={playback.toggle}
-            onPrevious={playback.previous}
-            onNext={playback.next}
-            onJumpToStart={playback.jumpToStart}
-            onJumpToEnd={playback.jumpToEnd}
-            onRestart={playback.restart}
-            onSeek={playback.seek}
-          />
-        </div>
-      </Panel>
-
-      <LearningPanel learning={playback.learning} isLoading={isLoading} />
-
-      {error ? <Alert title="Visualization unavailable">{error}</Alert> : null}
-
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
+  return (
+    <VisualizerWorkspace
+      algorithmId={algorithm}
+      metadata={props}
+      controls={controls}
+      notices={<LearningPanel learning={playback.learning} isLoading={isLoading} />}
+      error={run.error}
+      visualization={
         <VisualizationPanel
           title={DYNAMIC_PROGRAMMING_ALGORITHM_LABELS[algorithm]}
           status={playbackStatus({
-            hasError: error !== null,
+            hasError: run.error !== null,
             hasValidationError,
             isComplete: playback.isComplete,
             isLoading,
@@ -387,20 +372,19 @@ export function DynamicProgrammingVisualizer(props: MetadataSourceProps) {
             variant={algorithm === "fibonacci" ? "compact" : "standard"}
           />
         </VisualizationPanel>
-        <div className="grid gap-5 self-start">
-          <PseudocodePanel algorithmId={algorithm} algorithms={props.algorithms} currentLine={currentStep?.pseudocode_line ?? undefined} isLoading={props.isMetadataLoading} error={props.metadataError} />
-          <VisualizerStats
-            algorithmName={DYNAMIC_PROGRAMMING_ALGORITHM_LABELS[algorithm]}
-            currentStep={playback.currentStepIndex + 1}
-            totalSteps={playback.steps.length}
-            elapsedMs={playback.elapsedMs}
-            resultLabel="DP result"
-            result={result}
-          />
-        </div>
-      </div>
-      <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
-    </div>
+      }
+      pseudocodeLine={currentStep?.pseudocode_line}
+      stats={
+        <VisualizerStats
+          algorithmName={DYNAMIC_PROGRAMMING_ALGORITHM_LABELS[algorithm]}
+          currentStep={playback.currentStepIndex + 1}
+          totalSteps={playback.steps.length}
+          elapsedMs={playback.elapsedMs}
+          resultLabel="DP result"
+          result={result}
+        />
+      }
+    />
   );
 }
 
