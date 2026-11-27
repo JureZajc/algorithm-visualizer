@@ -13,6 +13,7 @@ import { useLearningPlayback } from "@/hooks/use-learning-playback";
 import { LearningPanel } from "@/components/learning-panel";
 import { fetchSearchingSteps, generateRandomNumbers } from "@/lib/api";
 import { SEARCHING_PRESETS } from "@/lib/array-presets";
+import { validateCountDraft, validateTarget } from "@/lib/searching-input";
 import type { ArrayAlgorithmStep, MetadataSourceProps } from "@/types/algorithm";
 import { SEARCHING_ALGORITHM_LABELS, type SearchingAlgorithm } from "@/types/searching";
 
@@ -188,23 +189,4 @@ export function SearchingVisualizer(props: MetadataSourceProps) {
       <AlgorithmMetadataPanel algorithmId={algorithm} algorithms={props.algorithms} isLoading={props.isMetadataLoading} error={props.metadataError} />
     </div>
   );
-}
-
-function validateCountDraft(rawValue: string) {
-  const value = Number(rawValue.trim());
-  if (!Number.isInteger(value)) {
-    return { error: "Enter a whole number from 5 to 40.", value: null };
-  }
-  if (value < 5 || value > 40) {
-    return { error: "Random values must be between 5 and 40.", value: null };
-  }
-  return { error: null, value };
-}
-
-function validateTarget(rawValue: string) {
-  const value = Number(rawValue.trim());
-  if (!Number.isInteger(value)) {
-    return { error: "Enter an integer target value.", target: null };
-  }
-  return { error: null, target: value };
 }

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Alert, Button, EmptyState, FormField, inputClassName, Panel } from "@/components/ui-primitives";
 import { fetchSortingSteps, generateRandomNumbers } from "@/lib/api";
 import { SORTING_PRESETS } from "@/lib/array-presets";
+import { validateCountDraft } from "@/lib/sorting-input";
 import type { AlgorithmMetadata, MetadataSourceProps } from "@/types/algorithm";
 import {
   ALGORITHM_LABELS,
@@ -271,17 +272,6 @@ export function SortingComparison(props: MetadataSourceProps) {
       )}
     </div>
   );
-}
-
-function validateCountDraft(rawValue: string) {
-  const value = Number(rawValue.trim());
-  if (!Number.isInteger(value)) {
-    return { error: "Enter a whole number from 5 to 50.", value: null };
-  }
-  if (value < 5 || value > 50) {
-    return { error: "Random values must be between 5 and 50.", value: null };
-  }
-  return { error: null, value };
 }
 
 function summarizeResponse(
