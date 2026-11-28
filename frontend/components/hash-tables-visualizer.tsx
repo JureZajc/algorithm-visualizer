@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 
 import { HashTableView } from "@/components/hash-table-view";
+import { LearningPanel } from "@/components/learning-panel";
 import { StepControls } from "@/components/step-controls";
 import { ActionRow, Button, ControlPanel, FormField, inputClassName, SpeedField, type LegendItem } from "@/components/ui-primitives";
 import { playbackStatus, VisualizationPanel } from "@/components/visualizer-panel";
 import { Stat, VisualizerStats } from "@/components/visualizer-stats";
 import { VisualizerWorkspace } from "@/components/visualizer-workspace";
-import { useStepPlayback } from "@/hooks/use-step-playback";
+import { useLearningPlayback } from "@/hooks/use-learning-playback";
 import { useVisualizationRun } from "@/hooks/use-visualization-run";
 import { fetchHashTableSteps } from "@/lib/api";
 import {
@@ -57,7 +58,7 @@ export function HashTablesVisualizer({ initialQuery, onQueryChange, ...props }: 
   const [targetInput, setTargetInput] = useState(restored.target ?? DEFAULT_TARGET);
   const [speed, setSpeed] = useState(520);
   const run = useVisualizationRun();
-  const playback = useStepPlayback<HashTableStep>(speed);
+  const playback = useLearningPlayback<HashTableStep>(speed, algorithm);
   const isLoading = run.isLoading;
   const currentStep = playback.currentStep;
   const isSearch = isSearchAlgorithm(algorithm);
@@ -214,6 +215,7 @@ export function HashTablesVisualizer({ initialQuery, onQueryChange, ...props }: 
           totalSteps={playback.steps.length}
           isLoading={isLoading}
           isPlaying={playback.isPlaying}
+          learningBlocked={playback.learning.blocked}
           onTogglePlayback={playback.toggle}
           onPrevious={playback.previous}
           onNext={playback.next}
@@ -231,6 +233,7 @@ export function HashTablesVisualizer({ initialQuery, onQueryChange, ...props }: 
       algorithmId={algorithm}
       metadata={props}
       controls={controls}
+      notices={<LearningPanel learning={playback.learning} isLoading={isLoading} />}
       error={run.error}
       visualization={
         <VisualizationPanel
