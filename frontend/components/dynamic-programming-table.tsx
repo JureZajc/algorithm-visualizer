@@ -11,6 +11,11 @@ interface DynamicProgrammingTableProps {
   rowLabels: string[];
   columnLabels: string[];
   variant?: "standard" | "compact";
+  /**
+   * Names a compact cell in its title and for screen readers. Defaults to its column label,
+   * which repeats on every row when a table wraps one long row into several.
+   */
+  cellLabel?: (rowIndex: number, columnIndex: number) => string;
 }
 
 function positionKey(position: TablePosition) {
@@ -23,6 +28,7 @@ export function DynamicProgrammingTable({
   rowLabels,
   columnLabels,
   variant = "standard",
+  cellLabel = (_rowIndex, columnIndex) => columnLabels[columnIndex] ?? `Column ${columnIndex}`,
 }: DynamicProgrammingTableProps) {
   if (table.length === 0) {
     return (
@@ -56,13 +62,15 @@ export function DynamicProgrammingTable({
                   : isRelated
                     ? "border-amber-300 bg-amber-50 text-amber-900"
                     : "border-slate-200 bg-white text-slate-800";
+                const label = cellLabel(rowIndex, columnIndex);
 
                 return (
                   <div
                     className={`min-h-12 min-w-0 rounded-lg border px-2 py-2 text-center font-mono text-[clamp(0.72rem,1.2vw,0.95rem)] font-bold transition ${stateClass}`}
                     key={key}
-                    title={`${columnLabels[columnIndex] ?? `Column ${columnIndex}`}: ${cell}`}
+                    title={`${label}: ${cell}`}
                   >
+                    <span className="sr-only">{`${label}: `}</span>
                     <span className="block whitespace-nowrap">{cell}</span>
                   </div>
                 );

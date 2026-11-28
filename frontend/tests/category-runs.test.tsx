@@ -195,6 +195,15 @@ describe("category controls", () => {
     expect(screen.queryByText("No tree yet")).toBeNull();
   });
 
+  it("Dynamic Programming numbers wrapped Fibonacci cells across rows", () => {
+    render(<DynamicProgrammingVisualizer {...props} />);
+    // F(8) has nine cells, so n 8 wraps onto a second row, where its slot index is 0.
+    expect(screen.getByText("n 8-8")).toBeTruthy();
+    const cell = screen.getByTitle("n 8: 0");
+    expect(cell.textContent).toBe("n 8: 0");
+    expect(screen.queryByTitle(/^Slot/)).toBeNull();
+  });
+
   it("Backtracking marks the selected maze tool as pressed", () => {
     render(<BacktrackingVisualizer {...props} />);
     fireEvent.change(screen.getByLabelText("Backtracking algorithm"), { target: { value: "maze_solver" } });
