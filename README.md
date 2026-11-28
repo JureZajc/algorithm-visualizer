@@ -27,7 +27,10 @@ The project spans arrays, hash tables, trees, graphs, dynamic programming, and b
 ### Interactive learning
 
 Learning mode supports Bubble Sort, Selection Sort, Insertion Sort, Linear Search,
-Binary Search, BST Insert, BST Search, BFS, DFS, Fibonacci DP, and N-Queens.
+Binary Search, BST Insert, BST Search, BFS, DFS, Fibonacci DP, N-Queens, and all
+four Hash Tables operations: insert and search with separate chaining or linear
+probing. Hash Tables asks which bucket a key hashes to only for non-negative
+integer keys; string keys hash by the sum of their character codes.
 Enable it within the visualizer before starting a run:
 
 ```text
