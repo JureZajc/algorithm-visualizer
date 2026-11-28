@@ -2,9 +2,10 @@ import type { ArrayAlgorithmStep } from "@/types/algorithm";
 import type { BacktrackingStep } from "@/types/backtracking";
 import type { DynamicProgrammingStep } from "@/types/dynamic-programming";
 import type { GraphStep } from "@/types/graph";
+import type { HashTableStep } from "@/types/hash-tables";
 import type { TreeStep } from "@/types/trees";
 
-export type LearningStep = ArrayAlgorithmStep | TreeStep | GraphStep | DynamicProgrammingStep | BacktrackingStep;
+export type LearningStep = ArrayAlgorithmStep | TreeStep | GraphStep | DynamicProgrammingStep | BacktrackingStep | HashTableStep;
 
 export interface LearningQuestion {
   id: string;

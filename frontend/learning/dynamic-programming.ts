@@ -3,7 +3,7 @@ import { question, type LearningQuestion, type LearningStep } from "./types";
 export function fibonacciQuestion(steps: readonly LearningStep[], index: number): LearningQuestion | null {
   const step = steps[index];
   const previous = steps[index - 1];
-  if (!step || !previous || !("table" in step) || !("table" in previous) ||
+  if (!step || !previous || !("related_cells" in step) || !("related_cells" in previous) ||
       !step.active_cell || step.active_cell[0] !== 0 || step.related_cells.length !== 2) return null;
   const k = step.active_cell[1];
   if (k < 2) return null;
