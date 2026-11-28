@@ -142,7 +142,7 @@ describe("backtracking list playback", () => {
 
       // Step backward, then seek to arbitrary indexes in both directions.
       for (let index = steps.length - 2; index >= steps.length - 6; index -= 1) {
-        fireEvent.click(screen.getByRole("button", { name: "Previous step" }));
+        fireEvent.click(screen.getByRole("button", { name: "Prev step" }));
         expectResultsAt(steps, index);
       }
       const slider = screen.getByRole("slider", { name: /Choose a step/ });

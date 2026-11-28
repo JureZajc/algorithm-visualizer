@@ -72,7 +72,7 @@ export function StepControls(props: StepControlsProps) {
           size="sm"
           className="min-w-0 whitespace-nowrap px-1.5 text-[0.625rem] leading-tight tracking-[-0.02em] sm:px-3 sm:text-sm"
           type="button"
-          aria-label="Previous step"
+          aria-label="Prev step"
           disabled={!canGoBack}
           onClick={props.onPrevious}
         >
