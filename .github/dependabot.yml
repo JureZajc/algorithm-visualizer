@@ -17,6 +17,18 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - version-update:semver-major
+      # TypeScript 6+ fails npm ci with ERESOLVE: openapi-typescript needs
+      # typescript ^5.x, and typescript-eslint (through eslint-config-next)
+      # needs typescript >=4.8.4 <6.1.0. Lift this when both accept the new major.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+      # ESLint 10 fails npm ci with ERESOLVE: eslint-config-next depends on
+      # eslint-plugin-react, eslint-plugin-import, and eslint-plugin-jsx-a11y,
+      # whose eslint peer ranges stop at ^9. Lift this when all three accept it.
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: uv
     directory: /backend
