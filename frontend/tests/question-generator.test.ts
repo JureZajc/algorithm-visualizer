@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { generateQuestions, supportsLearning } from "@/learning/question-generator";
 import { selectCheckpoints } from "@/learning/checkpoint-selector";
 import { question } from "@/learning/types";
+import type { HashTableStep } from "@/types/hash-tables";
 import { run, runs } from "./learning-fixtures";
 
 describe("question generation", () => {
@@ -21,7 +22,8 @@ describe("question generation", () => {
     }
   });
 
-  it.each(["bubble", "selection", "insertion", "linear_found", "binary_right", "bst_insert", "bst_search", "bfs", "dfs", "fibonacci_8", "n_queens"])("provides checkpoints for supported algorithm %s", (name) => {
+  it.each(["bubble", "selection", "insertion", "linear_found", "binary_right", "bst_insert", "bst_search", "bfs", "dfs", "fibonacci_8", "n_queens",
+    "hash_chaining_insert", "hash_chaining_found", "hash_probing_insert_wrap", "hash_probing_absent"])("provides checkpoints for supported algorithm %s", (name) => {
     const { algorithm, steps, context } = run(name);
     expect(selectCheckpoints(generateQuestions(algorithm, steps, context), steps.length).length).toBeGreaterThan(0);
   });
@@ -38,7 +40,7 @@ describe("question generation", () => {
     expect(generateQuestions(sorted.algorithm, sorted.steps).at(-1)?.correctChoice).toBe(2);
   });
 
-  it.each(["selection", "insertion", "linear_found", "linear_absent", "dfs"])("derives %s questions from step state, not descriptions or pseudocode lines", (name) => {
+  it.each(["selection", "insertion", "linear_found", "linear_absent", "dfs", "hash_chaining_insert", "hash_probing_absent"])("derives %s questions from step state, not descriptions or pseudocode lines", (name) => {
     const sample = run(name);
     const expected = generateQuestions(sample.algorithm, sample.steps, sample.context);
     for (const step of sample.steps) {
@@ -166,6 +168,75 @@ describe("question generation", () => {
     expect(questions.some((item) => item.kind === "backtrack")).toBe(true);
     expect(candidates[0].stepIndex).toBe(1);
     expect(candidates[0].prompt).toContain("row 1, column 1");
+  });
+
+  it.each([
+    ["hash_chaining_insert", ["chain-or-place", "hash-bucket"]],
+    ["hash_string_insert", ["chain-or-place"]],
+    ["hash_probing_insert_wrap", ["hash-bucket", "next-probe"]],
+    ["hash_chaining_found", ["search-outcome"]],
+    ["hash_probing_absent", ["next-probe", "search-outcome"]],
+  ] as const)("asks only the hash table questions that fit %s", (name, kinds) => {
+    const sample = run(name);
+    expect([...new Set(generateQuestions(sample.algorithm, sample.steps).map((item) => item.kind))].sort()).toEqual(kinds);
+  });
+
+  it("asks which bucket an integer key hashes to, and never for string or negative keys", () => {
+    const chaining = run("hash_chaining_insert");
+    const buckets = generateQuestions(chaining.algorithm, chaining.steps).filter((item) => item.kind === "hash-bucket");
+    // The first key is hashed at step 0, before any checkpoint can open.
+    expect(buckets.map((item) => [item.stepIndex, item.choices[item.correctChoice]])).toEqual([[3, "Bucket 2"], [7, "Bucket 2"], [11, "Bucket 5"]]);
+    expect(buckets[0].prompt).toBe("22 is hashed next. The table has 10 buckets. Which bucket does 22 hash to?");
+    expect(buckets[0].choices).toEqual(["Bucket 1", "Bucket 2", "Bucket 3", "Bucket 4"]);
+    expect(buckets[1].explanation).toContain("32 mod 10 = 2, because 32 = 3 × 10 + 2.");
+    const probing = run("hash_probing_insert_wrap");
+    const slots = generateQuestions(probing.algorithm, probing.steps).filter((item) => item.kind === "hash-bucket");
+    expect(slots.map((item) => [item.stepIndex, item.choices[item.correctChoice]])).toEqual([[3, "Slot 4"], [8, "Slot 4"], [15, "Slot 3"]]);
+    // "cat" and "act" hash by their character-code sums, which is no fair mental calculation.
+    const strings = run("hash_string_insert");
+    expect(generateQuestions(strings.algorithm, strings.steps).some((item) => item.kind === "hash-bucket")).toBe(false);
+    // The backend floors negative keys (-8 mod 10 = 2), where JavaScript's remainder is -8.
+    const negative = run("hash_chaining_insert");
+    (negative.steps[3] as HashTableStep).key = -8;
+    expect(generateQuestions(negative.algorithm, negative.steps).some((item) => item.stepIndex === 3)).toBe(false);
+  });
+
+  it("predicts whether a chaining insert starts a bucket or extends its chain", () => {
+    const sample = run("hash_chaining_insert");
+    const chains = generateQuestions(sample.algorithm, sample.steps).filter((item) => item.kind === "chain-or-place");
+    expect(chains.map((item) => [item.stepIndex, item.choices[item.correctChoice]])).toEqual([
+      [2, "As the first key in bucket 2"], [5, "Appended to the chain in bucket 2"], [9, "Appended to the chain in bucket 2"], [13, "As the first key in bucket 5"]]);
+    expect(chains[2].prompt).toBe("Bucket 2 has been inspected for 32. How is 32 stored?");
+    expect(chains[2].explanation).toContain("already holds 12, 22");
+    const strings = run("hash_string_insert");
+    expect(generateQuestions(strings.algorithm, strings.steps).map((item) => [item.stepIndex, item.correctChoice])).toEqual([[2, 0], [5, 1], [9, 0]]);
+  });
+
+  it("predicts the next linear probe, wrapping from the last slot to slot 0", () => {
+    const insert = run("hash_probing_insert_wrap");
+    const inserts = generateQuestions(insert.algorithm, insert.steps).filter((item) => item.kind === "next-probe");
+    expect(inserts.map((item) => [item.stepIndex, item.choices[item.correctChoice]])).toEqual([[6, "Slot 0"], [11, "Slot 0"], [13, "Slot 1"]]);
+    expect(inserts[0].prompt).toBe("Slot 4 already holds 4, so 9 cannot go there. Which slot does linear probing check next?");
+    expect(inserts[0].choices).toEqual(["Slot 0", "Slot 1", "Slot 3", "Slot 4"]);
+    expect(inserts[0].explanation).toContain("wraps around to slot 0");
+    const search = run("hash_probing_absent");
+    const searches = generateQuestions(search.algorithm, search.steps).filter((item) => item.kind === "next-probe");
+    expect(searches.map((item) => [item.stepIndex, item.choices[item.correctChoice]])).toEqual([[3, "Slot 0"], [5, "Slot 1"], [7, "Slot 2"]]);
+    expect(searches[0].prompt).toBe("Slot 4 holds 4, not 19. Which slot does linear probing check next?");
+  });
+
+  it.each([
+    ["hash_chaining_found", [[2, "It finds 32 in bucket 2"]]],
+    ["hash_chaining_absent", [[2, "It stops: 42 is not in the table"]]],
+    ["hash_chaining_empty_bucket", [[2, "It stops: 7 is not in the table"]]],
+    ["hash_probing_found", [[2, "It checks the next slot"], [4, "It checks the next slot"], [6, "It finds 14 in slot 1"]]],
+    ["hash_probing_absent", [[2, "It checks the next slot"], [4, "It checks the next slot"], [6, "It checks the next slot"], [8, "It stops: 19 is not in the table"]]],
+    // Slot 1 is the full table's last unprobed slot: the search ends there without an empty slot, so it is not asked.
+    ["hash_probing_full", [[2, "It checks the next slot"]]],
+  ] as const)("predicts the search outcome at each inspected slot for %s", (name, answers) => {
+    const sample = run(name);
+    const outcomes = generateQuestions(sample.algorithm, sample.steps).filter((item) => item.kind === "search-outcome");
+    expect(outcomes.map((item) => [item.stepIndex, item.choices[item.correctChoice]])).toEqual(answers);
   });
 
   it("handles unsupported, empty, and insufficient-context runs", () => {

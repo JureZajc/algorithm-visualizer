@@ -2,6 +2,7 @@ import { binarySearchQuestion, bubbleSortQuestion, insertionSortQuestion, linear
 import { nQueensQuestion } from "./backtracking";
 import { fibonacciQuestion } from "./dynamic-programming";
 import { bfsQuestion, dfsQuestion } from "./graph";
+import { hashTableQuestion } from "./hash-tables";
 import { treeQuestion } from "./trees";
 import type { LearningQuestion, LearningRunContext, LearningStep } from "./types";
 
@@ -19,6 +20,10 @@ const strategies: Record<string, Strategy> = {
   dfs: dfsQuestion,
   fibonacci: fibonacciQuestion,
   n_queens: nQueensQuestion,
+  hash_insert_chaining: (steps, index) => hashTableQuestion("hash_insert_chaining", steps, index),
+  hash_search_chaining: (steps, index) => hashTableQuestion("hash_search_chaining", steps, index),
+  hash_insert_linear_probing: (steps, index) => hashTableQuestion("hash_insert_linear_probing", steps, index),
+  hash_search_linear_probing: (steps, index) => hashTableQuestion("hash_search_linear_probing", steps, index),
 };
 
 export function supportsLearning(algorithm: string): boolean {
