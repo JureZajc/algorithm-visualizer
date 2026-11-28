@@ -1,4 +1,4 @@
-import { Alert, Panel } from "@/components/ui-primitives";
+import { Alert, MetricTile, Panel, SubsectionHeading } from "@/components/ui-primitives";
 import type { AlgorithmCategory, AlgorithmMetadata } from "@/types/algorithm";
 
 interface AlgorithmMetadataPanelProps {
@@ -54,7 +54,7 @@ export function AlgorithmMetadataPanel(props: AlgorithmMetadataPanelProps) {
     <Panel className="mb-5 p-5" aria-labelledby={`metadata-${metadata.id}`}>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">
-          <span className="mb-2 inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-indigo-700">
+          <span className="mb-2 inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-extrabold uppercase tracking-[0.1em] text-indigo-700">
             {formatCategory(metadata.category)}
           </span>
           <h2 id={`metadata-${metadata.id}`} className="mb-1 text-xl font-extrabold tracking-normal text-slate-950">Algorithm overview</h2>
@@ -66,26 +66,17 @@ export function AlgorithmMetadataPanel(props: AlgorithmMetadataPanelProps) {
 
       <div className="mb-5 grid grid-cols-2 gap-2 lg:grid-cols-4">
         {complexityLabels.map(([label, key]) => (
-          <Complexity key={key} label={label} value={metadata.time_complexity[key]} />
+          <MetricTile key={key} label={label} surface="muted">{metadata.time_complexity[key]}</MetricTile>
         ))}
-        <Complexity label="Space" value={metadata.space_complexity} />
+        <MetricTile label="Space" surface="muted">{metadata.space_complexity}</MetricTile>
       </div>
 
       <div>
-        <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">Notes and limitations</h3>
+        <SubsectionHeading>Notes and limitations</SubsectionHeading>
         <ul className="m-0 grid gap-2 pl-5 text-sm leading-6 text-slate-700 md:grid-cols-2">
           {metadata.notes.map((note) => <li key={note}>{note}</li>)}
         </ul>
       </div>
     </Panel>
-  );
-}
-
-function Complexity({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-      <span className="mb-1 block text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-slate-500">{label}</span>
-      <span className="font-mono text-sm font-bold text-slate-900">{value}</span>
-    </div>
   );
 }
