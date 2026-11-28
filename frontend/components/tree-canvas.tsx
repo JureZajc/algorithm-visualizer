@@ -1,5 +1,6 @@
 import { ActionHalo } from "@/components/action-halo";
 import { OverflowFrame } from "@/components/overflow-frame";
+import { useVisualizationDescriptionId } from "@/components/visualization-description";
 import type { TreeNode, TreeStep, TreeStepType } from "@/types/trees";
 
 interface TreeCanvasProps {
@@ -107,6 +108,7 @@ const ROTATION_NODE_CLASSES = {
 const ROTATION_EDGE_CLASS = "stroke-fuchsia-500";
 
 export function TreeCanvas({ tree, step }: TreeCanvasProps) {
+  const descriptionId = useVisualizationDescriptionId();
   const layout = createTreeLayout(tree);
   const positions = new Map(layout.nodes.map((node) => [node.value, node]));
   const path = new Set(step?.path ?? []);
@@ -141,6 +143,7 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
         viewBox={`0 0 ${layout.width} ${layout.height}`}
         role="img"
         aria-label="Binary search tree visualization"
+        aria-describedby={descriptionId}
       >
         <rect x="0" y="0" width={layout.width} height={layout.height} className="fill-transparent" />
 

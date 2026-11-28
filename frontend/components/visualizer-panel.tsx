@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from "react";
 
 import { Legend, Panel, ResultSummary, ScreenReaderStatus, StatusBadge, type LegendItem } from "@/components/ui-primitives";
+import { VisualizationDescriptionContext } from "@/components/visualization-description";
 
 export type VisualizerStatus = "idle" | "loading" | "running" | "paused" | "complete" | "invalid" | "error";
 
@@ -60,6 +61,7 @@ export function VisualizationPanel({
   title: string;
 }) {
   const titleId = useId();
+  const descriptionId = useId();
   return (
     <Panel
       aria-busy={status === "loading"}
@@ -73,14 +75,14 @@ export function VisualizationPanel({
             <h2 className="m-0 text-lg font-extrabold tracking-normal text-slate-900" id={titleId}>{title}</h2>
             <StatusBadge label={statusLabel ?? statusLabels[status]} variant={status} />
           </div>
-          <p className="m-0 min-h-6 text-sm leading-6 text-slate-500">{description}</p>
+          <p className="m-0 min-h-6 text-sm leading-6 text-slate-500" id={descriptionId}>{description}</p>
           {/* Autoplay changes the description on every tick; announce it only when playback rests. */}
           <ScreenReaderStatus silent={status === "loading" || status === "running"}>{description}</ScreenReaderStatus>
           {resultSummary ? <ResultSummary>{resultSummary}</ResultSummary> : null}
         </div>
         {legend?.length ? <Legend items={legend} /> : null}
       </div>
-      {children}
+      <VisualizationDescriptionContext value={descriptionId}>{children}</VisualizationDescriptionContext>
     </Panel>
   );
 }

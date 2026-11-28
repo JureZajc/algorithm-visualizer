@@ -7,6 +7,7 @@ import { HashTableView } from "@/components/hash-table-view";
 import { OverflowFrame } from "@/components/overflow-frame";
 import { SudokuGrid } from "@/components/sudoku-grid";
 import { TreeCanvas } from "@/components/tree-canvas";
+import { VisualizationPanel } from "@/components/visualizer-panel";
 import type { BacktrackingCell, SudokuBoard } from "@/types/backtracking";
 import type { GraphStep } from "@/types/graph";
 import type { HashTableSnapshot } from "@/types/hash-tables";
@@ -396,5 +397,30 @@ describe("current action halo", () => {
       "pointer-events-none fill-rose-200",
     ]);
     expect(drawn[2].compareDocumentPosition(container.querySelector("line")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+describe("drawing descriptions", () => {
+  const graphProps = { nodes: [], edges: [], start: "A", target: "A", directed: false, showStart: false, showTarget: false, step: null };
+
+  it("describes the graph and the tree with the panel's step description", () => {
+    render(
+      <VisualizationPanel description="Visit node A." status="paused" title="Breadth-first search">
+        <GraphCanvas {...graphProps} />
+        <TreeCanvas tree={null} step={null} />
+      </VisualizationPanel>,
+    );
+    for (const name of ["Weighted graph algorithm visualization", "Binary search tree visualization"]) {
+      const descriptionId = screen.getByRole("img", { name }).getAttribute("aria-describedby");
+      expect(descriptionId).toBeTruthy();
+      const description = document.getElementById(descriptionId!);
+      expect(description?.tagName).toBe("P");
+      expect(description?.textContent).toBe("Visit node A.");
+    }
+  });
+
+  it("leaves a drawing outside a panel without a description", () => {
+    render(<TreeCanvas tree={null} step={null} />);
+    expect(screen.getByRole("img", { name: "Binary search tree visualization" }).hasAttribute("aria-describedby")).toBe(false);
   });
 });

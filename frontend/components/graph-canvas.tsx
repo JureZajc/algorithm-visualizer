@@ -2,6 +2,7 @@ import { useEffect, useRef, type KeyboardEvent, type MouseEvent } from "react";
 
 import { ActionHalo } from "@/components/action-halo";
 import { OverflowFrame } from "@/components/overflow-frame";
+import { useVisualizationDescriptionId } from "@/components/visualization-description";
 import type { GraphEdge, GraphNodePosition, GraphStep, GraphStepType } from "@/types/graph";
 
 interface GraphCanvasProps {
@@ -106,6 +107,7 @@ export function GraphCanvas({
   onCanvasClick,
 }: GraphCanvasProps) {
   const surfaceRef = useRef<HTMLDivElement>(null);
+  const descriptionId = useVisualizationDescriptionId();
   const canPlaceNode = isPlacementActive && onCanvasClick !== undefined;
 
   // Starting a placement disables the editor control that had focus. Catch that focus here,
@@ -186,7 +188,7 @@ export function GraphCanvas({
         className="min-w-[560px] rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-indigo-300"
         ref={surfaceRef}
       >
-        <svg className="block h-auto min-h-[360px] w-full" viewBox="0 0 650 410" role="img" aria-label="Weighted graph algorithm visualization">
+        <svg className="block h-auto min-h-[360px] w-full" viewBox="0 0 650 410" role="img" aria-label="Weighted graph algorithm visualization" aria-describedby={descriptionId}>
           <defs>
             <Marker id="arrow-default" colorClass="fill-slate-400" />
             <Marker id="arrow-visit" colorClass="fill-sky-500" />
