@@ -142,3 +142,20 @@ test("the speed slider is a 44px target that moves with the arrow keys", async (
   await page.keyboard.press("ArrowLeft");
   await expect(slider).toHaveValue("300");
 });
+
+test("the step slider is a 44px target that moves with the arrow keys", async ({ page }) => {
+  await page.goto("/");
+  const slider = page.getByRole("slider", { name: /Choose a step/ });
+  const box = await slider.boundingBox();
+  expect(box?.height).toBeGreaterThanOrEqual(44);
+
+  await page.getByRole("button", { name: "Start visualization" }).click();
+  await expect(slider).toBeEnabled();
+  await page.getByRole("button", { name: "Pause playback" }).click();
+  await slider.focus();
+  await page.keyboard.press("Home");
+  await expect(slider).toHaveValue("0");
+  await page.keyboard.press("ArrowRight");
+  await expect(slider).toHaveValue("1");
+  await expect(slider).toHaveAttribute("aria-valuetext", /^Step 2 of \d+$/);
+});

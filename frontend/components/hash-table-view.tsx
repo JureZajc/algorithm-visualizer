@@ -172,7 +172,7 @@ function BucketBadge({ index, step }: { index: number; step: HashTableStep | nul
   const label = bucketStateLabel(index, step);
   if (!label) return null;
   return (
-    <span className={`rounded-full px-2 py-1 text-[0.65rem] font-black uppercase ${BUCKET_BADGE_CLASSES[label]}`}>
+    <span className={`rounded-full px-2 py-1 text-xs font-black uppercase ${BUCKET_BADGE_CLASSES[label]}`}>
       {label}
     </span>
   );

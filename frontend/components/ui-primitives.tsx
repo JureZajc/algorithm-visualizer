@@ -386,6 +386,56 @@ export function SectionHeader({
   );
 }
 
+// The small uppercase label of a group or a value. 12px is the smallest text size the panels use.
+const eyebrowClasses = "text-xs font-extrabold uppercase tracking-[0.1em]";
+
+/** The header strip of a side-rail panel, such as the stats or the pseudocode. */
+export function PanelHeader({
+  eyebrow,
+  title,
+  titleId,
+}: {
+  eyebrow: string;
+  title: string;
+  /** Lets the panel name itself after the heading through `aria-labelledby`. */
+  titleId?: string;
+}) {
+  return (
+    <div className="border-b border-slate-100 px-5 py-4">
+      <p className={joinClasses("mb-1 text-indigo-600", eyebrowClasses)}>{eyebrow}</p>
+      <h2 className="m-0 text-base font-extrabold tracking-normal text-slate-900" id={titleId}>{title}</h2>
+    </div>
+  );
+}
+
+/** The heading of a group inside a panel, such as "Notes and limitations". */
+export function SubsectionHeading({ children }: { children: ReactNode }) {
+  return <h3 className={joinClasses("mb-2 text-slate-500", eyebrowClasses)}>{children}</h3>;
+}
+
+/** The small uppercase label above a value. */
+export function ValueLabel({ children }: { children: ReactNode }) {
+  return <span className={joinClasses("mb-1 block text-slate-500", eyebrowClasses)}>{children}</span>;
+}
+
+/** A labelled value in a bordered tile. Use the `muted` surface on a white panel. */
+export function MetricTile({
+  children,
+  label,
+  surface = "white",
+}: {
+  children: ReactNode;
+  label: string;
+  surface?: "white" | "muted";
+}) {
+  return (
+    <div className={joinClasses("rounded-xl border border-slate-200 px-4 py-3", surface === "muted" ? "bg-slate-50" : "bg-white")}>
+      <ValueLabel>{label}</ValueLabel>
+      <span className="font-mono text-sm font-bold text-slate-900">{children}</span>
+    </div>
+  );
+}
+
 /** The outcome of a finished run. Long values wrap instead of widening the panel. */
 export function ResultSummary({ children }: { children: ReactNode }) {
   return (

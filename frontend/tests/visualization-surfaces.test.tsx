@@ -7,9 +7,11 @@ import { HashTableView } from "@/components/hash-table-view";
 import { OverflowFrame } from "@/components/overflow-frame";
 import { SudokuGrid } from "@/components/sudoku-grid";
 import { TreeCanvas } from "@/components/tree-canvas";
+import { VisualizationPanel } from "@/components/visualizer-panel";
 import type { BacktrackingCell, SudokuBoard } from "@/types/backtracking";
+import type { GraphStep } from "@/types/graph";
 import type { HashTableSnapshot } from "@/types/hash-tables";
-import type { TreeNode } from "@/types/trees";
+import type { TreeNode, TreeStep } from "@/types/trees";
 
 vi.mock("@/lib/api", () => ({ fetchGraphSteps: vi.fn() }));
 
@@ -341,5 +343,84 @@ describe("tree canvas", () => {
     const svg = screen.getByRole("img", { name: "Binary search tree visualization" });
     expect(svg.getAttribute("viewBox")).toBe("0 0 2436 2710");
     expect(svg.style.minWidth).toBe("2436px");
+  });
+});
+
+describe("current action halo", () => {
+  const graphProps = {
+    nodes: [
+      { id: "A", x: 100, y: 100 },
+      { id: "B", x: 250, y: 100 },
+      { id: "C", x: 400, y: 100 },
+    ],
+    edges: [{ source: "A", target: "B", weight: 1 }],
+    start: "A",
+    target: "C",
+    directed: false,
+    showStart: true,
+    showTarget: true,
+  };
+
+  function halos(container: HTMLElement) {
+    return Array.from(container.querySelectorAll("[data-action-halo]"));
+  }
+
+  it("marks the graph's current node and neighbor, under the edges", () => {
+    const step = { type: "inspect_edge", current: "A", neighbor: "B", visited: [], frontier: [] } as unknown as GraphStep;
+    const { container, rerender } = render(<GraphCanvas {...graphProps} step={null} />);
+    expect(halos(container)).toHaveLength(0);
+
+    rerender(<GraphCanvas {...graphProps} step={step} />);
+    const drawn = halos(container);
+    expect(drawn.map((halo) => [halo.getAttribute("cx"), halo.getAttribute("r"), halo.getAttribute("class")])).toEqual([
+      ["100", "40", "pointer-events-none fill-amber-200"],
+      ["250", "40", "pointer-events-none fill-amber-200"],
+    ]);
+    // Drawn before the edges, so the edge and its weight stay on top.
+    const edge = container.querySelector("line")!;
+    expect(drawn[1].compareDocumentPosition(edge) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("marks the tree's current, imbalanced, and rotated nodes with the same halo", () => {
+    const tree: TreeNode = {
+      value: 2,
+      left: { value: 1, left: null, right: null },
+      right: { value: 3, left: null, right: null },
+    };
+    const step = { type: "compare", current_node: 1, imbalanced_node: 2, rotation_nodes: [3], path: [], visited: [] } as unknown as TreeStep;
+    const { container } = render(<TreeCanvas tree={tree} step={step} />);
+    const drawn = halos(container);
+    expect(drawn.map((halo) => halo.getAttribute("r"))).toEqual(["40", "40", "40"]);
+    expect(drawn.map((halo) => halo.getAttribute("class")).sort()).toEqual([
+      "pointer-events-none fill-amber-200",
+      "pointer-events-none fill-fuchsia-200",
+      "pointer-events-none fill-rose-200",
+    ]);
+    expect(drawn[2].compareDocumentPosition(container.querySelector("line")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+describe("drawing descriptions", () => {
+  const graphProps = { nodes: [], edges: [], start: "A", target: "A", directed: false, showStart: false, showTarget: false, step: null };
+
+  it("describes the graph and the tree with the panel's step description", () => {
+    render(
+      <VisualizationPanel description="Visit node A." status="paused" title="Breadth-first search">
+        <GraphCanvas {...graphProps} />
+        <TreeCanvas tree={null} step={null} />
+      </VisualizationPanel>,
+    );
+    for (const name of ["Weighted graph algorithm visualization", "Binary search tree visualization"]) {
+      const descriptionId = screen.getByRole("img", { name }).getAttribute("aria-describedby");
+      expect(descriptionId).toBeTruthy();
+      const description = document.getElementById(descriptionId!);
+      expect(description?.tagName).toBe("P");
+      expect(description?.textContent).toBe("Visit node A.");
+    }
+  });
+
+  it("leaves a drawing outside a panel without a description", () => {
+    render(<TreeCanvas tree={null} step={null} />);
+    expect(screen.getByRole("img", { name: "Binary search tree visualization" }).hasAttribute("aria-describedby")).toBe(false);
   });
 });

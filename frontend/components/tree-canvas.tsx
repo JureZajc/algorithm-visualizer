@@ -1,4 +1,6 @@
+import { ActionHalo } from "@/components/action-halo";
 import { OverflowFrame } from "@/components/overflow-frame";
+import { useVisualizationDescriptionId } from "@/components/visualization-description";
 import type { TreeNode, TreeStep, TreeStepType } from "@/types/trees";
 
 interface TreeCanvasProps {
@@ -24,59 +26,59 @@ interface Edge {
 
 interface TreeStepClasses {
   node: string;
-  ring: string;
+  halo: string;
   text: string;
 }
 
 const TREE_STEP_CLASSES: Record<TreeStepType, TreeStepClasses> = {
   compare: {
     node: "fill-amber-400 stroke-amber-600",
-    ring: "stroke-amber-300",
+    halo: "fill-amber-200",
     text: "fill-slate-950",
   },
   insert: {
     node: "fill-violet-500 stroke-violet-700",
-    ring: "stroke-violet-300",
+    halo: "fill-violet-200",
     text: "fill-white",
   },
   visit: {
     node: "fill-sky-500 stroke-sky-700",
-    ring: "stroke-sky-300",
+    halo: "fill-sky-200",
     text: "fill-white",
   },
   found: {
     node: "fill-emerald-500 stroke-emerald-700",
-    ring: "stroke-emerald-300",
+    halo: "fill-emerald-200",
     text: "fill-white",
   },
   not_found: {
     node: "fill-slate-500 stroke-slate-700",
-    ring: "stroke-slate-300",
+    halo: "fill-slate-200",
     text: "fill-white",
   },
   traverse: {
     node: "fill-indigo-500 stroke-indigo-700",
-    ring: "stroke-indigo-300",
+    halo: "fill-indigo-200",
     text: "fill-white",
   },
   balance_check: {
     node: "fill-cyan-500 stroke-cyan-700",
-    ring: "stroke-cyan-300",
+    halo: "fill-cyan-200",
     text: "fill-white",
   },
   imbalance: {
     node: "fill-rose-500 stroke-rose-700",
-    ring: "stroke-rose-300",
+    halo: "fill-rose-200",
     text: "fill-white",
   },
   rotate: {
     node: "fill-fuchsia-500 stroke-fuchsia-700",
-    ring: "stroke-fuchsia-300",
+    halo: "fill-fuchsia-200",
     text: "fill-white",
   },
   done: {
     node: "fill-emerald-500 stroke-emerald-700",
-    ring: "stroke-emerald-300",
+    halo: "fill-emerald-200",
     text: "fill-white",
   },
 };
@@ -95,17 +97,18 @@ const VISITED_NODE_CLASSES = {
 };
 const IMBALANCED_NODE_CLASSES = {
   node: "fill-rose-500 stroke-rose-700",
-  ring: "stroke-rose-300",
+  halo: "fill-rose-200",
   text: "fill-white",
 };
 const ROTATION_NODE_CLASSES = {
   node: "fill-fuchsia-500 stroke-fuchsia-700",
-  ring: "stroke-fuchsia-300",
+  halo: "fill-fuchsia-200",
   text: "fill-white",
 };
 const ROTATION_EDGE_CLASS = "stroke-fuchsia-500";
 
 export function TreeCanvas({ tree, step }: TreeCanvasProps) {
+  const descriptionId = useVisualizationDescriptionId();
   const layout = createTreeLayout(tree);
   const positions = new Map(layout.nodes.map((node) => [node.value, node]));
   const path = new Set(step?.path ?? []);
@@ -121,6 +124,13 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
       .map((value, index) => edgeKey(pathValues[index], value)),
   );
 
+  function haloClassFor(value: number) {
+    if (imbalancedValue === value) return IMBALANCED_NODE_CLASSES.halo;
+    if (rotationValues.has(value)) return ROTATION_NODE_CLASSES.halo;
+    if (activeValue === value && activeClasses) return activeClasses.halo;
+    return null;
+  }
+
   return (
     <OverflowFrame
       className="max-h-[min(75vh,720px)] rounded-2xl border border-slate-200 bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.10),transparent_64%)] shadow-inner"
@@ -133,8 +143,14 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
         viewBox={`0 0 ${layout.width} ${layout.height}`}
         role="img"
         aria-label="Binary search tree visualization"
+        aria-describedby={descriptionId}
       >
         <rect x="0" y="0" width={layout.width} height={layout.height} className="fill-transparent" />
+
+        {layout.nodes.map((node) => {
+          const haloClass = haloClassFor(node.value);
+          return haloClass ? <ActionHalo className={haloClass} key={`halo-${node.value}`} x={node.x} y={node.y} /> : null;
+        })}
 
         {layout.edges.map((edge) => {
           const source = positions.get(edge.source);
@@ -193,26 +209,10 @@ export function TreeCanvas({ tree, step }: TreeCanvasProps) {
                   : isPath
                     ? PATH_NODE_CLASSES.text
                     : DEFAULT_NODE_CLASSES.text;
-          const ringClass = isImbalanced
-            ? IMBALANCED_NODE_CLASSES.ring
-            : isRotationNode
-              ? ROTATION_NODE_CLASSES.ring
-              : isActive
-                ? activeClasses.ring
-                : null;
           const metrics = formatNodeMetrics(node);
 
           return (
             <g key={node.value} className="transition-all duration-200">
-              {ringClass ? (
-                <circle
-                  cx={node.x}
-                  cy={node.y}
-                  r="34"
-                  strokeWidth="4"
-                  className={`fill-none ${ringClass}`}
-                />
-              ) : null}
               <circle
                 cx={node.x}
                 cy={node.y}

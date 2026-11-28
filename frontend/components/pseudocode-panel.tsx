@@ -1,4 +1,4 @@
-import { Panel } from "@/components/ui-primitives";
+import { Panel, PanelHeader } from "@/components/ui-primitives";
 import type { AlgorithmMetadata } from "@/types/algorithm";
 
 interface PseudocodePanelProps {
@@ -41,10 +41,7 @@ export function PseudocodePanel(props: PseudocodePanelProps) {
       className="overflow-hidden"
       aria-labelledby={`pseudocode-${metadata.id}`}
     >
-      <div className="border-b border-slate-100 px-5 py-4">
-        <p className="mb-1 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-indigo-600">Follow the steps</p>
-        <h2 id={`pseudocode-${metadata.id}`} className="m-0 text-base font-extrabold tracking-normal text-slate-900">Pseudocode</h2>
-      </div>
+      <PanelHeader eyebrow="Follow the steps" title="Pseudocode" titleId={`pseudocode-${metadata.id}`} />
       <ol className="m-0 grid list-none gap-1.5 p-3 font-mono text-xs leading-5">
         {metadata.pseudocode.map((line, index) => {
           const lineNumber = index + 1;
@@ -57,7 +54,7 @@ export function PseudocodePanel(props: PseudocodePanelProps) {
               key={`${lineNumber}-${line}`}
               aria-current={isCurrent ? "step" : undefined}
             >
-              <span className={isCurrent ? "select-none font-bold text-indigo-600" : "select-none text-slate-400"}>{lineNumber}</span>
+              <span className={isCurrent ? "select-none font-bold text-indigo-600" : "select-none text-slate-500"}>{lineNumber}</span>
               <span className="whitespace-pre-wrap break-words">{line.trimStart()}</span>
             </li>
           );

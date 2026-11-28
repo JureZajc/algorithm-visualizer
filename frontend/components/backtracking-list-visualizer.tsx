@@ -1,5 +1,4 @@
-import type { ReactNode } from "react";
-
+import { MetricTile, SubsectionHeading } from "@/components/ui-primitives";
 import type {
   BacktrackingAlgorithm,
   PermutationsResult,
@@ -100,9 +99,7 @@ export function BacktrackingListVisualizer({
   return (
     <div className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <section>
-        <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
-          Input values
-        </h3>
+        <SubsectionHeading>Input values</SubsectionHeading>
         <div className="flex flex-wrap gap-2">
           {displayValues.map((value, index) => {
             const isActive = activeIndex === index;
@@ -122,9 +119,9 @@ export function BacktrackingListVisualizer({
       </section>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Metric label="Depth">{depth}</Metric>
-        <Metric label="Active item">{activeItem ?? "None"}</Metric>
-        <Metric label="Generated">{generated.length}</Metric>
+        <MetricTile label="Depth">{depth}</MetricTile>
+        <MetricTile label="Active item">{activeItem ?? "None"}</MetricTile>
+        <MetricTile label="Generated">{generated.length}</MetricTile>
       </div>
 
       {decision ? (
@@ -134,9 +131,7 @@ export function BacktrackingListVisualizer({
       ) : null}
 
       <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
-          {partialLabel}
-        </h3>
+        <SubsectionHeading>{partialLabel}</SubsectionHeading>
         <div className="flex min-h-12 flex-wrap gap-2 rounded-xl bg-slate-50 p-3">
           {partial.length ? (
             partial.map((item, index) => (
@@ -156,9 +151,7 @@ export function BacktrackingListVisualizer({
       </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.1em] text-slate-500">
-          Generated results
-        </h3>
+        <SubsectionHeading>Generated results</SubsectionHeading>
         <div className="max-h-56 overflow-auto rounded-xl bg-slate-50 p-3">
           {generated.length ? (
             <ol className="m-0 grid gap-2 p-0">
@@ -178,17 +171,6 @@ export function BacktrackingListVisualizer({
           )}
         </div>
       </section>
-    </div>
-  );
-}
-
-function Metric({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-      <span className="mb-1 block text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-slate-500">
-        {label}
-      </span>
-      <span className="font-mono text-sm font-bold text-slate-900">{children}</span>
     </div>
   );
 }

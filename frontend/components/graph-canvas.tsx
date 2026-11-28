@@ -1,6 +1,8 @@
 import { useEffect, useRef, type KeyboardEvent, type MouseEvent } from "react";
 
+import { ActionHalo } from "@/components/action-halo";
 import { OverflowFrame } from "@/components/overflow-frame";
+import { useVisualizationDescriptionId } from "@/components/visualization-description";
 import type { GraphEdge, GraphNodePosition, GraphStep, GraphStepType } from "@/types/graph";
 
 interface GraphCanvasProps {
@@ -45,27 +47,28 @@ export function nextFreeNodePosition(nodes: GraphNodePosition[]) {
 
 interface GraphStepClasses {
   node: string;
+  halo: string;
   edge: string;
   markerId: string;
   weight: string;
 }
 
 const GRAPH_STEP_CLASSES: Record<GraphStepType, GraphStepClasses> = {
-  visit: { node: "fill-sky-500 stroke-sky-700", edge: "stroke-sky-500", markerId: "arrow-visit", weight: "fill-sky-800" },
-  inspect_edge: { node: "fill-amber-400 stroke-amber-600", edge: "stroke-amber-500", markerId: "arrow-active", weight: "fill-amber-800" },
-  enqueue: { node: "fill-violet-500 stroke-violet-700", edge: "stroke-violet-500", markerId: "arrow-frontier", weight: "fill-violet-800" },
-  dequeue: { node: "fill-amber-400 stroke-amber-600", edge: "stroke-amber-500", markerId: "arrow-active", weight: "fill-amber-800" },
-  push: { node: "fill-violet-500 stroke-violet-700", edge: "stroke-violet-500", markerId: "arrow-frontier", weight: "fill-violet-800" },
-  pop: { node: "fill-amber-400 stroke-amber-600", edge: "stroke-amber-500", markerId: "arrow-active", weight: "fill-amber-800" },
-  relax: { node: "fill-fuchsia-500 stroke-fuchsia-700", edge: "stroke-fuchsia-500", markerId: "arrow-relax", weight: "fill-fuchsia-800" },
-  path_found: { node: "fill-emerald-500 stroke-emerald-700", edge: "stroke-emerald-500", markerId: "arrow-success", weight: "fill-emerald-800" },
-  not_found: { node: "fill-slate-500 stroke-slate-700", edge: "stroke-slate-500", markerId: "arrow-default", weight: "fill-slate-700" },
-  cycle_detected: { node: "fill-rose-500 stroke-rose-700", edge: "stroke-rose-500", markerId: "arrow-reject", weight: "fill-rose-800" },
-  accept_edge: { node: "fill-emerald-500 stroke-emerald-700", edge: "stroke-emerald-500", markerId: "arrow-success", weight: "fill-emerald-800" },
-  reject_edge: { node: "fill-rose-500 stroke-rose-700", edge: "stroke-rose-500", markerId: "arrow-reject", weight: "fill-rose-800" },
-  add_to_result: { node: "fill-teal-500 stroke-teal-700", edge: "stroke-teal-500", markerId: "arrow-result", weight: "fill-teal-800" },
-  update_frontier: { node: "fill-cyan-500 stroke-cyan-700", edge: "stroke-cyan-500", markerId: "arrow-candidate", weight: "fill-cyan-800" },
-  done: { node: "fill-emerald-500 stroke-emerald-700", edge: "stroke-emerald-500", markerId: "arrow-success", weight: "fill-emerald-800" },
+  visit: { node: "fill-sky-500 stroke-sky-700", halo: "fill-sky-200", edge: "stroke-sky-500", markerId: "arrow-visit", weight: "fill-sky-800" },
+  inspect_edge: { node: "fill-amber-400 stroke-amber-600", halo: "fill-amber-200", edge: "stroke-amber-500", markerId: "arrow-active", weight: "fill-amber-800" },
+  enqueue: { node: "fill-violet-500 stroke-violet-700", halo: "fill-violet-200", edge: "stroke-violet-500", markerId: "arrow-frontier", weight: "fill-violet-800" },
+  dequeue: { node: "fill-amber-400 stroke-amber-600", halo: "fill-amber-200", edge: "stroke-amber-500", markerId: "arrow-active", weight: "fill-amber-800" },
+  push: { node: "fill-violet-500 stroke-violet-700", halo: "fill-violet-200", edge: "stroke-violet-500", markerId: "arrow-frontier", weight: "fill-violet-800" },
+  pop: { node: "fill-amber-400 stroke-amber-600", halo: "fill-amber-200", edge: "stroke-amber-500", markerId: "arrow-active", weight: "fill-amber-800" },
+  relax: { node: "fill-fuchsia-500 stroke-fuchsia-700", halo: "fill-fuchsia-200", edge: "stroke-fuchsia-500", markerId: "arrow-relax", weight: "fill-fuchsia-800" },
+  path_found: { node: "fill-emerald-500 stroke-emerald-700", halo: "fill-emerald-200", edge: "stroke-emerald-500", markerId: "arrow-success", weight: "fill-emerald-800" },
+  not_found: { node: "fill-slate-500 stroke-slate-700", halo: "fill-slate-200", edge: "stroke-slate-500", markerId: "arrow-default", weight: "fill-slate-700" },
+  cycle_detected: { node: "fill-rose-500 stroke-rose-700", halo: "fill-rose-200", edge: "stroke-rose-500", markerId: "arrow-reject", weight: "fill-rose-800" },
+  accept_edge: { node: "fill-emerald-500 stroke-emerald-700", halo: "fill-emerald-200", edge: "stroke-emerald-500", markerId: "arrow-success", weight: "fill-emerald-800" },
+  reject_edge: { node: "fill-rose-500 stroke-rose-700", halo: "fill-rose-200", edge: "stroke-rose-500", markerId: "arrow-reject", weight: "fill-rose-800" },
+  add_to_result: { node: "fill-teal-500 stroke-teal-700", halo: "fill-teal-200", edge: "stroke-teal-500", markerId: "arrow-result", weight: "fill-teal-800" },
+  update_frontier: { node: "fill-cyan-500 stroke-cyan-700", halo: "fill-cyan-200", edge: "stroke-cyan-500", markerId: "arrow-candidate", weight: "fill-cyan-800" },
+  done: { node: "fill-emerald-500 stroke-emerald-700", halo: "fill-emerald-200", edge: "stroke-emerald-500", markerId: "arrow-success", weight: "fill-emerald-800" },
 };
 
 const DEFAULT_NODE_CLASSES = "fill-white stroke-slate-500";
@@ -104,6 +107,7 @@ export function GraphCanvas({
   onCanvasClick,
 }: GraphCanvasProps) {
   const surfaceRef = useRef<HTMLDivElement>(null);
+  const descriptionId = useVisualizationDescriptionId();
   const canPlaceNode = isPlacementActive && onCanvasClick !== undefined;
 
   // Starting a placement disables the editor control that had focus. Catch that focus here,
@@ -184,7 +188,7 @@ export function GraphCanvas({
         className="min-w-[560px] rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-indigo-300"
         ref={surfaceRef}
       >
-        <svg className="block h-auto min-h-[360px] w-full" viewBox="0 0 650 410" role="img" aria-label="Weighted graph algorithm visualization">
+        <svg className="block h-auto min-h-[360px] w-full" viewBox="0 0 650 410" role="img" aria-label="Weighted graph algorithm visualization" aria-describedby={descriptionId}>
           <defs>
             <Marker id="arrow-default" colorClass="fill-slate-400" />
             <Marker id="arrow-visit" colorClass="fill-sky-500" />
@@ -205,6 +209,12 @@ export function GraphCanvas({
             className={isPlacementActive ? "cursor-crosshair fill-transparent" : "fill-transparent"}
             onClick={isPlacementActive ? handleCanvasClick : undefined}
           />
+
+          {activeClasses
+            ? nodes
+                .filter((node) => node.id === step?.current || node.id === step?.neighbor)
+                .map((node) => <ActionHalo className={activeClasses.halo} key={`halo-${node.id}`} x={node.x} y={node.y} />)
+            : null}
 
           {edges.map((edge, index) => {
             const source = positions.get(edge.source);

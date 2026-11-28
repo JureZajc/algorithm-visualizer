@@ -5,14 +5,14 @@
 ## Status
 
 - Audit completed on 2026-07-10.
-- Phase 1 is in progress. The checkboxes below record which items have shipped.
-- Reviewed against the code on 2026-11-27, after task T9: items 1, 2, 3, 5, 6, and 8 have shipped. Items 4, 7, and 9 are partly done:
-  - Item 3 has `ControlPanel`, `SectionHeader`, `RangeField`, `ActionRow`, `ResultSummary`, `VisualizationEmptyState`, and `OverflowFrame`. `Panel` renders a `section` only when it has a name, and every category uses one 300px support rail. The stats, pseudocode, and backtracking list panels still style their own headers and use 0.65–0.68rem labels.
-  - Item 4 has the “Reset run” label, form message rows that render only when there is a message, 44px speed sliders, the danger variant on “Clear walls” and “Clear puzzle”, and 44px graph remove buttons. The step slider in the playback controls still has the browser's default hit area.
-  - Item 7 has readable category names, legends built from explicit `{ label, tone }` items that match the drawn colors (Searching's “Inspect” is now amber), an empty state for Trees, and result summaries that wrap and give the length of the sorted array. A consistent outline for the current graph and tree action, and slot numbers in the wrapped Fibonacci table, remain; the cell titles there still restart at “Slot 0” in each row.
-  - Item 9 has one tab stop with arrow-key movement in the maze and Sudoku grids, keyboard placement of graph nodes, list semantics for hash buckets, a named region for every control and visualization panel, and `aria-pressed` on the maze tools. Linking the graph and tree drawings to the step description remains.
-
-  [improvement.md](improvement.md#3-finish-ux-audit-phase-1) has the review that led to task T9 in [improvement-tasks.md](improvement-tasks.md).
+- Phase 1 is complete. Every item below has shipped.
+- Reviewed against the code on 2026-11-27, after task T9: items 1, 2, 5, 6, and 8 had shipped, and items 3, 4, 7, and 9 had the gaps that the next point closes. [improvement.md](improvement.md#3-finish-ux-audit-phase-1) has the review that led to task T9 in [improvement-tasks.md](improvement-tasks.md).
+- Finished on 2026-11-28:
+  - Item 3: `ControlPanel`, `SectionHeader`, `RangeField`, `ActionRow`, `ResultSummary`, `VisualizationEmptyState`, and `OverflowFrame` shipped with T9. `Panel` renders a `section` only when it has a name, and every category uses one 300px support rail. The stats, pseudocode, backtracking list, and overview panels now use `PanelHeader`, `SubsectionHeading`, `ValueLabel`, and `MetricTile`, and their labels are 12px instead of 0.65–0.68rem.
+  - Item 4: “Reset run”, message rows only when there is a message, 44px speed sliders, the danger variant on “Clear walls” and “Clear puzzle”, and 44px graph remove buttons shipped with T9. The step slider in the playback controls now has the same 44px hit area.
+  - Item 7: readable category names, legends built from explicit `{ label, tone }` items that match the drawn colors, an empty state for Trees, and wrapping result summaries shipped with T9. The graph and the tree now draw the same `ActionHalo` behind each node the current step acts on, and the wrapped Fibonacci table names each cell by its n instead of restarting at “Slot 0” on each row.
+  - Item 9: one tab stop per maze and Sudoku grid, keyboard placement of graph nodes, list semantics for hash buckets, a named region for every panel, and `aria-pressed` on the maze tools shipped with T9. The graph and tree drawings now point `aria-describedby` at the visualization panel's step description.
+- One exception to the 12px minimum remains: below 640px, the playback buttons use 10px labels, so that the five-button row from item 5 fits at 320px.
 - Phase 2 item 1 has shipped: every category renders through `VisualizerWorkspace` and `VisualizerSupportRail`. Items 2 to 4 have not started.
 - The Playwright smoke tests run axe on every category before and after a run and fail on serious and critical findings.
 
@@ -223,7 +223,7 @@
 
   **Likely files:** Core UI, Playback, Supporting panels, and Category shells.
 
-- [ ] **4. Standardize forms and actions**
+- [x] **4. Standardize forms and actions**
 
   **Concrete problem:** Empty `FormField` message rows waste vertical space. Range inputs have only a 16px hit area. “Reset” and destructive clears are ambiguous. Graph delete buttons are 28–36px.
 
@@ -265,7 +265,7 @@
 
   **Likely files:** Core UI, Playback, and Category shells.
 
-- [ ] **7. Align headers, legends, empty states, and results**
+- [x] **7. Align headers, legends, empty states, and results**
 
   **Concrete problem:** Raw category identifiers appear in metadata, legends can disagree with actual colors, and initial states are inconsistent. Long results can strain narrow headers.
 
@@ -293,7 +293,7 @@
 
   **Likely files:** Wide and editable surfaces.
 
-- [ ] **9. Finish keyboard and semantic accessibility**
+- [x] **9. Finish keyboard and semantic accessibility**
 
   **Concrete problem:** Mobile nav names are abbreviated; visualization/control sections are often unnamed; maze tools lack selection state; grid editors create 81–225 tab stops; graph placement is pointer-only.
 

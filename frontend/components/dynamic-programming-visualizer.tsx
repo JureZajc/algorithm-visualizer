@@ -101,6 +101,11 @@ function wrapFibonacciPosition(position: TablePosition | null) {
   ] as TablePosition;
 }
 
+/** The n of a cell in the wrapped table, counted across rows rather than restarting at 0. */
+function fibonacciCellLabel(rowIndex: number, columnIndex: number) {
+  return `n ${rowIndex * FIBONACCI_COLUMNS_PER_ROW + columnIndex}`;
+}
+
 function wrapFibonacciRelatedPosition(position: TablePosition) {
   return wrapFibonacciPosition(position) as TablePosition;
 }
@@ -376,6 +381,7 @@ export function DynamicProgrammingVisualizer({ initialQuery, onQueryChange, ...p
             rowLabels={rowLabels}
             columnLabels={columnLabels}
             variant={algorithm === "fibonacci" ? "compact" : "standard"}
+            cellLabel={algorithm === "fibonacci" ? fibonacciCellLabel : undefined}
           />
         </VisualizationPanel>
       }

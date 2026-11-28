@@ -123,8 +123,9 @@ export function StepControls(props: StepControlsProps) {
             Step {displayedStep} / {props.totalSteps}
           </span>
         </span>
+        {/* 44px tall like RangeField, so the whole row is a pointer target, not only the track. */}
         <input
-          className="w-full accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-45"
+          className="h-11 w-full cursor-pointer accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-45"
           type="range"
           min={0}
           max={Math.max(0, props.learningBlocked ? props.currentStepIndex : props.totalSteps - 1)}
