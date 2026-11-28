@@ -78,7 +78,7 @@ describe("learning panel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Skip question" }));
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     fireEvent.click(screen.getByRole("button", { name: "Jump to last step" }));
-    expect((screen.getByRole("button", { name: "Previous step" }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: "Prev step" }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: "Jump to first step" }) as HTMLButtonElement).disabled).toBe(false);
     const slider = screen.getByRole("slider") as HTMLInputElement;
     expect(slider.max).toBe(slider.value);
