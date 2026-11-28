@@ -13,7 +13,7 @@ updates:
         patterns:
           - "*"
     ignore:
-      # The project pins Node.js 22 (.nvmrc and engines), so keep its types on 22.
+      # The project pins Node.js 24 (.nvmrc and engines), so keep its types on 24.
       - dependency-name: "@types/node"
         update-types:
           - version-update:semver-major
