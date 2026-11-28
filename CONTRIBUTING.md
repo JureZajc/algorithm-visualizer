@@ -6,7 +6,7 @@ approach can be agreed first.
 
 ## Setup
 
-You need Python 3.12 or newer, [uv](https://docs.astral.sh/uv/), and Node.js 22
+You need Python 3.12 or newer, [uv](https://docs.astral.sh/uv/), and Node.js 24
 with npm, the version CI uses. From the repository root:
 
 ```bash

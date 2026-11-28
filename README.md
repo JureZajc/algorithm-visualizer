@@ -133,7 +133,7 @@ The sorting comparison mode requests the same input for each selected algorithm 
 
 - Python 3.12 or newer
 - [uv](https://docs.astral.sh/uv/)
-- Node.js with npm (CI currently uses Node.js 22)
+- Node.js with npm (CI currently uses Node.js 24)
 
 From the repository root, install the locked backend and frontend dependencies:
 
@@ -224,7 +224,7 @@ npm run test:e2e
 
 Playwright starts its own backend and a production build of the frontend on free ports, and stops both when it finishes. The run replaces `frontend/.next` with a build that points at that stopped backend, so run `npm run build` again before using `npm run start`; `next dev` is not affected.
 
-CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (22). A separate job runs the smoke tests. A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
+CI runs the same checks on pushes and pull requests to `master`: Ruff, mypy, and pytest for the backend, then ESLint, frontend tests, and a production build on the Node.js version pinned in `.nvmrc` (24). A separate job runs the smoke tests. A development workflow test fails if CI stops running a step of the local `check` command. Dependabot opens weekly update pull requests for the npm, uv, and GitHub Actions dependencies.
 
 ## Deployment
 
